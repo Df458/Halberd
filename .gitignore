@@ -1,0 +1,11 @@
+# Ignore vim undo files
+*.un~
+
+# Ignore object files
+obj
+
+# Ignore build-specific files
+./game
+./editor
+gmon.out
+perf.data
