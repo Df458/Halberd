@@ -59,27 +59,28 @@ static const uint8_t autotile_lookup[] =
     0b00000000,
 };
 
-void update_static(uint16_t x, uint16_t y, uint16_t z, uint8_t map_id)
+void update_static(uint16_t X, uint16_t Y, int16_t x, int16_t y, int16_t z)
 {
-    uint8_t tile = automaps[map_id].tile_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * z)];
+    get_true_tile_position(&X, &Y, &x, &y);
+    uint8_t tile = automaps[Y * 3 + X].tile_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * z)];
     if(tile == 0)
         return;
     uint8_t map = 0;
-    if(x > 0 && y > 0 && automaps[map_id].tile_data[(x - 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)]*/get_autotile(X, Y, x - 1, y - 1, z) == tile)
         map += 0b10000000;
-    if(y > 0 && automaps[map_id].tile_data[(x) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x, y - 1, z) == tile)
         map += 0b01000000;
-    if(x < TILEMAP_DIMS - 1 && automaps[map_id].tile_data[(x + 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y - 1, z) == tile)
         map += 0b00100000;
-    if(x < TILEMAP_DIMS - 1 && automaps[map_id].tile_data[(x + 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y, z) == tile)
         map += 0b00010000;
-    if(x < TILEMAP_DIMS - 1 && y < TILEMAP_DIMS + 1 && automaps[map_id].tile_data[(x + 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y + 1, z) == tile)
         map += 0b00001000;
-    if(y < TILEMAP_DIMS - 1 && automaps[map_id].tile_data[(x) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x, y + 1, z) == tile)
         map += 0b00000100;
-    if(x > 0 && y < TILEMAP_DIMS - 1 && automaps[map_id].tile_data[(x - 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x - 1, y + 1, z) == tile)
         map += 0b00000010;
-    if(x > 0 && automaps[map_id].tile_data[(x - 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile)
+    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x - 1, y, z) == tile)
         map += 0b00000001;
 
     int i;
@@ -91,7 +92,7 @@ void update_static(uint16_t x, uint16_t y, uint16_t z, uint8_t map_id)
         i = -1;
 
     // Place i on map
-    update_tile(x, y, z, i + 1, map_id);
+    update_tile(x, y, z, i + 1, Y * 3 + X);
 }
 
 void load_automap(const char* path, uint8_t map_id)
@@ -105,7 +106,7 @@ void load_automap(const char* path, uint8_t map_id)
     for(int i = 0; i < TILEMAP_DIMS; ++i) {
         for(int j = 0; j < TILEMAP_DIMS; ++j) {
             for(int k = 0; k < TILEMAP_LAYERS; ++k) {
-                update_static(j, i, k, map_id);
+                update_static(map_id % 3, map_id / 3, j, i, k);
             }
         }
     }
@@ -159,14 +160,23 @@ void save_automaps()
     }
 }
 
-void place_autotile(uint16_t x, uint16_t y, uint16_t z, uint8_t tile, uint8_t map_id)
+void place_autotile(uint16_t X, uint16_t Y, uint16_t x, uint16_t y, uint16_t z, uint8_t tile)
 {
-    automaps[map_id].tile_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * z)] = tile;
+    automaps[Y * 3 + X].tile_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * z)] = tile;
     int i,j;
     for(int i = y - 1; i <= y + 1; ++i) {
         for(int j = x - 1; j <= x + 1; ++j) {
-            if(i >= 0 && i < TILEMAP_DIMS && j >= 0 && j < TILEMAP_DIMS)
-                update_static(j, i, z, map_id);
+            update_static(X, Y, j, i, z);
         }
     }
+}
+
+uint8_t get_autotile(uint16_t X, uint16_t Y, int16_t x, int16_t y, uint16_t z)
+{
+    get_true_tile_position(&X, &Y, &x, &y);
+    if(z >= TILEMAP_LAYERS || z < 0)
+        return 0;
+    /*if(!automaps[Y * 3 + X].loaded)*/
+        /*return 0;*/
+    return automaps[Y * 3 + X].tile_data[x + (y*TILEMAP_DIMS) + (z*TILEMAP_DIMS*TILEMAP_DIMS)];
 }

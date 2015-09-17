@@ -52,6 +52,7 @@ int main(int argc, char** argv)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     init_graphics();
+    update_camera(800, 600);
     init_input(win);
     init_player(0, 0);
     init_ui();

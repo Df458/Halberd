@@ -184,10 +184,10 @@ int main(int argc, char** argv)
         if(can_place) {
             if(cursor_left_button) {
                 /*update_tile(cursor_x / 32, cursor_y / 32, 0, current_id + 1);*/
-                place_autotile(selected_tile_x, selected_tile_y, 0, 1, selected_map);
+                place_autotile(selected_map % 3, selected_map / 3, selected_tile_x, selected_tile_y, 0, 1);
             } else if(cursor_right_button) {
                 update_tile(selected_tile_x, selected_tile_y, 0, 0, selected_map);
-                place_autotile(selected_tile_x, selected_tile_y, 0, 0, selected_map);
+                place_autotile(selected_map % 3, selected_map / 3, selected_tile_x, selected_tile_y, 0, 0);
             }
         }
 
