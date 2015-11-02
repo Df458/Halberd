@@ -1,15 +1,19 @@
 #include "actor.h"
+#include "callbacks.h"
 #include "io.h"
 #include "map.h"
 #include "render_util.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
-actor** actor_list = 0;
+actor* actor_list = 0;
 uint32_t actor_count = 0;
 uint32_t available_count = 0;
 
-actor* create_actor(const char* path)
+actor create_actor(const char* path)
 {
     if(available_count <= actor_count) {
         available_count += 5;
@@ -21,7 +25,76 @@ actor* create_actor(const char* path)
     return actor_list[actor_count - 1];
 }
 
-void update_actor(actor* a, float delta)
+actor load_actor(const char* path)
+{
+    xmlDocPtr doc = xmlReadFile(path, NULL, 0);
+    if(!doc)
+        return 0;
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    for(; root; root = root->next)
+        if(root->type == XML_ELEMENT_NODE && !xmlStrcmp(root->name, (const xmlChar*)"actor"))
+            break;
+    if(!root)
+        return 0;
+    actor a_new = malloc(sizeof(actor));
+    a_new->data.grid_x = 0;
+    a_new->data.grid_y = 0;
+    a_new->data.super_grid_x = 0;
+    a_new->data.super_grid_y = 0;
+    a_new->data.flags = FLAG_VISIBLE + FLAG_LOCK_TO_GRID + FLAG_BLOCK_WITH_SOLID;
+    a_new->data.sprites = 0;
+    memset(a_new->callbacks, 0, CALLBACK_COUNT * sizeof(lua_State*));
+    a_new->data.speed = 0;
+    a_new->data.moving = 0;
+    a_new->data.orientation = 0;
+    a_new->data.animation_index = 0;
+    a_new->data.animation_playing = 0;
+    a_new->data.animation_timer = 0;
+
+    for(xmlNodePtr node = root->children; node; node = node->next) {
+        if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"position")) {
+            xmlChar* a = 0;
+            if((a = xmlGetProp(node, (const xmlChar*)"x"))) {
+                a_new->data.grid_x = atoi((char*)a);
+                free(a);
+            }
+            a = 0;
+            if((a = xmlGetProp(node, (const xmlChar*)"y"))) {
+                a_new->data.grid_y = atoi((char*)a);
+                free(a);
+            }
+        }
+        if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"display")) {
+            xmlChar* a = 0;
+            if((a = xmlGetProp(node, (const xmlChar*)"id"))) {
+                a_new->data.sprites = get_spriteset((char*)a);
+                free(a);
+            }
+        }
+        if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"callback")) {
+            build_actor_states(a_new, node);
+        }
+    }
+    xmlChar* a = 0;
+    if((a = xmlGetProp(root, (const xmlChar*)"solid"))) {
+        a_new->data.flags += strcmp((char*)a, "false") ? FLAG_SOLID : 0;
+        free(a);
+    }
+
+    if(a_new->data.sprites != 0) {
+        a_new->data.animation_index = 0;
+        a_new->data.animation_playing = a_new->data.sprites->animations[0].play;
+    }
+    a_new->data.position_x = a_new->data.grid_x * TILE_WIDTH;
+    a_new->data.position_y = a_new->data.grid_y * TILE_HEIGHT;
+
+    xmlFreeDoc(doc);
+    xmlCleanupParser();
+
+    return a_new;
+}
+
+void update_actor(actor a, float delta)
 {   
     if(!a)
         return;
@@ -115,7 +188,7 @@ void update_actor(actor* a, float delta)
     }
 }
 
-void actor_set_anim_index(actor* a, int8_t index)
+void actor_set_anim_index(actor a, int8_t index)
 {
     if(!a || a->data.animation_index == index)
         return;
@@ -133,7 +206,7 @@ void update_actors(float delta)
         update_actor(actor_list[i], delta);
 }
 
-void draw_actor(actor* a)
+void draw_actor(actor a)
 {
     if(!(a->data.flags & FLAG_VISIBLE))
         return;
@@ -153,7 +226,7 @@ void draw_actors()
     }
 }
 
-void destroy_actor(actor* a)
+void destroy_actor(actor a)
 {
     for(uint16_t i = 0; i < CALLBACK_COUNT; ++i)
         if(a->callbacks[i])
@@ -165,12 +238,13 @@ void destroy_actor(actor* a)
 
 void destroy_actors()
 {
+    fprintf(stderr, "Destroying %d actors...\n", actor_count);
     for(uint32_t i = 0; i < actor_count; ++i)
         destroy_actor(actor_list[i]);
     free(actor_list);
 }
 
-uint8_t can_move(actor* a)
+uint8_t can_move(actor a)
 {
     if(!(a->data.flags & FLAG_BLOCK_WITH_SOLID))
         return 1;
@@ -221,7 +295,7 @@ uint8_t can_move(actor* a)
     return get_solid(get_tile(next_super_x, next_super_y, next_x, next_y, 0));
 }
 
-void actor_callback(actor* a, uint8_t type, void* data)
+void actor_callback(actor a, uint8_t type, void* data)
 {
     // TODO: Use extra data passed in
     if(a->callbacks[type]) {
@@ -235,7 +309,7 @@ void actor_callback(actor* a, uint8_t type, void* data)
     }
 }
 
-void actor_operate(actor* a)
+void actor_operate(actor a)
 {
     uint16_t next_x = a->data.grid_x;
     uint16_t next_y = a->data.grid_y;
@@ -277,7 +351,7 @@ void actor_operate(actor* a)
     }
 }
 
-uint8_t actor_orients(actor* a)
+uint8_t actor_orients(actor a)
 {
     if(!(a->data.flags & FLAG_CAN_ORIENT))
         return 1;

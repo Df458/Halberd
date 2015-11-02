@@ -1,4 +1,5 @@
 #include "game_input.h"
+#include "stdio.h"
 
 // TODO: Allow multiple keys per action
 // TODO: Allow action modifiers
@@ -23,26 +24,32 @@ uint8_t cancel_state = 0;
 uint8_t menu_state = 0;
 uint8_t quit_state = 0;
 
+uint8_t y_input_prio = 0;
+
 void keyCodeCallback(GLFWwindow* window, int key_code, int scancode, int action, int mod)
 {
     // TODO: Better state management
-    if(key_code == up_key)
+    if(key_code == up_key) {
         up_state = action;
-    if(key_code == down_key)
+        y_input_prio = 1;
+    } else if(key_code == down_key) {
         down_state = action;
-    if(key_code == left_key)
+        y_input_prio = 1;
+    } else if(key_code == left_key) {
         left_state = action;
-    if(key_code == right_key)
+        y_input_prio = 0;
+    } else if(key_code == right_key) {
         right_state = action;
-    if(key_code == action_key && action == GLFW_PRESS)
+        y_input_prio = 0;
+    } else if(key_code == action_key && action == GLFW_PRESS)
         action_state = action;
-    if(key_code == confirm_key && action == GLFW_PRESS)
+    else if(key_code == confirm_key && action == GLFW_PRESS)
         confirm_state = action;
-    if(key_code == cancel_key && action == GLFW_PRESS)
+    else if(key_code == cancel_key && action == GLFW_PRESS)
         cancel_state = action;
-    if(key_code == menu_key)
+    else if(key_code == menu_key)
         menu_state = action;
-    if(key_code == quit_key)
+    else if(key_code == quit_key)
         quit_state = action;
 }
 
@@ -79,9 +86,12 @@ uint8_t get_directional_input()
         ++y;
 
     if (x && y) {
-        x = 0;
-        y = 0;
-    } else if(x) {
+        if(y_input_prio)
+            x = 0;
+        else
+            y = 0;
+    }
+    if(x) {
         return x > 0 ? 2 : 1;
     } else if(y) {
         return y > 0 ? 4 : 3;

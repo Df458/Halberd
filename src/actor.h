@@ -60,24 +60,27 @@ struct actordata
     spriteset* sprites;
 };
 
-typedef struct actor
+typedef struct Actor
 {
     struct actordata data;
     lua_State* callbacks[CALLBACK_COUNT];
-} actor;
+} Actor;
 
-actor* create_actor(const char* path);
-void update_actor(actor* a, float delta);
+typedef struct Actor* actor;
+
+actor create_actor(const char* path);
+void update_actor(actor a, float delta);
 void update_actors(float delta);
-void draw_actor(actor* a);
+actor load_actor(const char* path);
+void draw_actor(actor a);
 void draw_actors();
-void destroy_actor(actor* a);
+void destroy_actor(actor a);
 void destroy_actors();
-uint8_t can_move(actor* a);
-void actor_set_anim_index(actor* a, int8_t index);
-void actor_callback(actor* a, uint8_t type, void* data);
-void actor_operate(actor* a);
-uint8_t actor_orients(actor* a);
+uint8_t can_move(actor a);
+void actor_set_anim_index(actor a, int8_t index);
+void actor_callback(actor a, uint8_t type, void* data);
+void actor_operate(actor a);
+uint8_t actor_orients(actor a);
 void move_actor_maps(int16_t x, int16_t y);
 
 #endif

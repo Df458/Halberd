@@ -1,12 +1,12 @@
 PKGCONFIG=pkg-config
 OS=GNU/Linux
 CC=gcc
-CFLAGS=-Isrc -Iincl -O3 -pipe -g -pg -Wall -Wno-unused-variable -Werror `$(PKGCONFIG) --cflags glew glfw3 libpng libxml-2.0 lua`
+CFLAGS=-Isrc -Iincl -O3 -pipe -g -pg -Wall -Wno-unused-variable -Werror `$(PKGCONFIG) --cflags glew glfw3 libpng libxml-2.0 lua gtk+-3.0`
 WINFLAGS=-m32 -Wl,-subsystem,windows -static-libgcc -DWINDOWS
 LINUXFLAGS=
 CLIBS=
-WINLIBS=`$(PKGCONFIG) --libs glew ` -Wl,-Bstatic `$(PKGCONFIG) --static --libs gl glfw3 libpng libxml-2.0 lua`
-LINUXLIBS=`$(PKGCONFIG) --libs --static glew glfw3 libpng libxml-2.0 lua`
+WINLIBS=`$(PKGCONFIG) --libs glew ` -Wl,-Bstatic `$(PKGCONFIG) --static --libs gl glfw3 libpng libxml-2.0 lua gtk+-3.0`
+LINUXLIBS=`$(PKGCONFIG) --libs --static glew glfw3 libpng libxml-2.0 lua gtk+-3.0`
 SRCPATH=src/
 OBJPATH=obj/
 
@@ -43,7 +43,7 @@ $(OBJPATH)%.depend: $(SRCPATH)%.c
 
 $(OBJPATH)%.o: $(SRCPATH)%.c
 	@echo -e "Building \e[1;35m$<\e[0m..."
-	@$(CC) -c $< -o $@ $(CFLAGS) $(OSFLAGS)
+	$(CC) -c $< -o $@ $(CFLAGS) $(OSFLAGS)
 
 
 all: editor game

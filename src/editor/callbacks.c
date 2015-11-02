@@ -1,7 +1,7 @@
 #include "callbacks.h"
 #include "actor.h"
 
-void build_actor_states(actor* a, xmlNodePtr node)
+void build_actor_states(actor a, xmlNodePtr node)
 {
 }
 

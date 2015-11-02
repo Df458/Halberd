@@ -66,21 +66,21 @@ void update_static(uint16_t X, uint16_t Y, int16_t x, int16_t y, int16_t z)
     if(tile == 0)
         return;
     uint8_t map = 0;
-    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)]*/get_autotile(X, Y, x - 1, y - 1, z) == tile)
+    if(get_autotile(X, Y, x - 1, y - 1, z) == tile)
         map += 0b10000000;
-    if(/*automaps[Y * 3 + X].tile_data[(x) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x, y - 1, z) == tile)
+    if(get_autotile(X, Y, x, y - 1, z) == tile)
         map += 0b01000000;
-    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y - 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y - 1, z) == tile)
+    if(get_autotile(X, Y, x + 1, y - 1, z) == tile)
         map += 0b00100000;
-    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y, z) == tile)
+    if(get_autotile(X, Y, x + 1, y, z) == tile)
         map += 0b00010000;
-    if(/*automaps[Y * 3 + X].tile_data[(x + 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x + 1, y + 1, z) == tile)
+    if(get_autotile(X, Y, x + 1, y + 1, z) == tile)
         map += 0b00001000;
-    if(/*automaps[Y * 3 + X].tile_data[(x) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x, y + 1, z) == tile)
+    if(get_autotile(X, Y, x, y + 1, z) == tile)
         map += 0b00000100;
-    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y + 1)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x - 1, y + 1, z) == tile)
+    if(get_autotile(X, Y, x - 1, y + 1, z) == tile)
         map += 0b00000010;
-    if(/*automaps[Y * 3 + X].tile_data[(x - 1) + (TILEMAP_DIMS * (y)) + (TILEMAP_DIMS * z)] == tile*/get_autotile(X, Y, x - 1, y, z) == tile)
+    if(get_autotile(X, Y, x - 1, y, z) == tile)
         map += 0b00000001;
 
     int i;
@@ -103,13 +103,13 @@ void load_automap(const char* path, uint8_t map_id)
     for(i = 0; i < TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS; ++i) {
         automaps[map_id].tile_data[i] = data[i];
     }
-    for(int i = 0; i < TILEMAP_DIMS; ++i) {
-        for(int j = 0; j < TILEMAP_DIMS; ++j) {
-            for(int k = 0; k < TILEMAP_LAYERS; ++k) {
-                update_static(map_id % 3, map_id / 3, j, i, k);
-            }
-        }
-    }
+    /*for(int i = 0; i < TILEMAP_DIMS; ++i) {*/
+        /*for(int j = 0; j < TILEMAP_DIMS; ++j) {*/
+            /*for(int k = 0; k < TILEMAP_LAYERS; ++k) {*/
+                /*update_static(map_id % 3, map_id / 3, j, i, k);*/
+            /*}*/
+        /*}*/
+    /*}*/
 }
 
 void clear_automaps()

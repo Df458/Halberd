@@ -10,11 +10,36 @@ void _error(const char* file, unsigned line, char* const message);
 #define warn(message) _warn(__FILE__, __LINE__, message)
 #define error(message) _error(__FILE__, __LINE__, message)
 #define error_code() _error(__FILE__, __LINE__, strerror(errno))
+#define nulltest(ptr) if(!ptr) _error(__FILE__, __LINE__, "Recieved unexpected null pointer")
 
 unsigned char* loadFileContents(const char* const filepath);
 void getPath(char* buf);
 
 #define DEGTORAD 0.01745329251
 #define RADTODEG 57.2957795131
+
+static const int8_t surround_x_table[] =
+{
+    -1,
+     0,
+     1,
+    -1,
+     1,
+    -1,
+     0,
+     1
+};
+
+static const int8_t surround_y_table[] =
+{
+    -1,
+    -1,
+    -1,
+     0,
+     0,
+     1,
+     1,
+     1
+};
 
 #endif
