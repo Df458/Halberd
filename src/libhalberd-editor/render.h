@@ -46,6 +46,8 @@ static const char* GRID_FRAGMENT_SHADER[] =
 //"discard;\n"
 "}"};
 
+uint8_t init_render();
+void destroy_render();
 uint8_t init_grid();
 void draw_grid(mat4 transform);
 #endif

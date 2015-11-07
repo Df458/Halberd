@@ -1,7 +1,9 @@
 #include "render.h"
 #include "render_util.h"
+#include "util.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <stdio.h>
 
 GLuint grid_program = 0;
 GLuint grid_position_attrib = 0;
@@ -15,6 +17,41 @@ GLuint grid_dash_texture = 0;
 GLuint grid_buffer = 0;
 GLuint grid_horiz_buffer = 0;
 GLuint grid_position_buffer = 0;
+
+uint8_t init_render()
+{
+    glewExperimental = 1;
+    if(glewInit() != GLEW_OK) {
+        error("glewInit() failed.");
+        return 0;
+    }
+    glGetError(); // Because GLEW is silly. <http://stackoverflow.com/questions/20034615/why-does-glewinit-result-in-gl-invalid-enum-after-making-some-calls-to-glfwwin>
+    GLuint VAO; // FIXME: Stupid Hack. <http://stackoverflow.com/questions/13403807/glvertexattribpointer-raising-gl-invalid-operation>
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_CULL_FACE);
+
+    // TODO: Re-enable these
+    /*init_graphics();*/
+    /*init_grid();*/
+
+    /*init_automaps();*/
+    /*load_maps("test");*/
+    /*load_automaps("test");*/
+    /*color col = {1,1,1,1};*/
+    /*set_id = get_tileset_id("Plains.png");*/
+}
+
+void destroy_render()
+{
+    // TODO: Re-enable these
+    /*destroy_maps();*/
+    /*destroy_graphics();*/
+    fprintf(stderr, "Exiting gracefully...\n");
+}
 
 uint8_t init_grid()
 {

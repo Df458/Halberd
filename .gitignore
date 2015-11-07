@@ -1,11 +1,13 @@
-# Ignore vim undo files
+# Ignore vim files
 *.un~
+*.swp
 
 # Ignore object files
 obj
 
 # Ignore build-specific files
-./game
-./editor
+./halberd-editor
+./halberd-game
 gmon.out
 perf.data
+lib
