@@ -1,7 +1,7 @@
 #include "render_util.h"
 #include "io.h"
 #include "ui.h"
-#include "game_input.h"
+#include "controls.h"
 #include <stdlib.h>
 #include <string.h>
 

@@ -31,5 +31,21 @@ namespace Game {
         TICK,
         OPERATED,
     }
+
+    [CCode (cheader_filename = "map.h")]
+    namespace Maps {
+        [CCode (cname = "init_maps")]
+        void init();
+        [CCode (cname = "load_maps")]
+        void load(string filepath);
+    }
+
+    [CCode (cheader_filename = "settings.h")]
+    namespace Settings {
+        [CCode (cname = "init_settings")]
+        void init();
+        [CCode (cname = "cleanup_settings")]
+        void cleanup();
+    }
 }
 }

@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "actor.h"
+#include "actor-manager.h"
 
 void init_player();
 void update_player(float delta);

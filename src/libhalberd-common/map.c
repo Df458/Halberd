@@ -6,10 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-tilemap maps[9];
-int32_t central_pos_x = 1;
-int32_t central_pos_y = 1;
+tilemap maps[9]; int32_t central_pos_x = 1; int32_t central_pos_y = 1;
 const char* mapname = "test";
 
 void init_maps()
@@ -240,6 +237,4 @@ void move_maps(int16_t x, int16_t y)
                 free(filename);
             }
         }
-
-    move_actor_maps(x, y);
 }

@@ -1,4 +1,5 @@
-#include "render.h"
+#include "cursor.h"
+#include "editor-render.h"
 #include "render_util.h"
 #include "util.h"
 #include <GL/glew.h>
@@ -17,13 +18,15 @@ GLuint grid_dash_texture = 0;
 GLuint grid_buffer = 0;
 GLuint grid_horiz_buffer = 0;
 GLuint grid_position_buffer = 0;
+uint8_t set_id = 0;
+uint32_t current_id = 0;
 
-uint8_t init_render()
+bool init_render()
 {
     glewExperimental = 1;
     if(glewInit() != GLEW_OK) {
         error("glewInit() failed.");
-        return 0;
+        return false;
     }
     glGetError(); // Because GLEW is silly. <http://stackoverflow.com/questions/20034615/why-does-glewinit-result-in-gl-invalid-enum-after-making-some-calls-to-glfwwin>
     GLuint VAO; // FIXME: Stupid Hack. <http://stackoverflow.com/questions/13403807/glvertexattribpointer-raising-gl-invalid-operation>
@@ -34,26 +37,58 @@ uint8_t init_render()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_CULL_FACE);
 
-    // TODO: Re-enable these
-    /*init_graphics();*/
-    /*init_grid();*/
+    init_graphics();
+    if(!init_grid())
+        return false;
 
-    /*init_automaps();*/
-    /*load_maps("test");*/
-    /*load_automaps("test");*/
     /*color col = {1,1,1,1};*/
-    /*set_id = get_tileset_id("Plains.png");*/
+    // TODO: Move this somewhere
+    set_id = get_tileset_id("Plains.png");
+    return true;
+}
+
+bool render_editor()
+{
+    cursor c = cursor_get();
+    map_view v = view_get();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    update_view(v.x, v.y, v.zoom);
+    /*update_cursor_data(&selected_map, &selected_tile_x, &selected_tile_y);*/
+    uint8_t can_place = cursor_in_bounds(c.selected_tile_x, c.selected_tile_y);
+
+    mat4 t = ident;
+    mat4 cursor_pos = ident;
+    uint16_t tile_w = (TILE_WIDTH * v.zoom);
+    uint16_t tile_h = (TILE_HEIGHT * v.zoom);
+    if(tile_w == 0)
+        tile_w = 1;
+    if(tile_h == 0)
+        tile_h = 1;
+    translate(&cursor_pos, c.selected_tile_x * TILE_WIDTH + (c.selected_map % 3 * TILEMAP_DIMS * TILE_WIDTH), c.selected_tile_y * TILE_HEIGHT + (c.selected_map / 3 * TILEMAP_DIMS * TILE_HEIGHT), 0);
+    draw_maps(t);
+    if(can_place) {
+        draw_single_tile(set_id, current_id + 1, cursor_pos);
+    }
+    for(int i = 0; i < 3; ++i)
+        for(int j = 0; j < 3; ++j) {
+            translate(&t, TILEMAP_DIMS * TILE_WIDTH * i, TILEMAP_DIMS * TILE_HEIGHT * j, 0);
+            draw_grid(t);
+        }
+    
+    glFlush();
+
+    return true;
 }
 
 void destroy_render()
 {
     // TODO: Re-enable these
     /*destroy_maps();*/
-    /*destroy_graphics();*/
+    destroy_graphics();
     fprintf(stderr, "Exiting gracefully...\n");
 }
 
-uint8_t init_grid()
+bool init_grid()
 {
     create_program(&grid_program, GRID_VERTEX_SHADER, GRID_FRAGMENT_SHADER);
     grid_position_attrib = glGetAttribLocation(grid_program, "position");
@@ -63,13 +98,13 @@ uint8_t init_grid()
     grid_texture_uniform = glGetUniformLocation(grid_program, "texture");
     grid_color_uniform = glGetUniformLocation(grid_program, "color");
     if(checkGLError())
-        return 0;
+        return false;
 
     glGenBuffers(1, &grid_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, grid_buffer);
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), GRID_BUFFER_DATA, GL_STATIC_DRAW);
     if(checkGLError())
-        return 0;
+        return false;
 
     float position_buffer_data[TILEMAP_DIMS * 6];
     GLuint horiz_buffer_data[TILEMAP_DIMS * 2];
@@ -92,14 +127,14 @@ uint8_t init_grid()
     glBindBuffer(GL_ARRAY_BUFFER, grid_position_buffer);
 	glBufferData(GL_ARRAY_BUFFER, 6 * TILEMAP_DIMS * sizeof(float), position_buffer_data, GL_STATIC_DRAW);
     if(checkGLError())
-        return 0;
+        return false;
 
 
     glGenBuffers(1, &grid_horiz_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, grid_horiz_buffer);
 	glBufferData(GL_ARRAY_BUFFER, 2 * TILEMAP_DIMS * sizeof(GLuint), horiz_buffer_data, GL_STATIC_DRAW);
     if(checkGLError())
-        return 0;
+        return false;
 
     glGenTextures(1, &grid_dash_texture);
     glBindTexture(GL_TEXTURE_2D, grid_dash_texture);
@@ -108,9 +143,9 @@ uint8_t init_grid()
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 5, 0, GL_RGBA, GL_UNSIGNED_BYTE, GRID_TEXTURE_BUFFER_DATA);
     if(checkGLError())
-        return 0;
+        return false;
 
-    return 1;
+    return true;
 }
 
 void draw_grid(mat4 transform)
@@ -153,4 +188,10 @@ void draw_grid(mat4 transform)
     glVertexAttribDivisor(grid_position_attrib, 0);
     glVertexAttribDivisor(grid_horizontal_attrib, 0);
 
+}
+
+void size_callback(int width, int height)
+{
+    glViewport(0, 0, width, height);
+    update_camera(width, height);
 }

@@ -1,4 +1,4 @@
-#include "actor.h"
+#include "actor-manager.h"
 #include "callbacks.h"
 #include "io.h"
 #include "map.h"

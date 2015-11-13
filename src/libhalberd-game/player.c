@@ -1,6 +1,5 @@
 #include "player.h"
-#include "actor.h"
-#include "game_input.h"
+#include "controls.h"
 #include "io.h"
 #include "render_util.h"
 
@@ -50,6 +49,7 @@ void update_player(float delta)
     update_actor(player, delta);
     if(player->data.super_grid_x != 1 || player->data.super_grid_y != 1) {
         move_maps(1 - player->data.super_grid_x, 1 - player->data.super_grid_y);
+        move_actor_maps(1 - player->data.super_grid_x, 1 - player->data.super_grid_y);
         player->data.super_grid_x = 1;
         player->data.super_grid_y = 1;
     }

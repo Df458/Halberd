@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "color.h"
+#include "controls.h"
 #include "game_input.h"
 #include "io.h"
 #include "player.h"
@@ -76,7 +77,7 @@ int main(int argc, char** argv)
             update_player(delta);
         update_actors(delta);
         update_ui(delta);
-        update_input();
+        update_input_states();
 
         mat4 t = ident;
         draw_maps(t);

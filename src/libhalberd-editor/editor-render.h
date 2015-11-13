@@ -2,6 +2,7 @@
 #define RENDER_H
 #include "map.h"
 #include "matrix.h"
+#include <stdbool.h>
 
 static const float GRID_BUFFER_DATA[] =
 {
@@ -46,8 +47,10 @@ static const char* GRID_FRAGMENT_SHADER[] =
 //"discard;\n"
 "}"};
 
-uint8_t init_render();
+bool init_render();
+bool render_editor();
 void destroy_render();
-uint8_t init_grid();
+bool init_grid();
 void draw_grid(mat4 transform);
+void size_callback(int width, int height);
 #endif
