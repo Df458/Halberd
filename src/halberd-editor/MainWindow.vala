@@ -22,6 +22,7 @@ public class MainWindow: Window
 
     private Gtk.Button button_new;
     private Gtk.Button button_open;
+    private Gtk.Button button_save;
     private Gtk.Button button_draw;
     private Gtk.Button button_fill;
     private Gtk.Button button_erase;
@@ -124,7 +125,11 @@ public class MainWindow: Window
         });
 
         button_new = new Gtk.Button.from_icon_name("document-new-symbolic", IconSize.LARGE_TOOLBAR);
+        button_new.sensitive = false;
         button_open = new Gtk.Button.from_icon_name("document-open-symbolic", IconSize.LARGE_TOOLBAR);
+        button_open.sensitive = false;
+        button_save = new Gtk.Button.from_icon_name("document-save-symbolic", IconSize.LARGE_TOOLBAR);
+        button_save.clicked.connect(() => { Editor.Automaps.save(); Game.Maps.save(); });
         button_draw = new Gtk.Button.from_icon_name("insert-object-symbolic", IconSize.LARGE_TOOLBAR);
         button_draw.clicked.connect(() => { current_tool = Tool.DRAW; });
         button_fill = new Gtk.Button.from_icon_name("zoom-fit-best-symbolic", IconSize.LARGE_TOOLBAR);
@@ -134,6 +139,7 @@ public class MainWindow: Window
 
         toolbar.pack_start(button_new);
         toolbar.pack_start(button_open);
+        toolbar.pack_start(button_save);
         toolbar.pack_start(button_draw);
         toolbar.pack_start(button_fill);
         toolbar.pack_start(button_erase);

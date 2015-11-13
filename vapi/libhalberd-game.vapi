@@ -38,6 +38,8 @@ namespace Game {
         void init();
         [CCode (cname = "load_maps")]
         void load(string filepath);
+        [CCode (cname = "save_maps")]
+        void save();
     }
 
     [CCode (cheader_filename = "settings.h")]
