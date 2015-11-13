@@ -17,7 +17,7 @@ void stack_push(stack* s, void* data)
 {
     nulltest(s);
     struct stack_node* node = malloc(sizeof(struct stack_node));
-    node->next_node = s->bottom_node;
+    node->next_node = s->top_node;
     s->top_node = node;
     if(!s->bottom_node)
         s->bottom_node = node;
