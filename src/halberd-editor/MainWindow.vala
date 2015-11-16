@@ -28,6 +28,7 @@ public class MainWindow: Window
     private Gtk.Button button_erase;
 
     private bool dragging_map = false;
+    private bool drag_wrap = false;
     private bool dragging_line = false;
     private Tool current_tool = Tool.DRAW;
 
@@ -50,14 +51,17 @@ public class MainWindow: Window
         viewport.has_depth_buffer = true;
         viewport.auto_render = true;
         viewport.set_required_version(3, 3);
-        viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK);
+        viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
         viewport.resize.connect((w, h) => {
             Editor.size_callback(w, h);
         });
         viewport.motion_notify_event.connect((event) => {
-            if(dragging_map)
-                Editor.Cursor.drag_map((int)event.x, (int)event.y);
-            else if(dragging_line) {
+            if(dragging_map) {
+                if(drag_wrap)
+                    drag_wrap = false;
+                else
+                    Editor.Cursor.drag_map((int)event.x, (int)event.y);
+            } else if(dragging_line) {
                 if(current_tool == Tool.DRAW)
                     Editor.Cursor.place_line(1, (int)event.x, (int)event.y);
                 else if(current_tool == Tool.ERASE)
@@ -121,6 +125,28 @@ public class MainWindow: Window
                 Editor.Cursor.zoom(-y);
                 viewport.queue_draw();
             }
+            return false;
+        });
+        viewport.leave_notify_event.connect((event) => {
+            if(!dragging_map)
+                return false;
+            int w, h, wx, wy;
+            int dx = (int)event.x_root;
+            int dy = (int)event.y_root;
+            event.window.get_origin(out wx, out wy);
+            event.window.get_geometry(null, null, out w, out h);
+            if(event.x > (double)w) {
+                dx -= w;
+            } else if(event.x < 0) {
+                dx += w;
+            }
+            if(event.y > (double)h) {
+                dy -= h;
+            } else if(event.y < 0) {
+                dy += h;
+            }
+            event.get_device().warp(event.window.get_screen(), dx, dy);
+            drag_wrap = true;
             return false;
         });
 
