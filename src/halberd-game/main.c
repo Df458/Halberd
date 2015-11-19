@@ -5,6 +5,7 @@
 #include "color.h"
 #include "controls.h"
 #include "game_input.h"
+#include "game-render.h"
 #include "io.h"
 #include "player.h"
 #include "render_util.h"
@@ -71,20 +72,13 @@ int main(int argc, char** argv)
         glfwSetTime(0);
         glfwPollEvents();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         if(!ui_present())
             update_player(delta);
         update_actors(delta);
         update_ui(delta);
         update_input_states();
 
-        mat4 t = ident;
-        draw_maps(t);
-
-        draw_player();
-        draw_actors();
-        draw_ui();
+        render_game();
 
         glfwSwapBuffers(win);
     } while(!get_quit_input());

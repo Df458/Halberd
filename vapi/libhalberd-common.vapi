@@ -1,4 +1,4 @@
-[CCode (cheader_filename = "stack.h")]
+[CCode (cheader_filename = "stack.h", cheader_filename = "matrix.h")]
 namespace Halberd {
     [CCode (cname="stack", free_function="stack_destroy")]
     [Compact]
@@ -12,4 +12,13 @@ namespace Halberd {
         [CCode (cname="stack_pop")]
         public void* pop(ushort clean);
     }
+
+    [CCode (cname="mat4", destroy_function="", default_value="ident", has_type_id=false)]
+    [SimpleType]
+    public struct Mat4 {
+        float data[16];
+    }
+
+    [CCode (cname="ident")]
+    const Mat4 Ident;
 }

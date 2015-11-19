@@ -1,8 +1,9 @@
 #ifndef UI_H
 #define UI_H
 #include <inttypes.h>
+#include <stdbool.h>
 
-uint8_t init_ui();
+bool init_ui();
 void update_ui(float dt);
 void draw_ui();
 void add_message(const char* message);

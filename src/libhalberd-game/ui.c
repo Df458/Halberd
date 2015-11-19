@@ -9,10 +9,10 @@ message_link* current_link = 0;
 message_link* final_link = 0;
 font* default_font = 0;
 
-uint8_t init_ui()
+bool init_ui()
 {
     if(!(default_font = load_font("Testfont.png")));
-        return 0;
+        return false;
 }
 
 void update_ui(float dt)
