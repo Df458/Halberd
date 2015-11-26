@@ -192,9 +192,10 @@ uint8_t init_graphics(void)
     if(checkGLError())
         return 0;
 
-    loaded_boxes = load_boxes("boxes.xml", &boxes);
-    if(loaded_boxes == -1)
-        return 0;
+    // TODO: Move this to a separate box loading bit, maybe in game?
+    /*loaded_boxes = load_boxes("boxes.xml", &boxes);*/
+    /*if(loaded_boxes == -1)*/
+        /*return 0;*/
 
     glGenBuffers(1, &quad_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);

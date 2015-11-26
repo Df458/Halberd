@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 tilemap maps[9]; int32_t central_pos_x = 1; int32_t central_pos_y = 1;
-const char* mapname = "test";
+char* mapname = "";
 
 void init_maps()
 {

@@ -1,4 +1,4 @@
-HalberdEditor app;
+static HalberdEditor app;
 
 public static int main (string[] args)
 {

@@ -20,6 +20,8 @@ public class MainWindow : Window
     private Gtk.Button button_fill;
     private Gtk.Button button_erase;
 
+    //private Gtk.FileChooserDialog dialog_open;
+
     private Gtk.ToggleButton button_play;
 
     public MainWindow()

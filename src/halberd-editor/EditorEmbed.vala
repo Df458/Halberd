@@ -31,8 +31,6 @@ public class EditorEmbed : EmbeddableView
         viewport.make_current();
         Editor.init_render();
         Editor.Automaps.init();
-        //Game.Maps.load("test");
-        //Editor.Automaps.load("test");
         editor_ready();
     }
 

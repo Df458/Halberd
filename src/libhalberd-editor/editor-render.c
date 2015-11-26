@@ -43,7 +43,7 @@ bool init_render()
 
     /*color col = {1,1,1,1};*/
     // TODO: Move this somewhere
-    set_id = get_tileset_id("Plains.png");
+    /*set_id = get_tileset_id("Plains.png");*/
     return true;
 }
 

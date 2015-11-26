@@ -1,4 +1,4 @@
-[CCode (cheader_filename = "editor-render.h")]
+[CCode (cheader_filename = "editor-render.h", cheader_filename = "project.h")]
 namespace Halberd {
 namespace Editor {
     [CCode (cname="init_render")]
@@ -9,6 +9,8 @@ namespace Editor {
     void cleanup_render();
     [CCode (cname="size_callback")]
     bool size_callback(int w, int h);
+    [CCode (cname="create_project")]
+    bool create_project(string path);
     [CCode (cheader_filename = "autotile.h")]
     namespace Automaps {
         [CCode (cname="init_automaps")]

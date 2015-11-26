@@ -150,6 +150,12 @@ $(COMMONTARGET): $(COMMONDEPS) $(COMMONSRCS) $(COMMONOBJS)
 	@echo -e "Build Complete"
 
 # Other rules
+settings: data/org.df458.halberd.gschema.xml
+	cp -f data/org.df458.halberd.gschema.xml /usr/share/glib-2.0/schemas
+	glib-compile-schemas /usr/share/glib-2.0/schemas
+
+install: settings
+
 .PHONY: clean
 clean:
 	@echo -e "\e[0;31mCleaning up...\e[0m"
