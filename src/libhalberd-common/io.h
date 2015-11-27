@@ -2,6 +2,8 @@
 #include "map.h"
 #include "render_util.h"
 
+void set_data_directory(const char* path);
+const char* get_data_directory();
 unsigned char* load_file(const char* filepath);
 GLuint load_image(const char* path, uint16_t* w, uint16_t* h);
 sprite make_sprite(const char* path);

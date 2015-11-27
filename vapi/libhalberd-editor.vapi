@@ -27,6 +27,8 @@ namespace Editor {
         void load(string filepath);
         [CCode (cname="save_automaps")]
         void save();
+        [CCode (cname="save_automaps_named")]
+        void save_as(string filepath);
     }
     [CCode (cheader_filename="cursor.h")]
     namespace Cursor {

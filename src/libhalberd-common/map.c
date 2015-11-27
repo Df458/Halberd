@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 tilemap maps[9]; int32_t central_pos_x = 1; int32_t central_pos_y = 1;
-char* mapname = "";
+char* mapname = 0;
 
 void init_maps()
 {
@@ -46,12 +46,16 @@ char* get_map_name(uint32_t x, uint32_t y, const char* ext)
 
 void set_map_name(const char* name)
 {
-    // TODO: SET NAME
+    if(mapname)
+        free(mapname);
+    mapname = strdup(name);
 }
 
 void load_maps(const char* name)
 {
-    mapname = name;
+    if(mapname)
+        free(mapname);
+    mapname = strdup(name);
     for(uint8_t i = 0; i < 9; ++i) {
         char* filename = get_map_name(i % 3, i / 3, "map");
         load_map(filename, &maps[i]);

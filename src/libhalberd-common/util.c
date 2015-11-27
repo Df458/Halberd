@@ -21,26 +21,6 @@ void _error(const char* file, unsigned line, char* const message)
     exit(1);
 }
 
-unsigned char* loadFileContents(const char* const filepath)
-{
-    FILE* file = fopen(filepath, "rb");
-    if(!file) {
-        fprintf(stderr, "%s not found\n", filepath);
-        error("Failed to load file: File not found.");
-        return NULL;
-    }
-
-    fseek(file, 0, SEEK_END);
-    size_t filesize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    unsigned char* filedata = calloc(filesize, sizeof(char));
-    fread(filedata, 1, filesize, file);
-    filedata[filesize - 1] = '\0';
-
-    fclose(file);
-    return filedata;
-}
-
 void get_path(char* buf)
 {
 #ifdef WINDOWS

@@ -6,15 +6,40 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-unsigned char* load_file(const char* filepath)
+char* data_directory = 0;
+
+void set_data_directory(const char* path)
 {
-    FILE* file = fopen(filepath, "rb");
+    if(data_directory)
+        free(data_directory);
+    data_directory = strdup(path);
+}
+
+const char* get_data_directory()
+{
+    return data_directory;
+}
+
+FILE* ex_fopen(const char* filepath, const char* mode)
+{
+    char* final_path = calloc(strlen(data_directory) + strlen(filepath) + 2, sizeof(char));
+    strcpy(final_path, data_directory);
+    strcat(final_path, "/");
+    strcat(final_path, filepath);
+    FILE* file = fopen(final_path, mode);
+    free(final_path);
     if(!file) {
-        fprintf(stderr, "%s not found\n", filepath);
+        fprintf(stderr, "%s not found\n", final_path);
         error("Failed to load file: File not found.");
         return NULL;
     }
 
+    return file;
+}
+
+unsigned char* load_file(const char* filepath)
+{
+    FILE* file = ex_fopen(filepath, "rb");
     fseek(file, 0, SEEK_END);
     size_t filesize = ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -215,7 +240,7 @@ uint8_t load_map(const char* path, tilemap* map)
 
 void save_map(const char* path, tilemap* map)
 {
-    FILE* file = fopen(path, "wb");
+    FILE* file = ex_fopen(path, "wb");
     if(!file)
         return NULL;
     // TODO: This is slow. Try something quicker.

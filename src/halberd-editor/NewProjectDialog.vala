@@ -26,8 +26,8 @@ public class NewProjectDialog {
         main_grid = new Grid();
         main_grid.margin_top = 12;
         main_grid.margin_bottom = 12;
-        main_grid.margin_left = 18;
-        main_grid.margin_right = 18;
+        main_grid.margin_start = 18;
+        main_grid.margin_end = 18;
         main_grid.set_row_spacing(6);
         main_grid.set_column_spacing(12);
 

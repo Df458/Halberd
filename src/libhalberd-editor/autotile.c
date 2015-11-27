@@ -97,7 +97,7 @@ void update_static(uint16_t X, uint16_t Y, int16_t x, int16_t y, int16_t z)
 
 void load_automap(const char* path, uint8_t map_id)
 {
-    unsigned char* data = loadFileContents(path);
+    unsigned char* data = load_file(path);
 
     int i;
     for(i = 0; i < TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS; ++i) {
@@ -139,7 +139,7 @@ void load_automaps(const char* name)
 
 void save_automap(const char* path, automap* map)
 {
-    FILE* file = fopen(path, "wb");
+    FILE* file = ex_fopen(path, "wb");
     if(!file)
         return NULL;
     // TODO: This is slow. Try something quicker.
@@ -159,6 +159,12 @@ void save_automaps()
         save_automap(filename, &automaps[i]);
         free(filename);
     }
+}
+
+void save_automaps_named(const char* name)
+{
+    set_map_name(name);
+    save_automaps();
 }
 
 void place_autotile(uint16_t X, uint16_t Y, uint16_t x, uint16_t y, uint16_t z, uint8_t tile)

@@ -1,3 +1,4 @@
+#include "io.h"
 #include "project.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +72,7 @@ bool load_project(const char* path)
     directory_path = calloc(strlen(path) - strlen(title_ptr), sizeof(char));
     strncpy(directory_path, path, strlen(path) - strlen(title_ptr));
     strncpy(project_name, title_ptr, strlen(title_ptr) - 4);
-    fprintf(stderr, "Load Path: %s\nLoad Name: %s\n", directory_path, project_name);
+    set_data_directory(directory_path);
 }
 
 const char* get_project_name()

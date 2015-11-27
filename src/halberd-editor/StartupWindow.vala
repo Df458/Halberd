@@ -54,8 +54,8 @@ public class StartupWindow : Window
 
         main_box.margin_top = 12;
         main_box.margin_bottom = 12;
-        main_box.margin_left = 18;
-        main_box.margin_right = 18;
+        main_box.margin_start = 18;
+        main_box.margin_end = 18;
         main_box.homogeneous = false;
 
         action_box.spacing = 6;

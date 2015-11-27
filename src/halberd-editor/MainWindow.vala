@@ -31,6 +31,8 @@ public class MainWindow : Window
     private Paned files_paned;
     private Box   toolbar_box;
 
+    string current_map_name = "";
+
     public MainWindow()
     {
         init_structure();
@@ -123,7 +125,15 @@ public class MainWindow : Window
         // FIXME: New button doesn't load the new project correctly
         button_new.clicked.connect(app.new_project);
         button_open.clicked.connect(app.load_dialog);
-        button_save.clicked.connect(() => { Editor.Automaps.save(); Game.Maps.save(); });
+        button_save.clicked.connect(() => {
+            if(current_map_name.length == 0) {
+                // TODO: Make the names selectable ahead of time
+                current_map_name = "Content/test";
+                Editor.Automaps.save_as(current_map_name);
+            } else
+                Editor.Automaps.save();
+            Game.Maps.save();
+        });
         button_play.toggled.connect(() => {
             if(button_play.active) {
                 current_embed = game;
