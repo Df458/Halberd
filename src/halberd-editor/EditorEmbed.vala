@@ -17,6 +17,7 @@ public class EditorEmbed : EmbeddableView
     private bool dragging_map = false;
     private bool drag_wrap = false;
     private bool dragging_line = false;
+    private bool first_run = true;
     public Tool current_tool = Tool.DRAW;
 
     private GLArea viewport;
@@ -29,9 +30,13 @@ public class EditorEmbed : EmbeddableView
     public void prepare()
     {
         viewport.make_current();
-        Editor.init_render();
-        Editor.Automaps.init();
+        if(first_run) {
+            Editor.init_render();
+            Editor.Automaps.init();
+        }
         editor_ready();
+        viewport.queue_draw();
+        first_run = false;
     }
 
     public signal void editor_ready();

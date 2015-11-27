@@ -1,13 +1,14 @@
-# Ignore vim files
+# Ignore temp/unnecessary files
 *.un~
 *.swp
+*.glade~
 
 # Ignore object files
 obj
 
 # Ignore build-specific files
-./halberd-editor
-./halberd-game
+/halberd-editor
+/halberd-game
 gmon.out
 perf.data
 lib

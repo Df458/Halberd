@@ -9,6 +9,9 @@
 
 #define PROJECT_FILE_VERSION "0.1.0"
 
+char* project_name;
+char* directory_path;
+
 bool create_project(const char* path)
 {
     // Check to see if the project directory exists already
@@ -59,4 +62,24 @@ bool create_project(const char* path)
     //       be looked into.
     free(content_path);
     free(project_path);
+}
+
+bool load_project(const char* path)
+{
+    const char* title_ptr = strrchr(path, '/') + 1;
+    project_name = calloc(strlen(title_ptr) - 4, sizeof(char));
+    directory_path = calloc(strlen(path) - strlen(title_ptr), sizeof(char));
+    strncpy(directory_path, path, strlen(path) - strlen(title_ptr));
+    strncpy(project_name, title_ptr, strlen(title_ptr) - 4);
+    fprintf(stderr, "Load Path: %s\nLoad Name: %s\n", directory_path, project_name);
+}
+
+const char* get_project_name()
+{
+    return project_name;
+}
+
+const char* get_project_path()
+{
+    return directory_path;
 }

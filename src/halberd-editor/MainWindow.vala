@@ -5,84 +5,125 @@ public class MainWindow : Window
 {
     public AccelGroup accel;
 
-    private HeaderBar toolbar;
+    private HeaderBar topbar;
 
     private EditorEmbed editor;
     private GameEmbed game;
     private EmbeddableView current_embed;
+    private GLArea viewport;
 
-    private Gtk.GLArea viewport;
+    // Top Buttons
+    private Button button_new;
+    private Button button_open;
+    private Button button_save;
+    private ToggleButton button_play;
+    private MenuButton button_menu;
 
-    private Gtk.Button button_new;
-    private Gtk.Button button_open;
-    private Gtk.Button button_save;
-    private Gtk.Button button_draw;
-    private Gtk.Button button_fill;
-    private Gtk.Button button_erase;
+    // Toolbar
+    private Separator tool_separator;
+    private Toolbar toolbar;
+    private ToolButton button_draw;
+    private ToolButton button_fill;
+    private ToolButton button_erase;
 
-    //private Gtk.FileChooserDialog dialog_open;
-
-    private Gtk.ToggleButton button_play;
+    // Containers
+    private Paned main_paned;
+    private Paned files_paned;
+    private Box   toolbar_box;
 
     public MainWindow()
     {
-        window_position = WindowPosition.CENTER;
-        set_default_size(1024, 768);
-        set_border_width(3);
+        init_structure();
+        init_content();
+        connect_signals();
+        this.show_all();
+    }
 
-        destroy.connect(on_exit);
+    public void reload()
+    {
+        topbar.subtitle = Editor.get_loaded_project_name();
+        // TODO: Reload the editor here
+    }
+
+    private void init_structure()
+    {
+        topbar = new HeaderBar();
+        main_paned = new Paned(Orientation.VERTICAL);
+        files_paned = new Paned(Orientation.HORIZONTAL);
+        toolbar_box = new Box(Orientation.HORIZONTAL, 0);
+        tool_separator = new Separator(Orientation.VERTICAL);
+        toolbar = new Toolbar();
+
+        this.window_position = WindowPosition.CENTER;
+        this.set_default_size(1024, 768);
         accel = new Gtk.AccelGroup();
-        add_accel_group(accel);
-        set_events(Gdk.EventMask.ALL_EVENTS_MASK);
+        this.add_accel_group(accel);
+        topbar.title = "Halberd RPG Engine";
+        topbar.subtitle = Editor.get_loaded_project_name();
+        topbar.show_close_button = true;
+        topbar.decoration_layout = "menu:close";
+        toolbar.orientation_changed(Orientation.VERTICAL);
+        toolbar.set_icon_size(IconSize.SMALL_TOOLBAR);
+        toolbar_box.set_homogeneous(false);
+        toolbar_box.set_spacing(0);
 
-        // Init. Structure
-        toolbar = new Gtk.HeaderBar();
-        toolbar.title = "Halberd RPG Engine";
-        toolbar.show_close_button = true;
-        toolbar.decoration_layout = "menu:close";
+        toolbar_box.pack_start(toolbar, false, false);
+        toolbar_box.pack_start(tool_separator, false, false);
+        main_paned.pack1(toolbar_box, true, false);
+        main_paned.pack2(files_paned, true, false);
+        this.add(main_paned);
+        this.set_titlebar(topbar);
+    }
 
-        // Init. Widgets
+    private void init_content()
+    {
         viewport = new GLArea();
         editor = new EditorEmbed(viewport);
         game = new GameEmbed(viewport);
-        current_embed = editor;
+        button_new  = new Button.from_icon_name("document-new-symbolic",  IconSize.SMALL_TOOLBAR);
+        button_open = new Button.from_icon_name("document-open-symbolic", IconSize.SMALL_TOOLBAR);
+        button_save = new Button.from_icon_name("document-save-symbolic", IconSize.SMALL_TOOLBAR);
+        button_play = new ToggleButton();
+        button_menu = new MenuButton();
 
+        button_draw = new ToggleToolButton();
+        button_fill = new ToggleToolButton();
+        button_erase = new ToggleToolButton();
+
+        button_play.set_image(new Gtk.Image.from_icon_name("media-playback-start-symbolic", IconSize.SMALL_TOOLBAR));
+        button_menu.set_image(new Gtk.Image.from_icon_name("emblem-system-symbolic", IconSize.SMALL_TOOLBAR));
+        button_menu.set_direction(ArrowType.DOWN);
+
+        button_draw.set_icon_name("insert-object-symbolic");
+        button_fill.set_icon_name("zoom-fit-best-symbolic");
+        button_erase.set_icon_name("edit-clear-all-symbolic");
+
+        current_embed = editor;
         viewport.has_depth_buffer = true;
         viewport.auto_render = true;
         viewport.can_focus = true;
         viewport.set_required_version(3, 3);
-        viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
-        viewport.realize.connect(editor.prepare);
-        viewport.button_press_event.connect((event) => { return current_embed.button_down(event); });
-        viewport.button_release_event.connect((event) => { return current_embed.button_up(event); });
-        viewport.key_press_event.connect((event) => { return current_embed.key_down(event); });
-        viewport.key_release_event.connect((event) => { return current_embed.key_up(event); });
-        viewport.leave_notify_event.connect((event) => { return current_embed.wrap_cursor(event); });
-        viewport.motion_notify_event.connect((event) => { return current_embed.move_cursor(event); });
-        viewport.render.connect(() => { return current_embed.render(); });
-        viewport.resize.connect((w, h) => { Editor.size_callback(w, h); });
-        viewport.scroll_event.connect((event) => { return current_embed.scroll_cursor(event);});
 
-        button_new = new Gtk.Button.from_icon_name("document-new-symbolic", IconSize.LARGE_TOOLBAR);
-        button_new.sensitive = false;
+        topbar.pack_start(button_new);
+        topbar.pack_start(button_open);
+        topbar.pack_start(button_save);
+        topbar.pack_end(button_menu);
+        topbar.pack_end(button_play);
+        toolbar_box.pack_start(viewport, true, true);
+        toolbar.insert(button_draw,  0);
+        toolbar.insert(button_erase, 1);
+        toolbar.insert(button_fill,  2);
+    }
 
-        button_open = new Gtk.Button.from_icon_name("document-open-symbolic", IconSize.LARGE_TOOLBAR);
-        button_open.sensitive = false;
+    private void connect_signals()
+    {
+        this.set_events(Gdk.EventMask.ALL_EVENTS_MASK);
+        this.destroy.connect(on_exit);
 
-        button_save = new Gtk.Button.from_icon_name("document-save-symbolic", IconSize.LARGE_TOOLBAR);
+        // FIXME: New button doesn't load the new project correctly
+        button_new.clicked.connect(app.new_project);
+        button_open.clicked.connect(app.load_dialog);
         button_save.clicked.connect(() => { Editor.Automaps.save(); Game.Maps.save(); });
-
-        button_draw = new Gtk.Button.from_icon_name("insert-object-symbolic", IconSize.LARGE_TOOLBAR);
-        button_draw.clicked.connect(() => { editor.current_tool = Tool.DRAW; });
-
-        button_fill = new Gtk.Button.from_icon_name("zoom-fit-best-symbolic", IconSize.LARGE_TOOLBAR);
-        button_fill.clicked.connect(() => { editor.current_tool = Tool.FILL; });
-
-        button_erase = new Gtk.Button.from_icon_name("edit-clear-all-symbolic", IconSize.LARGE_TOOLBAR);
-        button_erase.clicked.connect(() => { editor.current_tool = Tool.ERASE; });
-
-        button_play = new Gtk.ToggleButton();
-        button_play.set_image(new Gtk.Image.from_icon_name("media-playback-start-symbolic", IconSize.LARGE_TOOLBAR));
         button_play.toggled.connect(() => {
             if(button_play.active) {
                 current_embed = game;
@@ -95,22 +136,26 @@ public class MainWindow : Window
             this.show_all();
         });
 
-        toolbar.pack_start(button_new);
-        toolbar.pack_start(button_open);
-        toolbar.pack_start(button_save);
-        toolbar.pack_start(button_draw);
-        toolbar.pack_start(button_fill);
-        toolbar.pack_start(button_erase);
-        toolbar.pack_start(button_play);
+        button_draw.clicked.connect(() => { editor.current_tool = Tool.DRAW; });
+        button_erase.clicked.connect(() => { editor.current_tool = Tool.ERASE; });
+        button_fill.clicked.connect(() => { editor.current_tool = Tool.FILL; });
 
-        this.set_titlebar(toolbar);
-        this.add(viewport);
-        this.show_all();
+        viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
+        viewport.realize.connect(editor.prepare);
+        viewport.button_press_event.connect((event) => { return current_embed.button_down(event); });
+        viewport.button_release_event.connect((event) => { return current_embed.button_up(event); });
+        viewport.key_press_event.connect((event) => { return current_embed.key_down(event); });
+        viewport.key_release_event.connect((event) => { return current_embed.key_up(event); });
+        viewport.leave_notify_event.connect((event) => { return current_embed.wrap_cursor(event); });
+        viewport.motion_notify_event.connect((event) => { return current_embed.move_cursor(event); });
+        viewport.render.connect(() => { return current_embed.render(); });
+        viewport.resize.connect((w, h) => { Editor.size_callback(w, h); });
+        viewport.scroll_event.connect((event) => { return current_embed.scroll_cursor(event);});
     }
 
     private void on_exit()
     {
         Editor.cleanup_render();
-        Gtk.main_quit();
+        app.window_destroyed(this);
     }
 }

@@ -24,6 +24,8 @@ typedef struct tilemap
 void init_maps();
 void update_maps();
 void clear_maps();
+// TODO: Implement this
+void set_map_name(const char* name);
 char* get_map_name(uint32_t x, uint32_t y, const char* ext);
 void load_maps(const char* name);
 void update_tile(uint16_t x, uint16_t y, uint16_t z, uint32_t tile, uint8_t map_id);

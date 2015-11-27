@@ -1,0 +1,25 @@
+<schemalist>
+    <schema id="org.df458.halberd" path="/org/df458/halberd/" gettext-domain="halberd">
+        <key name="open-last" type="b">
+            <default>false</default>
+            <summary>Open last project on startup</summary>
+            <description>
+                Sets whether or not to open the last loaded project when the application starts.
+            </description>
+        </key>
+        <key name="project-dir" type="s">
+            <default>""</default>
+            <summary>The default directory to store projects</summary>
+            <description>
+                Sets the default directory that halberd uses to create and manage projects.
+            </description>
+        </key>
+        <key name="last-project" type="s">
+            <default>""</default>
+            <summary>The last open project</summary>
+            <description>
+                This is used to keep track of the last project that was open, so that it can be reloaded on startup.
+            </description>
+        </key>
+    </schema>
+</schemalist>

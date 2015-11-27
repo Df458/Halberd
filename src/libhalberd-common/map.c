@@ -44,6 +44,11 @@ char* get_map_name(uint32_t x, uint32_t y, const char* ext)
     return filename;
 }
 
+void set_map_name(const char* name)
+{
+    // TODO: SET NAME
+}
+
 void load_maps(const char* name)
 {
     mapname = name;

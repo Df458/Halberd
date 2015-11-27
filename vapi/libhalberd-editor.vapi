@@ -11,6 +11,12 @@ namespace Editor {
     bool size_callback(int w, int h);
     [CCode (cname="create_project")]
     bool create_project(string path);
+    [CCode (cname="load_project")]
+    bool load_project(string path);
+    [CCode (cname="get_project_name")]
+    unowned string? get_loaded_project_name();
+    [CCode (cname="get_project_path")]
+    unowned string? get_loaded_project_path();
     [CCode (cheader_filename = "autotile.h")]
     namespace Automaps {
         [CCode (cname="init_automaps")]

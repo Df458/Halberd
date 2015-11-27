@@ -127,6 +127,7 @@ void init_automaps()
 
 void load_automaps(const char* name)
 {
+    set_map_name(name);
     /*load_maps(name);*/
 
     for(uint8_t i = 0; i < 9; ++i) {

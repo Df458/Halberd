@@ -5,6 +5,7 @@ public class GameEmbed : EmbeddableView
 {
     private bool should_continue = true;
     private int64 time = 0;
+    private bool first_run = true;
 
     private int up_key      = Gdk.Key.Up;
     private int down_key    = Gdk.Key.Down;
@@ -29,7 +30,10 @@ public class GameEmbed : EmbeddableView
         Game.UI.init();
         Game.Settings.init();
         time = get_monotonic_time();
+        should_continue = true;
         Timeout.add(16, loop_step);
+        viewport.queue_draw();
+        first_run = false;
     }
 
     public override bool button_down(Gdk.EventButton event)

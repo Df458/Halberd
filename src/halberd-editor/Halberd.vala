@@ -24,7 +24,7 @@ class HalberdEditor : Gtk.Application
             // TODO: Check to make sure there is a last folder, yada yada
             load_project(last_path);
         } else {
-            startup_win = new StartupWindow();
+            startup_win = new StartupWindow(main_directory);
             current_win = startup_win;
         }
     }
@@ -60,39 +60,57 @@ class HalberdEditor : Gtk.Application
     {
         new_dialog = new NewProjectDialog(current_win, main_directory.get_path());
         new_dialog.response_selected.connect((cr, pa) => {
-            if(cr == true && pa != null & Halberd.Editor.create_project(pa)) {
-                load_project(pa);
+            if(cr == true && pa != null && Halberd.Editor.create_project(pa)) {
+                load_project(pa, true);
             }
+            new_dialog.destroy();
         });
         new_dialog.display();
     }
 
-    public void load_project(string project_path)
+    public void load_dialog()
     {
-        project_directory = File.new_for_path(project_path);
-        window = new MainWindow();
+        Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Load a project", current_win, Gtk.FileChooserAction.OPEN, "Cancel", Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.ACCEPT);
+        Gtk.FileFilter filter = new Gtk.FileFilter();
+        filter.add_pattern("*.hal");
+        filter.set_filter_name("Halberd Project Files");
+        fc.add_filter(filter);
+        fc.response.connect((r) => {
+            if(r == Gtk.ResponseType.ACCEPT) {
+                string path = fc.get_file().get_path();
+                load_project(path);
+            }
+            fc.destroy();
+        });
+        fc.run();
     }
 
+    public void load_project(string project_path, bool from_folder=false)
+    {
+        project_directory = File.new_for_path(project_path);
+        string full_path = project_path;
+        if(from_folder) {
+            full_path += "/" + project_directory.get_basename() + ".hal";
+        } else {
+            project_directory = project_directory.get_parent();
+        }
+        Gtk.RecentManager.get_default().add_item("file://" + full_path);
+        Halberd.Editor.load_project(full_path);
+        // TODO: Test version and prompt for upgrade
+        if(window == null)
+            window = new MainWindow();
+        else
+            window.reload();
+        current_win = window;
+        startup_win.destroy();
+    }
 
-    //private bool create_project(string path)
-    //{
-        ////project_directory = File.new_for_path(path);
-        ////if(!project_directory.query_exists()) {
-            ////try {
-                ////project_directory.make_directory();
-            ////} catch(Error err) {
-                ////display_warning("Error creating a new project: " + err.message + "\n");
-                ////return false;
-            ////}
-        ////} else {
-            ////display_warning("Error creating a new project: Project directory already exists\n");
-            ////return false;
-        ////}
-        //bool success = Halberd.Editor.create_project(path);
-
-        //// TODO: Init additional project dirs and files
-        //return true;
-    //}
+    public void window_destroyed(Gtk.Window win)
+    {
+        if(win == current_win) {
+            Gtk.main_quit();
+        }
+    }
 }
 
 public void display_warning(string format, ...)

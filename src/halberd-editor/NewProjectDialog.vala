@@ -103,6 +103,11 @@ public class NewProjectDialog {
         dialog.destroy();
     }
 
+    public void destroy()
+    {
+        dialog.destroy();
+    }
+
     public signal void response_selected(bool created, string? path = null);
 
 
