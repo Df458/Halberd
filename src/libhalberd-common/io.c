@@ -600,3 +600,81 @@ int16_t load_boxes(const char* path, ui_box** boxes)
         return -1;
     return count;
 }
+
+void read_quad_node(FILE* cursor, const fpos_t* start, struct quadtree_node* node)
+{
+    fprintf(stderr, "Reading node(%ld)\n", ftell(cursor));
+    uint32_t buffer[4];
+    fread(buffer, sizeof(uint32_t), 4, cursor);
+    for(int i = 0; i < 4; ++i) {
+        fprintf(stderr, "%d, ", buffer[i]);
+    }
+    fprintf(stderr, "\n");
+
+    for(int i = 0; i < 4; ++i) {
+        if(buffer[i] == 0) {
+            node->children[i] = 0;
+        } else {
+            node->children[i] = malloc(sizeof(struct quadtree_node));
+            fsetpos(cursor, start);
+            fseek(cursor, buffer[i], SEEK_CUR);
+            read_quad_node(cursor, start, node->children[i]);
+        }
+    }
+}
+
+// TODO: Write the position of leaf data
+void write_quad_node(FILE* cursor, const fpos_t* start, const struct quadtree_node* node, uint32_t* end_cursor)
+{
+    fprintf(stderr, "Writing node(%ld)\n", ftell(cursor));
+    uint32_t buffer[4] = { 0 };
+    if(node->children[0]) {
+        buffer[0] = *end_cursor;
+        *end_cursor += sizeof(uint32_t) * 4;
+    }
+    if(node->children[1]) {
+        buffer[1] = *end_cursor;
+        *end_cursor += sizeof(uint32_t) * 4;
+    }
+    if(node->children[2]) {
+        buffer[2] = *end_cursor;
+        *end_cursor += sizeof(uint32_t) * 4;
+    }
+    if(node->children[3]) {
+        buffer[3] = *end_cursor;
+        *end_cursor += sizeof(uint32_t) * 4;
+    }
+    fwrite(buffer, sizeof(uint32_t), 4, cursor);
+    for(int i = 0; i < 4; ++i) {
+        if(node->children[i]) {
+            fsetpos(cursor, start);
+            fseek(cursor, buffer[i], SEEK_CUR);
+            write_quad_node(cursor, start, node->children[i], end_cursor);
+        }
+    }
+}
+
+// TODO: write dims
+void write_quadtree(FILE* cursor, const quadtree* tree)
+{
+    // Write the tree depth
+    fprintf(stderr, "Depth: %d(4x%d)\n", tree->depth, sizeof(uint32_t));
+    fputc(tree->depth, cursor);
+    uint32_t end_cursor = ftell(cursor) + (sizeof(uint32_t) * 4) + 1;
+    fpos_t pos;
+    fgetpos(cursor, &pos);
+    write_quad_node(cursor, &pos, tree->root, &end_cursor);
+}
+
+// TODO: read dims
+void read_quadtree(FILE* cursor, quadtree* tree)
+{
+    tree = malloc(sizeof(quadtree));
+    tree->depth = fgetc(cursor);
+    fprintf(stderr, "Depth: %d\n", tree->depth);
+    tree->root = malloc(sizeof(struct quadtree_node));
+
+    fpos_t pos;
+    fgetpos(cursor, &pos);
+    read_quad_node(cursor, &pos, tree->root);
+}

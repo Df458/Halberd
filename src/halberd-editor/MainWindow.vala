@@ -26,10 +26,16 @@ public class MainWindow : Window
     private ToolButton button_fill;
     private ToolButton button_erase;
 
+    // Project Pane
+    //private Treeview project_tree_view;
+    //private Iconview project_icon_view;
+    //private Listview project_list_view;
+
     // Containers
     private Paned main_paned;
     private Paned files_paned;
     private Box   toolbar_box;
+    private Gtk.Stack view_stack;
 
     string current_map_name = "";
 
@@ -55,6 +61,7 @@ public class MainWindow : Window
         toolbar_box = new Box(Orientation.HORIZONTAL, 0);
         tool_separator = new Separator(Orientation.VERTICAL);
         toolbar = new Toolbar();
+        view_stack = new Gtk.Stack();
 
         this.window_position = WindowPosition.CENTER;
         this.set_default_size(1024, 768);
@@ -71,7 +78,8 @@ public class MainWindow : Window
 
         toolbar_box.pack_start(toolbar, false, false);
         toolbar_box.pack_start(tool_separator, false, false);
-        main_paned.pack1(toolbar_box, true, false);
+        view_stack.add_named(toolbar_box, "map");
+        main_paned.pack1(view_stack, true, false);
         main_paned.pack2(files_paned, true, false);
         this.add(main_paned);
         this.set_titlebar(topbar);

@@ -1,6 +1,7 @@
 #include "actor.h"
 #include "map.h"
 #include "render_util.h"
+#include "quadtree.h"
 
 void set_data_directory(const char* path);
 const char* get_data_directory();
@@ -14,3 +15,5 @@ uint8_t load_tileset(const char* path, tileset** tiles, uint8_t count, GLuint te
 uint8_t load_map(const char* path, tilemap* map);
 void save_map(const char* path, tilemap* map);
 int16_t load_boxes(const char* path, ui_box** boxes);
+void write_quadtree(FILE* cursor, const quadtree* tree);
+void read_quadtree(FILE* cursor, quadtree* tree);

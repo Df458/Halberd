@@ -5,6 +5,8 @@
 #include <stdlib.h>
 automap automaps[9];
 
+#define AUTOMAP_FILE_VERSION "0.1.0"
+
 static const uint8_t autotile_lookup[] =
 {
     0b11111111,
