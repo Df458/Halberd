@@ -10,10 +10,9 @@ void _error(const char* file, unsigned line, char* const message);
 #define warn(message) _warn(__FILE__, __LINE__, message)
 #define error(message) _error(__FILE__, __LINE__, message)
 #define error_code() _error(__FILE__, __LINE__, strerror(errno))
-#define nulltest(ptr) if(!ptr) _error(__FILE__, __LINE__, "Recieved unexpected null pointer")
+#define nulltest(ptr) if(!ptr) error("Recieved unexpected null pointer")
 
 unsigned char* loadFileContents(const char* const filepath);
-void getPath(char* buf);
 
 #define DEGTORAD 0.01745329251
 #define RADTODEG 57.2957795131

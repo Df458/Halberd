@@ -67,7 +67,7 @@ actor load_actor(const char* path)
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"display")) {
             xmlChar* a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"id"))) {
-                a_new->data.sprites = get_spriteset((char*)a);
+                a_new->data.sprites = load_resource_to_spriteset("sprites", (char*)a);
                 free(a);
             }
         }
@@ -232,7 +232,7 @@ void destroy_actor(actor a)
         if(a->callbacks[i])
             lua_close(a->callbacks[i]);
     if(a->data.sprites)
-        destroy_spriteset(a->data.sprites);
+        free_spriteset(a->data.sprites);
     free(a);
 }
 

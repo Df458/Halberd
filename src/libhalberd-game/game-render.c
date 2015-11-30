@@ -2,6 +2,10 @@
 #include "game-render.h"
 #include "matrix.h"
 #include "render_util.h"
+#include "player.h"
+#include "actor-manager.h"
+#include "ui.h"
+#include "map.h"
 
 bool render_game()
 {
@@ -12,4 +16,5 @@ bool render_game()
     draw_player();
     draw_actors();
     draw_ui();
+    return true;
 }

@@ -21,7 +21,8 @@ void init_player(uint32_t x, uint32_t y)
     player->data.speed = 3;
     player->data.animation_timer = 0;
     player->data.animation_index = 0;
-    player->data.sprites = get_spriteset("test.spr");
+    // TODO: Figure out how to properly get player info
+    /*player->data.sprites = get_spriteset("test.spr");*/
     if(player->data.sprites != 0) {
         player->data.animation_index = 0;
         player->data.animation_playing = player->data.sprites->animations[0].play;

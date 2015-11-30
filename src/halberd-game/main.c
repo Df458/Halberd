@@ -61,9 +61,9 @@ int main(int argc, char** argv)
     init_settings();
 
     init_maps();
-    get_tileset_id("Plains.png");
-    load_maps("test");
-    /*create_actor("chest.actr");*/
+    // TODO: Figure out the correct way to start up
+    /*get_tileset_id("Plains.png");*/
+    /*load_maps("test");*/
 
     float delta = 0;
     glfwSetTime(0);

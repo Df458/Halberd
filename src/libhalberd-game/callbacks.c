@@ -1,7 +1,7 @@
 #include <string.h>
 #include "callbacks.h"
 #include "actor.h"
-#include "io.h"
+#include "io_util.h"
 #include "ui.h"
 
 /*struct actordata*/
@@ -44,7 +44,7 @@ void build_actor_states(actor a_new, xmlNodePtr node)
         a_new->callbacks[cid] = luaL_newstate();
         luaL_openlibs(a_new->callbacks[cid]);
         if((b = xmlGetProp(node, (const xmlChar*)"src"))) {
-            char* file = (char*)load_file((char*)b);
+            char* file = (char*)load_resource_to_buffer("scripts", (char*)b);
             luaL_loadstring(a_new->callbacks[cid], file);
             lua_setglobal(a_new->callbacks[cid], CALLBACK_NAMES[cid]);
             free(file);

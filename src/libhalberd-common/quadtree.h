@@ -1,6 +1,7 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 #include <inttypes.h>
+#include <stdio.h>
 #include <string.h>
 
 struct quadtree_node
@@ -19,5 +20,8 @@ quadtree* quadtree_make(size_t w, size_t h);
 // TODO: Add a delete function to find a leaf and remove it recursively
 void quadtree_insert(quadtree* tree, size_t x, size_t y);
 void quadtree_destroy(quadtree* tree);
+
+void quadtree_read(FILE* cursor, quadtree* tree);
+void quadtree_write(FILE* cursor, const quadtree* tree);
 
 #endif

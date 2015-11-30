@@ -136,11 +136,9 @@ public class MainWindow : Window
         button_save.clicked.connect(() => {
             if(current_map_name.length == 0) {
                 // TODO: Make the names selectable ahead of time
-                current_map_name = "Content/test";
-                Editor.Automaps.save_as(current_map_name);
-            } else
-                Editor.Automaps.save();
-            Game.Maps.save();
+                current_map_name = "test";
+            }
+            Game.Maps.save(current_map_name);
         });
         button_play.toggled.connect(() => {
             if(button_play.active) {

@@ -1,18 +1,21 @@
 #include "render_util.h"
 #include "io.h"
 #include "ui.h"
+#include "texture_util.h"
 #include "controls.h"
 #include <stdlib.h>
 #include <string.h>
 
-message_link* current_link = 0;
-message_link* final_link = 0;
-font* default_font = 0;
+message_link* current_link = NULL;
+message_link* final_link = NULL;
+font* default_font = NULL;
 
 bool init_ui()
 {
-    if(!(default_font = load_font("Testfont.png")));
-        return false;
+    default_font = malloc(sizeof(font));
+    // TODO: Get the default font from elsewhere
+    *default_font = load_resource_to_font("fonts", "Testfont.png");
+    return true;
 }
 
 void update_ui(float dt)
@@ -51,8 +54,8 @@ void add_message(const char* message)
         final_link->next_link = malloc(sizeof(message_link));
         final_link = final_link->next_link;
     }
-    uint16_t max_len = 250 / default_font->w;
-    uint16_t max_lines = 48 / default_font->h;
+    uint16_t max_len = 250 / default_font->glyph_width;
+    uint16_t max_lines = 48 / default_font->glyph_height;
     message_link* link = final_link;
     link->next_link = 0;
     link->len = strlen(message);
@@ -139,7 +142,8 @@ void destroy_ui()
     }
 
     if(default_font) {
-        glDeleteTextures(1, &default_font->texture);
+        // TODO: Use a texture freeing function here
+        glDeleteTextures(1, &default_font->texture_data.texture_id);
         free(default_font);
     }
 }

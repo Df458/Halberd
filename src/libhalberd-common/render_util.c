@@ -2,10 +2,12 @@
 #include "render_util.h"
 #include "map.h"
 #include "io.h"
+#include "texture_util.h"
 #include "settings.h"
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <GL/gl.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -258,14 +260,16 @@ uint8_t init_graphics(void)
 
     camera = ortho(0, 800, 600, 0, -100, 100);
 
+    tilesets = calloc(32, sizeof(tileset));
+
     return 1;
 }
 
 void destroy_graphics()
 {
     for(int16_t i = 0; i < loaded_boxes && loaded_boxes >= 0; ++i) {
-        glDeleteTextures(1, &boxes[i].texture);
-        glDeleteBuffers(1, &boxes[i].uvs);
+        glDeleteTextures(1, &boxes[i].texture_data.texture_id);
+        glDeleteBuffers(1, &boxes[i].uv_buffer);
     }
     free(boxes);
 
@@ -298,15 +302,15 @@ void draw_sprite(struct sprite sprite, float position_x, float position_y, float
     mat4 tt = ident;
     mat4 rt = ident;
     mat4 st = ident;
-    translate(&tt, position_x + sprite.width * 0.5 - sprite.origin_x, position_y + sprite.height * 0.5 - sprite.origin_y, 0);
+    translate(&tt, position_x + sprite.texture_data.texture_width * 0.5 - sprite.origin_x, position_y + sprite.texture_data.texture_height * 0.5 - sprite.origin_y, 0);
     rotate(&rt, rotation, 0);
-    scale(&st, scale_x * sprite.width, scale_y * sprite.height, 0);
+    scale(&st, scale_x * sprite.texture_data.texture_width, scale_y * sprite.texture_data.texture_height, 0);
     mat4 transform = mul(mul(tt, rt), st);
     mat4 final = mul(camera, transform);
     glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sprite.texture); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, sprite.texture_data.texture_id); // TODO: Use actual sprite
     glUniform1i(sprite_texture_uniform, 0);
     checkGLError();
 
@@ -340,7 +344,7 @@ void draw_spriteset(struct spriteset* sprite, uint8_t a_index, uint8_t f_index, 
     glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sprite->atlas); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, sprite->atlas.texture_id); // TODO: Use actual sprite
     glUniform1i(sprite_texture_uniform, 0);
     checkGLError();
 
@@ -448,7 +452,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     glBindBuffer(GL_ARRAY_BUFFER, box_s_buffer);
     glVertexAttribPointer(box_outer_attrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(box_uv_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, frame.uvs);
+    glBindBuffer(GL_ARRAY_BUFFER, frame.uv_buffer);
     glVertexAttribPointer(box_uv_attrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     checkGLError();
 
@@ -465,7 +469,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     checkGLError();
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frame.texture); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, frame.texture_data.texture_id); // TODO: Use actual sprite
     glUniform1i(box_texture_uniform, 0);
     checkGLError();
 
@@ -516,14 +520,14 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
     glVertexAttribIPointer(font_id_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font->texture);
+    glBindTexture(GL_TEXTURE_2D, font->texture_data.texture_id);
     glUniform1i(font_texture_uniform, 0);
     checkGLError();
 
     mat4 st = ident;
     mat4 tt = ident;
-    translate(&tt, font->w * 0.5f + x, font->h * 0.5f + y, 0);
-    scale(&st, font->w, font->h, 0);
+    translate(&tt, font->glyph_width * 0.5f + x, font->glyph_height * 0.5f + y, 0);
+    scale(&st, font->glyph_width, font->glyph_height, 0);
     mat4 final = mul(camera, mul(tt, st));
     glUniformMatrix4fv(font_transform_uniform, 1, GL_FALSE, final.data);
 
@@ -559,14 +563,32 @@ int8_t index_by_handle(spriteset* set, const char* handle)
 
 uint8_t get_tileset_id(const char* name)
 {
-    for(uint8_t i = 0; i < loaded_tilesets; ++i)
+    uint8_t i;
+    for(i = 0; i < loaded_tilesets; ++i)
         if(!strcmp(tilesets[i].name, name))
             return i;
 
-    uint8_t res = load_tileset(name, &tilesets, loaded_tilesets, tile_buffer);
-    if(res != 0)
-        loaded_tilesets = res;
-    return res - 1;
+    for(i = 0; i < 32; ++i) {
+        bool found = 1;
+        for(uint8_t j = 0; j < loaded_tilesets; ++j) {
+            if(tilesets[j].layer == i) {
+                found = false;
+                break;
+            }
+        }
+        if(found)
+            break;
+    }
+
+    // TODO: Error out here
+    if(i == 32)
+        return 0;
+
+    // TODO: Load the tileset here
+    tilesets[loaded_tilesets] = load_resource_to_tileset("tilesets", name, tile_buffer, i);
+    loaded_tilesets++;
+
+    return i;
 }
 
 void update_camera(float w, float h)

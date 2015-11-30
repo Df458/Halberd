@@ -1,48 +1,47 @@
-#include "io.h"
+#include "io_util.h"
+#include "xml_util.h"
 #include "project.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <libxml/parser.h>
-#include <libxml/uri.h>
-#include <libxml/xmlwriter.h>
 
 #define PROJECT_FILE_VERSION "0.1.0"
 
 char* project_name;
-char* directory_path;
 
 bool create_project(const char* path)
 {
     // Check to see if the project directory exists already
-    struct stat dir_stat = {0};
-    if (stat(path, &dir_stat) != -1) {
+    if(!ensure_directory(path))
         return false;
-    }
 
-    mkdir(path, 0750);
-
+    // Create subdirectories and set the resource path
     char* content_path = calloc(strlen(path) + 8 + 1, sizeof(char));
     strcpy(content_path, path);
-    content_path = strcat(content_path, "/Content");
-    fprintf(stderr, "PATH: %s\nCPATH: %s\n", path, content_path);
+    content_path = strcat(content_path, "/content");
     mkdir(content_path, 0750);
+    set_resource_path(content_path);
+    free(content_path);
+    char* maps_path = construct_extended_resource_path(NULL, "maps");
+    mkdir(maps_path, 0750);
+    free(maps_path);
+    char* tilesets_path = construct_extended_resource_path(NULL, "tilesets");
+    mkdir(tilesets_path, 0750);
+    free(tilesets_path);
 
-    char* project_name = strrchr(path, '/') + 1;
-    
-    char* project_path = calloc(strlen(path) + strlen(project_name) + 5 + 1, sizeof(char));
-    strcpy(project_path, path);
-    project_path = strcat(project_path, "/");
-    project_path = strcat(project_path, project_name);
-    project_path = strcat(project_path, ".hal");
-    fprintf(stderr, "NAME: %s\nPPATH: %s\n", project_name, project_path);
-    // Create the project file
-    xmlChar* uri = xmlPathToURI(project_path);
-    xmlTextWriterPtr writer = xmlNewTextWriterFilename(uri, 0);
+    const char* title_ptr = strrchr(path, '/') + 1;
+    project_name = calloc(strlen(title_ptr) + 1, sizeof(char));
+    strncpy(project_name, title_ptr, strlen(title_ptr));
+
+    char* project_fname = calloc(strlen(project_name) + 5, sizeof(char));
+    strcpy(project_fname, project_name);
+    strcat(project_fname, ".hal");
+
+    xmlTextWriterPtr writer = create_xml_resource("..", project_fname);
+    free(project_fname);
     xmlTextWriterSetIndent(writer, 2);
 
-    // TODO: Write the file here
     xmlTextWriterStartDocument(writer, NULL, NULL, NULL);
     xmlTextWriterStartElement(writer, "project");
     xmlTextWriterWriteAttribute(writer, "version", PROJECT_FILE_VERSION);
@@ -58,29 +57,23 @@ bool create_project(const char* path)
     xmlTextWriterEndDocument(writer);
 
     xmlFreeTextWriter(writer);
-    free(uri);
-    // TODO: This seems to cause memory errors. May be unnecessary, and should
-    //       be looked into.
-    free(content_path);
-    free(project_path);
+    return true;
 }
 
 bool load_project(const char* path)
 {
     const char* title_ptr = strrchr(path, '/') + 1;
-    project_name = calloc(strlen(title_ptr) - 4, sizeof(char));
-    directory_path = calloc(strlen(path) - strlen(title_ptr), sizeof(char));
-    strncpy(directory_path, path, strlen(path) - strlen(title_ptr));
+    project_name = calloc(strlen(title_ptr) - 4 + 1, sizeof(char));
     strncpy(project_name, title_ptr, strlen(title_ptr) - 4);
-    set_data_directory(directory_path);
+
+    char* content_path = calloc(strlen(path) - strlen(title_ptr) + 8 + 1, sizeof(char));
+    strncpy(content_path, path, strlen(path) - strlen(title_ptr));
+    strcat(content_path, "/content");
+    set_resource_path(content_path);
+    return true;
 }
 
 const char* get_project_name()
 {
     return project_name;
-}
-
-const char* get_project_path()
-{
-    return directory_path;
 }

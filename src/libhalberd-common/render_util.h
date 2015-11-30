@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include "color.h"
 #include "matrix.h"
+#include "texture_util.h"
 
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 32
@@ -349,69 +350,6 @@ static const float BLANK_TEXTURE_BUFFER_DATA[] =
 
 uint8_t _checkGLError(const char* file, unsigned line);
 #define checkGLError() _checkGLError(__FILE__, __LINE__)
-
-// TODO: Sprite animations
-typedef struct sprite
-{
-    GLuint texture;
-    uint16_t width;
-    uint16_t height;
-    int16_t origin_x;
-    int16_t origin_y;
-} sprite;
-
-typedef struct font
-{
-    GLuint texture;
-    uint16_t w;
-    uint16_t h;
-} font;
-
-struct animation
-{
-    uint8_t orients; // 0 for no(1 orient), 1 for 4(grid orient), 2 for(full orient)
-    uint16_t dimensions_x;
-    uint16_t dimensions_y;
-    int16_t origin_x;
-    int16_t origin_y;
-    int8_t length;
-    uint8_t delay;
-    uint8_t loop;
-    uint8_t play;
-    float offset_x; // offset is for the position in the texture atlas
-    float offset_y;
-    float size_x; // size is for the size in the texture atlas
-    float size_y;
-    char* handle;
-};
-
-typedef struct spriteset
-{
-    GLuint atlas;
-    struct animation* animations;
-    uint8_t animation_count;
-
-    uint16_t _refcount;
-} spriteset;
-
-typedef struct ui_box
-{
-    GLuint texture;
-    GLuint uvs;
-
-    uint16_t w;
-    uint16_t h;
-
-    uint16_t border_w;
-    uint16_t border_h;
-} ui_box;
-
-typedef struct tileset // TODO: Fit all tilesets into a texture array(up to 256 simultaneous layers, 32 to be safe!) for extra speed and fewer texture changes
-{
-    uint8_t layer;
-    const char* name;
-    uint8_t solid[1024];
-} tileset;
 
 void create_program(GLuint* program, const char** vs, const char** fs);
 

@@ -38,15 +38,15 @@ COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
 # Flags
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC)
 VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
-CFLAGS=-g `$(PKGCONFIG) --cflags libxml-2.0 glew gl`
+CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl`
 CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua`
-GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) -I$(SRCPATH)$(COMMONTARGET) `pkg-config --cflags glfw3 libpng`
+GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng`
 GAMELIBS=`$(PKGCONFIG) --libs glfw3`
-EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -I$(SRCPATH)$(COMMONTARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0`
+EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0`
 EDITORLIBS=`$(PKGCONFIG) --libs glib-2.0 gtk+-3.0 gee-0.8` $(LIBEDITORLIBS) $(LIBGAMELIBS)
-LIBGAMEFLAGS=-I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libpng`
+LIBGAMEFLAGS=`$(PKGCONFIG) --cflags libpng`
 LIBGAMELIBS=-lm `$(PKGCONFIG) --libs glfw3 libpng`
-LIBEDITORFLAGS=-I$(SRCPATH)$(COMMONTARGET) 
+LIBEDITORFLAGS=
 LIBEDITORLIBS=
 
 # Directory inits
@@ -122,30 +122,30 @@ $(OBJPATH)$(COMMONTARGET)/%.o: $(SRCPATH)$(COMMONTARGET)/%.c
 all: $(GAMETARGET) $(EDITORTARGET)
 
 $(GAMETARGET): $(LIBGAMETARGET) $(GAMEDEPS) $(GAMESRCS) $(GAMEOBJS)
-	@echo -e "Building \e[1;35m$<\e[0m..."
-	@$(CC) -o $(GAMETARGET) $(GAMEOBJS) $(LIBPATH)$(LIBGAMETARGET).a $(LIBPATH)$(COMMONTARGET).a $(CFLAGS) $(GAMEFLAGS) $(CLIBS) $(GAMELIBS) $(LIBGAMELIBS)
+	@echo -e "Building \e[1;35m$@\e[0m..."
+	$(CC) -o $(GAMETARGET) $(GAMEOBJS) $(LIBPATH)$(LIBGAMETARGET).a $(LIBPATH)$(COMMONTARGET).a $(CFLAGS) $(GAMEFLAGS) $(CLIBS) $(GAMELIBS) $(LIBGAMELIBS)
 	@echo -e "Build Complete"
 
 # $(EDITORSRCS) compiles the files. This should be changed.
 $(EDITORTARGET): $(LIBEDITORTARGET) $(EDITORSRCS) $(LIBGAMETARGET)
-	@echo -e "Building \e[1;35m$<\e[0m..."
+	@echo -e "Building \e[1;35m$@\e[0m..."
 	$(VALAC) $(VFLAGS) $(EDITORSRCS) $(VLIBS)
 	mv *.o $(OBJPATH)/$(EDITORTARGET)
 	$(CC) -o $(EDITORTARGET) $(EDITOROBJS) $(LIBPATH)$(LIBEDITORTARGET).a $(LIBPATH)$(LIBGAMETARGET).a $(LIBPATH)$(COMMONTARGET).a $(CFLAGS) $(EDITORFLAGS) $(CLIBS) $(EDITORLIBS)
 	@echo -e "Build Complete"
 
 $(LIBGAMETARGET): $(COMMONTARGET) $(LIBGAMEDEPS) $(LIBGAMESRCS) $(LIBGAMEOBJS)
-	@echo -e "Packaging \e[1;35m$<\e[0m..."
+	@echo -e "Packaging \e[1;35m$@\e[0m..."
 	@ar -rs $(LIBPATH)$(LIBGAMETARGET).a $(LIBGAMEOBJS)
 	@echo -e "Build Complete"
 
 $(LIBEDITORTARGET): $(COMMONTARGET) $(LIBEDITORDEPS) $(LIBEDITORSRCS) $(LIBEDITOROBJS)
-	@echo -e "Packaging \e[1;35m$<\e[0m..."
+	@echo -e "Packaging \e[1;35m$@\e[0m..."
 	@ar -rs $(LIBPATH)$(LIBEDITORTARGET).a $(LIBEDITOROBJS)
 	@echo -e "Build Complete"
 
 $(COMMONTARGET): $(COMMONDEPS) $(COMMONSRCS) $(COMMONOBJS)
-	@echo -e "Packaging \e[1;35m$<\e[0m..."
+	@echo -e "Packaging \e[1;35m$@\e[0m..."
 	@ar -rs $(LIBPATH)$(COMMONTARGET).a $(COMMONOBJS)
 	@echo -e "Build Complete"
 
