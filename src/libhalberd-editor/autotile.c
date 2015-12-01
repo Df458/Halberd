@@ -97,23 +97,6 @@ void update_static(uint16_t X, uint16_t Y, int16_t x, int16_t y, int16_t z)
     update_tile(x, y, z, i + 1, Y * 3 + X);
 }
 
-/*void load_automap(const char* path, uint8_t map_id)*/
-/*{*/
-    /*unsigned char* data = load_file(path);*/
-
-    /*int i;*/
-    /*for(i = 0; i < TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS; ++i) {*/
-        /*automaps[map_id].tile_data[i] = data[i];*/
-    /*}*/
-    /*[>for(int i = 0; i < TILEMAP_DIMS; ++i) {<]*/
-        /*[>for(int j = 0; j < TILEMAP_DIMS; ++j) {<]*/
-            /*[>for(int k = 0; k < TILEMAP_LAYERS; ++k) {<]*/
-                /*[>update_static(map_id % 3, map_id / 3, j, i, k);<]*/
-            /*[>}<]*/
-        /*[>}<]*/
-    /*[>}<]*/
-/*}*/
-
 void clear_automaps()
 {
     for(int i = 0; i < 9; ++i) {
@@ -155,55 +138,13 @@ bool automap_saver(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
     fwrite(&width, sizeof(uint16_t), 1, infile);
     fwrite(&height, sizeof(uint16_t), 1, infile);
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
+    fprintf(stderr, "START AT: %lu, ", ftell(infile));
     fwrite(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);
     fwrite(automaps[x + y * 3].tile_data, sizeof(uint8_t), chunk_size, infile);
-
-    map->loaded = 1;
+    fprintf(stderr, "STOP AT: %lu\n", ftell(infile));
 
     return true;
 }
-
-/*void load_automaps(const char* name)*/
-/*{*/
-    /*set_map_name(name);*/
-    /*[>load_maps(name);<]*/
-
-    /*for(uint8_t i = 0; i < 9; ++i) {*/
-        /*char* filename = get_map_name(i % 3, i / 3, "automap");*/
-        /*load_automap(filename, i);*/
-        /*free(filename);*/
-    /*}*/
-/*}*/
-
-/*void save_automap(const char* path, automap* map)*/
-/*{*/
-    /*FILE* file = ex_fopen(path, "wb");*/
-    /*if(!file)*/
-        /*return NULL;*/
-    /*// TODO: This is slow. Try something quicker.*/
-    /*int i;*/
-    /*for(i = 0; i < TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS; ++i) {*/
-        /*fputc(map->tile_data[i], file);*/
-    /*}*/
-    /*fputc(0, file);*/
-    /*fclose(file);*/
-/*}*/
-
-/*void save_automaps()*/
-/*{*/
-    /*int i;*/
-    /*for(i = 0; i < 9; ++i) {*/
-        /*char* filename = get_map_name(i % 3, i / 3, "automap");*/
-        /*save_automap(filename, &automaps[i]);*/
-        /*free(filename);*/
-    /*}*/
-/*}*/
-
-/*void save_automaps_named(const char* name)*/
-/*{*/
-    /*set_map_name(name);*/
-    /*save_automaps();*/
-/*}*/
 
 void place_autotile(uint16_t X, uint16_t Y, uint16_t x, uint16_t y, uint16_t z, uint8_t tile)
 {

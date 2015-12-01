@@ -27,13 +27,17 @@ public class MainWindow : Window
     private ToolButton button_erase;
 
     // Project Pane
-    //private Treeview project_tree_view;
-    //private Iconview project_icon_view;
-    //private Listview project_list_view;
+    private Button import_button;
+    private SearchEntry filter_entry;
+    private TreeView project_tree_view;
+    private IconView project_icon_view;
+    private TreeStore project_tree_data;
 
     // Containers
     private Paned main_paned;
     private Paned files_paned;
+    private Box   files_box;
+    private Box   files_control_box;
     private Box   toolbar_box;
     private Gtk.Stack view_stack;
 
@@ -44,6 +48,7 @@ public class MainWindow : Window
         init_structure();
         init_content();
         connect_signals();
+        read_project_directory();
         this.show_all();
     }
 
@@ -58,6 +63,8 @@ public class MainWindow : Window
         topbar = new HeaderBar();
         main_paned = new Paned(Orientation.VERTICAL);
         files_paned = new Paned(Orientation.HORIZONTAL);
+        files_box = new Box(Orientation.VERTICAL, 6);
+        files_control_box = new Box(Orientation.HORIZONTAL, 6);
         toolbar_box = new Box(Orientation.HORIZONTAL, 0);
         tool_separator = new Separator(Orientation.VERTICAL);
         toolbar = new Toolbar();
@@ -71,16 +78,22 @@ public class MainWindow : Window
         topbar.subtitle = Editor.get_loaded_project_name();
         topbar.show_close_button = true;
         topbar.decoration_layout = "menu:close";
+        files_box.margin_top = 6;
+        files_box.set_homogeneous(false);
+        files_control_box.margin_start = 12;
+        files_control_box.margin_end = 12;
         toolbar.orientation_changed(Orientation.VERTICAL);
         toolbar.set_icon_size(IconSize.SMALL_TOOLBAR);
         toolbar_box.set_homogeneous(false);
         toolbar_box.set_spacing(0);
 
+        files_box.pack_start(files_control_box, false, false);
+        files_box.pack_end(files_paned, true, true);
         toolbar_box.pack_start(toolbar, false, false);
         toolbar_box.pack_start(tool_separator, false, false);
         view_stack.add_named(toolbar_box, "map");
         main_paned.pack1(view_stack, true, false);
-        main_paned.pack2(files_paned, true, false);
+        main_paned.pack2(files_box, false, false);
         this.add(main_paned);
         this.set_titlebar(topbar);
     }
@@ -95,6 +108,17 @@ public class MainWindow : Window
         button_save = new Button.from_icon_name("document-save-symbolic", IconSize.SMALL_TOOLBAR);
         button_play = new ToggleButton();
         button_menu = new MenuButton();
+        import_button = new Button.with_label("Import");
+        filter_entry = new SearchEntry();
+        project_tree_view = new TreeView();
+        project_icon_view = new IconView();
+
+        // Tree data stuff
+        project_tree_data = new TreeStore(2, typeof(string), typeof(string));
+        project_tree_data.set_sort_column_id(0, SortType.ASCENDING);
+        project_tree_view.set_model(project_tree_data);
+        TreeViewColumn col_name = new Gtk.TreeViewColumn.with_attributes("Name", new CellRendererText(), "text", 0, null);
+        project_tree_view.insert_column(col_name, -1);
 
         button_draw = new ToggleToolButton();
         button_fill = new ToggleToolButton();
@@ -108,6 +132,11 @@ public class MainWindow : Window
         button_fill.set_icon_name("zoom-fit-best-symbolic");
         button_erase.set_icon_name("edit-clear-all-symbolic");
 
+        import_button.image = new Image.from_icon_name("document-open-symbolic", IconSize.SMALL_TOOLBAR);
+        import_button.get_style_context().add_class(STYLE_CLASS_SUGGESTED_ACTION);
+        filter_entry.placeholder_text = "Search\u2026";
+        filter_entry.editable = false;
+
         current_embed = editor;
         viewport.has_depth_buffer = true;
         viewport.auto_render = true;
@@ -119,6 +148,10 @@ public class MainWindow : Window
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
+        files_control_box.pack_start(filter_entry, false, false);
+        files_control_box.pack_start(import_button, false, false);
+        files_paned.pack1(project_tree_view, false, false);
+        files_paned.pack2(project_icon_view, true, false);
         toolbar_box.pack_start(viewport, true, true);
         toolbar.insert(button_draw,  0);
         toolbar.insert(button_erase, 1);
@@ -167,6 +200,11 @@ public class MainWindow : Window
         viewport.render.connect(() => { return current_embed.render(); });
         viewport.resize.connect((w, h) => { Editor.size_callback(w, h); });
         viewport.scroll_event.connect((event) => { return current_embed.scroll_cursor(event);});
+    }
+
+    private void read_project_directory()
+    {
+        // TODO: Implement this
     }
 
     private void on_exit()

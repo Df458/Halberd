@@ -1,6 +1,7 @@
 using Gtk;
 
-public class NewProjectDialog {
+public class NewProjectDialog
+{
     Dialog dialog;
     FileChooserDialog fc_dialog;
 

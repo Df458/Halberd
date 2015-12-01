@@ -187,7 +187,7 @@ void clear_maps()
 
 void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
 {
-    FILE* file = load_resource_file(resource_location, resource_name, "wb");
+    FILE* file = load_resource_file(resource_location, resource_name, "r+");
     save_callback_fn(file, map, x, y);
     fclose(file);
 }
@@ -206,7 +206,7 @@ void save_maps(const char* name)
 
 void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
 {
-    FILE* file = load_resource_file(resource_location, resource_name, "rb");
+    FILE* file = load_resource_file(resource_location, resource_name, "r");
     load_callback_fn(file, map, x, y);
     fclose(file);
 }
