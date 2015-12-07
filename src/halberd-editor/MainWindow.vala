@@ -4,7 +4,7 @@ using Halberd;
 public class MainWindow : Window
 {
     public AccelGroup accel;
-    public int icon_size = 4;
+    public int icon_size = 5;
 
     // FIle Icons
     // TODO: Replace with string icon names
@@ -62,6 +62,7 @@ public class MainWindow : Window
         //init_icons();
         init_content();
         connect_signals();
+        add_actions();
         add_project_directory(app.get_content_directory(), null);
         this.show_all();
     }
@@ -169,7 +170,8 @@ public class MainWindow : Window
         // 1: URI
         // 2: Icon
         // 3: Is Folder
-        project_tree_data = new TreeStore(4, typeof(string), typeof(string), typeof(Gdk.Pixbuf), typeof(bool));
+        // 4: Icon Name
+        project_tree_data = new TreeStore(5, typeof(string), typeof(string), typeof(Gdk.Pixbuf), typeof(bool), typeof(string));
         project_tree_data.set_sort_column_id(0, SortType.ASCENDING);
         project_tree_filter = new TreeModelFilter(project_tree_data, null);
         project_tree_filter.set_visible_column(3);
@@ -347,12 +349,21 @@ public class MainWindow : Window
         viewport.scroll_event.connect((event) => { return current_embed.scroll_cursor(event);});
     }
 
+    /*!
+     * This function adds functions as GTK actions to various parts of the app,
+     * for use in menus and with accelerators.
+     */
+    private void add_actions()
+    {
+        // TODO: Implement this
+    }
+
     private void add_project_directory(File f, TreeIter? parent_iter)
     {
         TreeIter iter;
         project_tree_data.append(out iter, parent_iter);
 
-        project_tree_data.set(iter, 0, f.get_basename(), 1, f.get_uri(), 2, folder_icon, 3, true);
+        project_tree_data.set(iter, 0, f.get_basename(), 1, f.get_uri(), 2, folder_icon, 3, true, 4, "folder");
         FileInfo info;
         try{
             info = f.query_info ("standard::*", 0);
@@ -366,7 +377,10 @@ public class MainWindow : Window
                     TreeIter temp_iter;
                     project_tree_data.append(out temp_iter, iter);
 
-                    project_tree_data.set(temp_iter, 0, file_info.get_name(), 1, f.get_uri() + file_info.get_name(), 2, default_icon, 3, false);
+                    string name = "text-x-generic";
+                    if(file_info.get_name().has_suffix(".png"))
+                        name = "image-x-generic";
+                    project_tree_data.set(temp_iter, 0, file_info.get_name(), 1, f.get_uri() + file_info.get_name(), 2, default_icon, 3, false, 4, name);
                 }
             }
         } catch (Error e) {
@@ -385,7 +399,7 @@ public class MainWindow : Window
     {
         if(cell is CellRendererPixbuf) {
             string icon_name = "folder";
-            //model.get(iter, 2, out icon_name, null);
+            model.get(iter, 4, out icon_name);
             ((CellRendererPixbuf)cell).icon_name = icon_name;
             ((CellRendererPixbuf)cell).stock_size = icon_size;
             //cell.width = 100;
