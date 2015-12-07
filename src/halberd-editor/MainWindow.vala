@@ -323,7 +323,7 @@ public class MainWindow : Window
             fc.response.connect((r) => {
                 if(r == Gtk.ResponseType.ACCEPT) {
                     try {
-                        File dest = app.get_content_directory().get_child("tilesets").get_child(fc.get_file().get_basename());
+                        File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + get_selected_path() + Halberd.IO.get_unique_name(get_selected_path(), fc.get_file().get_basename()));
                         fc.get_file().copy(dest, FileCopyFlags.NONE);
                     } catch(Error e) {
                         stderr.printf("Error importing: %s\n", e.message);
