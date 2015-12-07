@@ -71,6 +71,15 @@ unsigned char* load_resource_to_buffer(const char* resource_location, const char
 //-----------------------------------------------------------------------------
 
 /*!
+ * This checks if a resource doesn't exist. If it does, it alters the name by
+ * incrementing it until it finds a free id.
+ * E.g. File might try File (1), then File (2), then File (3), etc.
+ *
+ * See get_extended_resource_path(io_util.h) for additional usage details
+ */
+char* get_unique_resource_name(const char* resource_location, const char* resource_name);
+
+/*!
  * Checks to see if the directory at path exists. If not, the directory is
  * created.
  * Returns true if a new directory was created, and false if it existed

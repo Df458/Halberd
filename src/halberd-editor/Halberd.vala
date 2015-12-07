@@ -31,7 +31,7 @@ class HalberdEditor : Gtk.Application
 
     public File get_content_directory()
     {
-        return File.new_for_path(Halberd.get_resource_path());
+        return File.new_for_path(Halberd.IO.get_path());
     }
 
     public int runall()

@@ -244,10 +244,9 @@ public class MainWindow : Window
         button_open.clicked.connect(app.load_dialog);
         button_save.clicked.connect(() =>
         {
-            // TODO: Make the names change if there are duplicates  
             if(current_map_name.length == 0) {
-                current_map_name = "test.map";
                 current_map_path = get_selected_path();
+                current_map_name = Halberd.IO.get_unique_name(current_map_path, "Untitled.map");
             }
             Game.Maps.save(current_map_path, current_map_name);
         });
@@ -278,6 +277,7 @@ public class MainWindow : Window
                 return;
             project_tree_filter.get_iter(out iter, path);
             project_tree_filter.get(iter, 1, out uri);
+            path = project_tree_filter.convert_path_to_child_path(path);
 
             build_content_data(path);
         });

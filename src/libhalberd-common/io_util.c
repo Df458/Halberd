@@ -1,6 +1,7 @@
 #include "io_util.h"
 #include "util.h"
 
+#include <math.h>
 #include <stdlib.h>
 #ifdef WINDOWS
 #include <windows.h>
@@ -131,6 +132,36 @@ unsigned char* load_resource_to_buffer(const char* resource_location, const char
 
     fclose(file);
     return filedata;
+}
+
+char* get_unique_resource_name(const char* resource_location, const char* resource_name)
+{
+    char* name = strdup(resource_name);
+    char* path = construct_extended_resource_path(resource_location, name);
+    const char* extension = strrchr(resource_name, '.');
+    char* resource_prefix = calloc(strlen(resource_name) - strlen(extension) + 1, sizeof(char));
+    strncpy(resource_prefix, resource_name, strlen(resource_name) - strlen(extension));
+    struct stat dir_stat = {0};
+    uint8_t  digits = 1;
+    uint16_t digits_next = 10;
+    uint16_t value = 1;
+
+    while (stat(path, &dir_stat) != -1) {
+        free(path);
+        name = realloc(name, (strlen(resource_name) + 4 + digits) * sizeof(char));
+        snprintf(name, strlen(resource_name) + 4 + digits, "%s (%d)%s", resource_prefix, value, extension);
+        path = construct_extended_resource_path(resource_location, name);
+
+        ++value;
+        if(value > digits_next) {
+            ++digits;
+            digits_next = pow(10, digits);
+        }
+    }
+    free(path);
+    free(resource_prefix);
+
+    return name;
 }
 
 bool ensure_directory(const char* path)

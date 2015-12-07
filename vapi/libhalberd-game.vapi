@@ -40,9 +40,9 @@ namespace Game {
         [CCode (cname = "init_maps")]
         void init();
         [CCode (cname = "load_maps_from_resource")]
-        void load(string location, string name);
+        void load(string? location, string name);
         [CCode (cname = "save_maps_to_resource")]
-        void save(string location, string name);
+        void save(string? location, string name);
 
         [CCode (cname = "draw_maps")]
         void draw(Mat4 mat);

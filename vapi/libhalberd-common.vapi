@@ -22,6 +22,12 @@ namespace Halberd {
     [CCode (cname="ident")]
     const Mat4 Ident;
 
-    [CCode (cname="get_base_resource_path", cheader_filename="io_util.h")]
-    unowned string? get_resource_path();
+    [CCode (cheader_filename="io_util.h")]
+    namespace IO {
+        [CCode (cname="get_base_resource_path")]
+        unowned string? get_path();
+
+        [CCode (cname="get_unique_resource_name")]
+        string get_unique_name(string? location, string name);
+    }
 }
