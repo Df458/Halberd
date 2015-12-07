@@ -40,6 +40,20 @@ void mapcp(uint8_t from, uint8_t to)
     /*maps[to].position_y = maps[from].position_y;*/
 }
 
+void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
+{
+    FILE* file = load_resource_file(resource_location, resource_name, "r+!");
+    save_callback_fn(file, map, x, y);
+    fclose(file);
+}
+
+void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
+{
+    FILE* file = load_resource_file(resource_location, resource_name, "r");
+    load_callback_fn(file, map, x, y);
+    fclose(file);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Public functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,39 +199,25 @@ void clear_maps()
     }
 }
 
-void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
-{
-    FILE* file = load_resource_file(resource_location, resource_name, "r+");
-    save_callback_fn(file, map, x, y);
-    fclose(file);
-}
-
-void save_maps(const char* name)
+void save_maps_to_resource(const char* resource_location, const char* resource_name)
 {
     if(mapname)
         free(mapname);
-    mapname = strdup(name);
+    mapname = strdup(resource_name);
     for(uint8_t i = 0; i < 9; ++i) {
         if(maps[i].loaded) {
-            save_tilemap_to_resource("maps", name, &maps[i], i % 3, i / 3);
+            save_tilemap_to_resource(resource_location, resource_name, &maps[i], i % 3, i / 3);
         }
     }
 }
 
-void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
-{
-    FILE* file = load_resource_file(resource_location, resource_name, "r");
-    load_callback_fn(file, map, x, y);
-    fclose(file);
-}
-
-void load_maps(const char* name)
+void load_maps_from_resource(const char* resource_location, const char* resource_name)
 {
     if(mapname)
         free(mapname);
-    mapname = strdup(name);
+    mapname = strdup(resource_name);
     for(uint8_t i = 0; i < 9; ++i) {
-        load_resource_to_tilemap("maps", name, &maps[i], i % 3, i / 3);
+        load_resource_to_tilemap(resource_location, resource_name, &maps[i], i % 3, i / 3);
         glBindBuffer(GL_ARRAY_BUFFER, maps[i].tile_id_buffer);
         glBufferData(GL_ARRAY_BUFFER, TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS * sizeof(GLuint), maps[i].tile_id_data, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, maps[i].tile_set_buffer);

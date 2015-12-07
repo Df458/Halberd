@@ -40,7 +40,7 @@ public class StartupWindow : Window
                     project_list.add(enumerator.get_child(file_info));
             }
         } catch(GLib.Error e) {
-            display_warning("Error getting the project list: " + e.message + "\n");
+            app.display_warning("Error getting the project list: " + e.message + "\n");
             return;
         }
     }

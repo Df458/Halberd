@@ -60,7 +60,7 @@ int main(int argc, char** argv)
     init_ui();
     init_settings();
 
-    init_maps();
+    /*init_maps();*/
     // TODO: Figure out the correct way to start up
     /*get_tileset_id("Plains.png");*/
     /*load_maps("test");*/

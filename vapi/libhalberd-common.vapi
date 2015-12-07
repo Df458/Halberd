@@ -21,4 +21,7 @@ namespace Halberd {
 
     [CCode (cname="ident")]
     const Mat4 Ident;
+
+    [CCode (cname="get_base_resource_path", cheader_filename="io_util.h")]
+    unowned string? get_resource_path();
 }

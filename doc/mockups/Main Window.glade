@@ -2,10 +2,12 @@
 <!-- Generated with glade 3.19.0 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
-  <object class="GtkImage" id="image7">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">document-open-symbolic</property>
+  <object class="GtkAdjustment" id="Scale Adjustment">
+    <property name="lower">8</property>
+    <property name="upper">128</property>
+    <property name="value">8</property>
+    <property name="step_increment">8</property>
+    <property name="page_increment">32</property>
   </object>
   <object class="GtkListStore" id="liststore1">
     <columns>
@@ -47,51 +49,73 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkToolbar" id="toolbar1">
+              <object class="GtkBox" id="box5">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="margin_left">3</property>
+                <property name="margin_right">3</property>
+                <property name="margin_top">3</property>
                 <property name="orientation">vertical</property>
-                <property name="toolbar_style">icons</property>
-                <property name="icon_size">2</property>
                 <child>
-                  <object class="GtkToolButton" id="toolbutton1">
+                  <object class="GtkToggleButton" id="togglebutton1">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">toolbutton1</property>
-                    <property name="use_underline">True</property>
-                    <property name="icon_name">insert-object-symbolic</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <child>
+                      <object class="GtkImage" id="image7">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="icon_name">insert-object-symbolic</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="toolbutton2">
+                  <object class="GtkToggleButton" id="togglebutton2">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">toolbutton2</property>
-                    <property name="use_underline">True</property>
-                    <property name="icon_name">zoom-fit-best-symbolic</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <child>
+                      <object class="GtkImage" id="image8">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="icon_name">zoom-fit-best-symbolic</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="toolbutton3">
+                  <object class="GtkToggleButton" id="togglebutton3">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">toolbutton3</property>
-                    <property name="use_underline">True</property>
-                    <property name="icon_name">edit-clear-all-symbolic</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <child>
+                      <object class="GtkImage" id="image9">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="icon_name">edit-clear-all-symbolic</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
+                <style>
+                  <class name="linked"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -108,7 +132,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -125,7 +149,7 @@
                     <property name="margin_top">18</property>
                     <property name="margin_bottom">18</property>
                     <property name="pixel_size">256</property>
-                    <property name="icon_name">emblem-documents-symbolic</property>
+                    <property name="icon_name">text-x-generic-symbolic</property>
                     <property name="icon_size">6</property>
                   </object>
                   <packing>
@@ -137,12 +161,12 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="resize">False</property>
+            <property name="resize">True</property>
             <property name="shrink">False</property>
           </packing>
         </child>
@@ -193,7 +217,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="image">image7</property>
                     <property name="always_show_image">True</property>
                     <style>
                       <class name="suggested-action"/>
@@ -216,6 +239,8 @@
               <object class="GtkPaned" id="paned2">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="position">500</property>
+                <property name="position_set">True</property>
                 <child>
                   <object class="GtkTreeView" id="treeview1">
                     <property name="visible">True</property>
@@ -244,29 +269,55 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkIconView" id="iconview1">
+                  <object class="GtkOverlay" id="overlay1">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="margin">6</property>
-                    <property name="model">liststore1</property>
+                    <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkCellRendererPixbuf" id="cellrenderertext3">
-                        <property name="stock_size">6</property>
+                      <object class="GtkIconView" id="iconview1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="margin">6</property>
+                        <property name="model">liststore1</property>
+                        <child>
+                          <object class="GtkCellRendererPixbuf" id="cellrenderertext3">
+                            <property name="stock_size">6</property>
+                          </object>
+                          <attributes>
+                            <attribute name="icon-name">1</attribute>
+                          </attributes>
+                        </child>
+                        <child>
+                          <object class="GtkCellRendererText" id="cellrenderertext2"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
                       </object>
-                      <attributes>
-                        <attribute name="icon-name">1</attribute>
-                      </attributes>
+                      <packing>
+                        <property name="index">-1</property>
+                      </packing>
                     </child>
-                    <child>
-                      <object class="GtkCellRendererText" id="cellrenderertext2"/>
-                      <attributes>
-                        <attribute name="text">0</attribute>
-                      </attributes>
+                    <child type="overlay">
+                      <object class="GtkScale" id="scale1">
+                        <property name="width_request">128</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="halign">end</property>
+                        <property name="valign">end</property>
+                        <property name="adjustment">Scale Adjustment</property>
+                        <property name="restrict_to_fill_level">False</property>
+                        <property name="fill_level">0</property>
+                        <property name="round_digits">1</property>
+                        <property name="draw_value">False</property>
+                        <style>
+                          <class name="osd"/>
+                        </style>
+                      </object>
                     </child>
                   </object>
                   <packing>
                     <property name="resize">True</property>
-                    <property name="shrink">False</property>
+                    <property name="shrink">True</property>
                   </packing>
                 </child>
               </object>
@@ -320,7 +371,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -337,7 +388,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">3</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>

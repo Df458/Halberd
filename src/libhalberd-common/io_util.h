@@ -53,6 +53,9 @@ void set_resource_path_relative(const char* path);
 /*!
  * Opens a file from the resource path and extension.
  * See get_extended_resource_path(io_util.h) for usage details
+ *
+ * appending a ! to the end of mode will cause this function to try swapping an
+ * initial r with w if the file cannot be loaded.
  */
 FILE* load_resource_file(const char* resource_location, const char* resource_name, const char* mode);
 

@@ -104,7 +104,6 @@ public class EditorEmbed : EmbeddableView
 
     public override bool scroll_cursor(Gdk.EventScroll event)
     {
-        // TODO: Implement this
         double x, y;
         if(!event.get_scroll_deltas(out x, out y)) {
             x = event.x;

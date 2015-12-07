@@ -138,10 +138,8 @@ bool automap_saver(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
     fwrite(&width, sizeof(uint16_t), 1, infile);
     fwrite(&height, sizeof(uint16_t), 1, infile);
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
-    fprintf(stderr, "START AT: %lu, ", ftell(infile));
     fwrite(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);
     fwrite(automaps[x + y * 3].tile_data, sizeof(uint8_t), chunk_size, infile);
-    fprintf(stderr, "STOP AT: %lu\n", ftell(infile));
 
     return true;
 }

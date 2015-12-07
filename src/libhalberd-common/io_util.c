@@ -99,12 +99,22 @@ FILE* load_resource_file(const char* resource_location, const char* resource_nam
 {
     char* final_path = construct_extended_resource_path(resource_location, resource_name);
     FILE* file = fopen(final_path, mode);
-    free(final_path);
+    bool retry = mode[strlen(mode) - 1] == '!';
     if(!file) {
-        fprintf(stderr, "%s not found\n", final_path);
-        error("Failed to load file: File not found.");
-        return NULL;
+        fprintf(stderr, "%s (%s, %s) not found\n", final_path, resource_location, resource_name);
+        if(retry) {
+            fprintf(stderr, "Retrying...\n");
+            char* mode2 = strdup(mode);
+            mode2[0] = 'w';
+            file = fopen(final_path, mode2);
+        }
+
+        if(!file) {
+            error("Failed to load file: File not found.");
+            return NULL;
+        }
     }
+    free(final_path);
 
     return file;
 }

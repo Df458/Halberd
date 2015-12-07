@@ -38,10 +38,10 @@ void draw_maps(mat4 transform);
 void move_maps(int16_t x, int16_t y);
 
 void clear_maps();
-void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
-void save_maps(const char* name);
-void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
-void load_maps(const char* name);
+//void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
+void save_maps_to_resource(const char* resource_location, const char* resource_name);
+//void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
+void load_maps_from_resource(const char* resource_location, const char* resource_name);
 
 void get_true_tile_position(uint16_t* X, uint16_t* Y, int16_t* x, int16_t* y);
 uint32_t get_tile(uint16_t X, uint16_t Y, int16_t x, int16_t y, uint16_t z);
