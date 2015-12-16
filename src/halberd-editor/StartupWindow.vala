@@ -19,11 +19,12 @@ public class StartupWindow : Window
 
     Gee.ArrayList<File> project_list;
 
-    public StartupWindow(File directory)
+    public StartupWindow(File directory, bool load_last_setting)
     {
+        this.window_position = WindowPosition.CENTER;
         init_project_list(directory);
         init_structure();
-        init_content();
+        init_content(load_last_setting);
         connect_signals();
         this.show_all();
     }
@@ -72,7 +73,7 @@ public class StartupWindow : Window
         this.add(main_box);
     }
 
-    private void init_content()
+    private void init_content(bool load_last_setting)
     {
         load_last_check = new CheckButton.with_label("Load the last project on startup");
         button_new = new Button.with_label("Create New");
@@ -85,6 +86,7 @@ public class StartupWindow : Window
         button_new.get_style_context().add_class(STYLE_CLASS_SUGGESTED_ACTION);
         empty_image.set_pixel_size(256);
         empty_image.set_opacity(0.25f);
+        load_last_check.active = load_last_setting;
 
         empty_box.pack_start(empty_image, true, true);
         empty_box.pack_start(empty_label, true, false);

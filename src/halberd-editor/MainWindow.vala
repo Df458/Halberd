@@ -21,8 +21,6 @@ public class MainWindow : Window
     private GLArea viewport;
 
     // Top Buttons
-    private Button button_new;
-    private Button button_open;
     private Button button_save;
     private ToggleButton button_play;
     private MenuButton button_menu;
@@ -161,8 +159,6 @@ public class MainWindow : Window
         viewport = new GLArea();
         editor = new EditorEmbed(viewport);
         game = new GameEmbed(viewport);
-        button_new  = new Button.from_icon_name("document-new-symbolic",  IconSize.SMALL_TOOLBAR);
-        button_open = new Button.from_icon_name("document-open-symbolic", IconSize.SMALL_TOOLBAR);
         button_save = new Button.from_icon_name("document-save-symbolic", IconSize.SMALL_TOOLBAR);
         button_play = new ToggleButton();
         button_menu = new MenuButton();
@@ -228,8 +224,6 @@ public class MainWindow : Window
         viewport.can_focus = true;
         viewport.set_required_version(3, 3);
 
-        topbar.pack_start(button_new);
-        topbar.pack_start(button_open);
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
@@ -250,8 +244,6 @@ public class MainWindow : Window
         this.destroy.connect(on_exit);
 
         // FIXME: New button doesn't load the new project correctly
-        button_new.clicked.connect(app.new_project);
-        button_open.clicked.connect(app.load_dialog);
         button_save.clicked.connect(() =>
         {
             if(current_map_name.length == 0) {
@@ -435,8 +427,10 @@ public class MainWindow : Window
         act_preferences.set_enabled(false);
         main_group.add_action(act_preferences);
         SimpleAction act_about = new SimpleAction("about", null);
-        // TODO: Implement this
-        act_about.set_enabled(false);
+        act_about.activate.connect(() =>
+        {
+            app.display_about();
+        });
         main_group.add_action(act_about);
         button_menu.insert_action_group("file", main_group);
 

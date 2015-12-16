@@ -18,15 +18,6 @@ class HalberdEditor : Gtk.Application
         if(!init_main_directory()) {
             failed_init = true;
         }
-
-        string? last_path;
-        last_path = settings.get_string("last-project");
-        if(settings.get_boolean("open-last") && last_path != null) {
-            load_project(last_path);
-        } else {
-            startup_win = new StartupWindow(main_directory);
-            current_win = startup_win;
-        }
     }
 
     public File get_content_directory()
@@ -36,6 +27,20 @@ class HalberdEditor : Gtk.Application
 
     public int runall()
     {
+        string? last_path;
+        bool? open_last;
+        last_path = settings.get_string("last-project");
+        open_last = settings.get_boolean("open-last");
+        if(open_last && last_path != null && last_path.length > 0) {
+            load_project(last_path);
+        } else {
+            if(open_last == null)
+                open_last = false;
+
+            startup_win = new StartupWindow(main_directory, open_last);
+            current_win = startup_win;
+        }
+
         if(!failed_init)
             Gtk.main();
         Halberd.Game.Settings.cleanup();
@@ -80,6 +85,7 @@ class HalberdEditor : Gtk.Application
         } else {
             project_directory = project_directory.get_parent();
         }
+        settings.set_string("last-project", full_path);
         Gtk.RecentManager.get_default().add_item("file://" + full_path);
         Halberd.Editor.load_project(full_path);
         // TODO: Test version and prompt for upgrade
@@ -88,7 +94,8 @@ class HalberdEditor : Gtk.Application
         else
             window.reload();
         current_win = window;
-        startup_win.destroy();
+        if(startup_win != null)
+            startup_win.destroy();
     }
 
     public void window_destroyed(Gtk.Window win)
@@ -128,6 +135,17 @@ class HalberdEditor : Gtk.Application
         Gtk.MessageDialog dialog = new Gtk.MessageDialog(current_win, Gtk.DialogFlags.MODAL, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, format);
         dialog.response.connect((r) => { dialog.destroy(); });
         dialog.show();
+    }
+
+    public void display_about()
+    {
+        Gtk.AboutDialog about_dialog = new Gtk.AboutDialog();
+        about_dialog.set_authors({"Hugues Ross"});
+        about_dialog.set_program_name("Halberd RPG Engine");
+        about_dialog.set_website("github.com/Df458/Halberd");
+        about_dialog.response.connect(() => { about_dialog.close(); });
+        about_dialog.set_transient_for(current_win);
+        about_dialog.run();
     }
 }
 
