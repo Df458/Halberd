@@ -23,12 +23,6 @@ bool create_project(const char* path)
     mkdir(content_path, 0750);
     set_resource_path(content_path);
     free(content_path);
-    char* maps_path = construct_extended_resource_path(NULL, "maps");
-    mkdir(maps_path, 0750);
-    free(maps_path);
-    char* tilesets_path = construct_extended_resource_path(NULL, "tilesets");
-    mkdir(tilesets_path, 0750);
-    free(tilesets_path);
 
     const char* title_ptr = strrchr(path, '/') + 1;
     project_name = calloc(strlen(title_ptr) + 1, sizeof(char));
