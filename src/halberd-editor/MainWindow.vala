@@ -343,31 +343,37 @@ public class MainWindow : Window
                 viewport.queue_draw();
             }
         });
-        CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(project_icon_view.get_text_column());
+        CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(0);
         text.edited.connect((path, new_text) =>
         {
             TreeIter iter;
+            string file_name;
             string file_uri;
             project_content_data.get_iter(out iter, new TreePath.from_string(path));
-            project_content_data.get(iter, 1, out file_uri);
+            project_content_data.get(iter, 0, out file_name, 1, out file_uri);
+            if(file_name == new_text) {
+                text.editable = false;
+                return;
+            }
 
             File f = File.new_for_uri(file_uri);
             try {
                 f = f.set_display_name(new_text);
             } catch(Error e) {
-                stderr.printf("Error renaming directory: %s\n", e.message);
+                app.display_warning("Error renaming directory: " + e.message);
             }
-            text.editable = false;
         });
 
         project_icon_view.button_press_event.connect((event) =>
         {
             if(event.button == 3) {
                 TreePath path = project_icon_view.get_path_at_pos((int)event.x, (int)event.y);
-                if(path != null)
+                if(path != null) {
                     project_icon_view.select_path(path);
-                else
+                    project_icon_view.set_cursor(path, null, false);
+                } else {
                     project_icon_view.unselect_all();
+                }
                 project_icon_view.popup_menu();
             }
             return false;
@@ -454,7 +460,7 @@ public class MainWindow : Window
         {
             TreePath path = null;
             CellRenderer renderer;
-            CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(project_icon_view.get_text_column());
+            CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(0);
             project_icon_view.get_cursor(out path, out renderer);
             if(path != null) {
                 text.editable = true;
