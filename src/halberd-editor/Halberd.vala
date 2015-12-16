@@ -132,19 +132,14 @@ class HalberdEditor : Gtk.Application
 }
 
 /*
- * This function ensures that a new file has a name that isn't taken. If it is,
- * then the file has a number appended to it, starting from 1.
+ * This function takes a resource extension and filename and creates a GIO File
+ * from the path returned by construct_extended_resource_path.
  */
-public void ensure_new(File infile)
+public File file_from_resource(string? ext, string name, bool new_file = false)
 {
-    string base_name = infile.get_basename();
-    uint i = 1;
-    while(infile.query_exists()) {
-        try {
-            infile.set_display_name(base_name + i.to_string());
-            ++i;
-        } catch(Error e) {
-            warning("Error renaming file: %s\n", e.message);
-        }
-    }
+    string path = Halberd.IO.make_path(ext, name);
+    if(new_file)
+        path = Halberd.IO.make_path(ext, Halberd.IO.get_unique_name(ext, name));
+    File f = File.new_for_path(path);
+    return f;
 }

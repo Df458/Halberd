@@ -29,5 +29,8 @@ namespace Halberd {
 
         [CCode (cname="get_unique_resource_name")]
         string get_unique_name(string? location, string name);
+
+        [CCode (cname="construct_extended_resource_path")]
+        string make_path(string? location, string name);
     }
 }

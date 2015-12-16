@@ -139,8 +139,14 @@ char* get_unique_resource_name(const char* resource_location, const char* resour
     char* name = strdup(resource_name);
     char* path = construct_extended_resource_path(resource_location, name);
     const char* extension = strrchr(resource_name, '.');
-    char* resource_prefix = calloc(strlen(resource_name) - strlen(extension) + 1, sizeof(char));
-    strncpy(resource_prefix, resource_name, strlen(resource_name) - strlen(extension));
+    // FIXME: Extensionless files fail
+    char* resource_prefix = 0;
+    if(extension) {
+        resource_prefix = calloc(strlen(resource_name) - strlen(extension) + 1, sizeof(char));
+        strncpy(resource_prefix, resource_name, strlen(resource_name) - strlen(extension));
+    } else {
+        resource_prefix = strdup(resource_name);
+    }
     struct stat dir_stat = {0};
     uint8_t  digits = 1;
     uint16_t digits_next = 10;

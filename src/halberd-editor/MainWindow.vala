@@ -44,6 +44,9 @@ public class MainWindow : Window
     private TreeModelFilter project_tree_filter;
     private Overlay project_content_overlay;
     private Scale icon_scale;
+    private Gtk.Menu content_menu;
+    private Gtk.Menu content_file_menu;
+    FileMonitor? content_monitor = null;
 
     // Containers
     private Paned main_paned;
@@ -59,11 +62,16 @@ public class MainWindow : Window
     public MainWindow()
     {
         init_structure();
-        //init_icons();
         init_content();
         connect_signals();
         add_actions();
+        init_menus();
+
         add_project_directory(app.get_content_directory(), null);
+        TreePath path = new TreePath.from_indices(0);
+        project_tree_view.expand_to_path(path);
+        project_tree_view.set_cursor(path, null, false);
+
         this.show_all();
     }
 
@@ -280,6 +288,37 @@ public class MainWindow : Window
             project_tree_filter.get_iter(out iter, path);
             project_tree_filter.get(iter, 1, out uri);
             path = project_tree_filter.convert_path_to_child_path(path);
+            project_content_data.get_iter(out iter, path);
+
+            File dir_file = File.new_for_uri(uri);
+            if(content_monitor != null)
+                content_monitor.cancel();
+            try {
+                content_monitor = dir_file.monitor_directory(FileMonitorFlags.NONE);
+                content_monitor.set_rate_limit(1000);
+                content_monitor.changed.connect((dir, file, type) =>
+                {
+                    TreePath current_path = project_content_data.virtual_root;
+                    TreeIter current_iter;
+                    project_tree_data.get_iter(out current_iter, current_path);
+
+                    switch(type) {
+                        case FileMonitorEvent.CREATED:
+                            try {
+                                add_project_file(dir.query_info("standard::*", FileQueryInfoFlags.NONE), current_iter);
+                            } catch(Error e) {
+                                app.display_warning("Can't get file info: " + e.message);
+                            }
+                        break;
+
+                        case FileMonitorEvent.DELETED:
+                            rm_project_file(dir, current_iter);
+                        break;
+                    }
+                });
+            } catch(IOError e) {
+                app.display_warning("Can't watch content directory: " + e.message);
+            }
 
             build_content_data(path);
         });
@@ -304,6 +343,43 @@ public class MainWindow : Window
                 viewport.queue_draw();
             }
         });
+        CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(project_icon_view.get_text_column());
+        text.edited.connect((path, new_text) =>
+        {
+            TreeIter iter;
+            string file_uri;
+            project_content_data.get_iter(out iter, new TreePath.from_string(path));
+            project_content_data.get(iter, 1, out file_uri);
+
+            File f = File.new_for_uri(file_uri);
+            try {
+                f = f.set_display_name(new_text);
+            } catch(Error e) {
+                stderr.printf("Error renaming directory: %s\n", e.message);
+            }
+            text.editable = false;
+        });
+
+        project_icon_view.button_press_event.connect((event) =>
+        {
+            if(event.button == 3) {
+                TreePath path = project_icon_view.get_path_at_pos((int)event.x, (int)event.y);
+                if(path != null)
+                    project_icon_view.select_path(path);
+                else
+                    project_icon_view.unselect_all();
+                project_icon_view.popup_menu();
+            }
+            return false;
+        });
+        project_icon_view.popup_menu.connect(() =>
+        {
+            if(project_icon_view.get_selected_items().length() == 0)
+                content_menu.popup(null, null, null, 0, Gtk.get_current_event_time());
+            else
+                content_file_menu.popup(null, null, null, 0, Gtk.get_current_event_time());
+            return false;
+        });
 
         icon_scale.value_changed.connect(() =>
         {
@@ -315,26 +391,7 @@ public class MainWindow : Window
         });
 
         // TODO: File Previews
-        import_button.clicked.connect(() =>
-        {
-            Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Import an Asset", this, Gtk.FileChooserAction.OPEN, "Cancel", Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.ACCEPT);
-            Gtk.FileFilter filter = new Gtk.FileFilter();
-            filter.add_pattern("*.png");
-            filter.set_filter_name("PNG files");
-            fc.add_filter(filter);
-            fc.response.connect((r) => {
-                if(r == Gtk.ResponseType.ACCEPT) {
-                    try {
-                        File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + get_selected_path() + Halberd.IO.get_unique_name(get_selected_path(), fc.get_file().get_basename()));
-                        fc.get_file().copy(dest, FileCopyFlags.NONE);
-                    } catch(Error e) {
-                        stderr.printf("Error importing: %s\n", e.message);
-                    }
-                }
-                fc.destroy();
-            });
-            fc.run();
-        });
+        import_button.clicked.connect(import_dialog);
 
         viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
         viewport.realize.connect(editor.prepare);
@@ -349,13 +406,157 @@ public class MainWindow : Window
         viewport.scroll_event.connect((event) => { return current_embed.scroll_cursor(event);});
     }
 
-    /*!
+    /*
      * This function adds functions as GTK actions to various parts of the app,
      * for use in menus and with accelerators.
+     * It also connects the activation signals on these actions.
      */
     private void add_actions()
     {
+        // Main menu group
+        SimpleActionGroup main_group = new SimpleActionGroup();
+        SimpleAction act_new_project = new SimpleAction("new", null);
+        act_new_project.activate.connect(app.new_project);
+        main_group.add_action(act_new_project);
+        SimpleAction act_load_project = new SimpleAction("load", null);
+        act_load_project.activate.connect(app.load_dialog);
+        main_group.add_action(act_load_project);
+        SimpleAction act_exit = new SimpleAction("exit", null);
+        act_exit.activate.connect(() => { this.destroy(); });
+        main_group.add_action(act_exit);
+        SimpleAction act_preferences = new SimpleAction("preferences", null);
         // TODO: Implement this
+        act_preferences.set_enabled(false);
+        main_group.add_action(act_preferences);
+        SimpleAction act_about = new SimpleAction("about", null);
+        // TODO: Implement this
+        act_about.set_enabled(false);
+        main_group.add_action(act_about);
+        button_menu.insert_action_group("file", main_group);
+
+        // Main content browser group
+        SimpleActionGroup content_group = new SimpleActionGroup();
+        SimpleAction act_import = new SimpleAction("import", null);
+        act_import.activate.connect(import_dialog);
+        act_import.set_enabled(true);
+        content_group.add_action(act_import);
+        SimpleAction act_open = new SimpleAction("open", null);
+        act_open.activate.connect(() =>
+        {
+            project_icon_view.selected_foreach((view, path) =>
+            {
+                view.item_activated(path);
+            });
+        });
+        content_group.add_action(act_open);
+        SimpleAction act_rename = new SimpleAction("rename", null);
+        act_rename.activate.connect(() =>
+        {
+            TreePath path = null;
+            CellRenderer renderer;
+            CellRendererText text = (CellRendererText)project_icon_view.get_cells().nth_data(project_icon_view.get_text_column());
+            project_icon_view.get_cursor(out path, out renderer);
+            if(path != null) {
+                text.editable = true;
+                project_icon_view.set_cursor(path, text, true);
+                text.editable = false;
+            }
+        });
+        content_group.add_action(act_rename);
+        SimpleAction act_delete = new SimpleAction("delete", null);
+        act_delete.activate.connect(() =>
+        {
+            project_icon_view.selected_foreach((view, path) =>
+            {
+                TreeIter iter;
+                string file_uri;
+                project_content_data.get_iter(out iter, path);
+                project_content_data.get(iter, 1, out file_uri);
+                // Get the file
+                File file = File.new_for_uri(file_uri);
+                try {
+                    file.delete();
+                } catch(Error e) {
+                    app.display_warning("Can't delete file: " + e.message);
+                }
+            });
+        });
+        content_group.add_action(act_delete);
+        files_paned.insert_action_group("content", content_group);
+
+        // Main content browser group for creating assets
+        SimpleActionGroup content_new_group = new SimpleActionGroup();
+        SimpleAction act_new_folder = new SimpleAction("folder", null);
+        act_new_folder.activate.connect(() =>
+        {
+            try {
+                File new_folder = file_from_resource(get_selected_path(), "Untitled", true);
+                new_folder.make_directory();
+            } catch(Error e) {
+                app.display_warning("Can't make directory: " + e.message);
+            }
+        });
+        content_new_group.add_action(act_new_folder);
+        SimpleAction act_new_actor = new SimpleAction("actor", null);
+        // TODO: Implement this
+        act_new_actor.set_enabled(false);
+        content_new_group.add_action(act_new_actor);
+        SimpleAction act_new_map = new SimpleAction("map", null);
+        // TODO: Implement this
+        act_new_map.set_enabled(false);
+        content_new_group.add_action(act_new_map);
+        SimpleAction act_new_sprite = new SimpleAction("sprite", null);
+        // TODO: Implement this
+        act_new_sprite.set_enabled(false);
+        content_new_group.add_action(act_new_sprite);
+        SimpleAction act_new_tileset = new SimpleAction("tileset", null);
+        // TODO: Implement this
+        act_new_tileset.set_enabled(false);
+        content_new_group.add_action(act_new_tileset);
+        files_paned.insert_action_group("new", content_new_group);
+    }
+
+    /*
+     * This function creates the menu models for this window, and also connects
+     * the signals that display them.
+     */
+    private void init_menus()
+    {
+        // TODO: Implement this
+        GLib.Menu main_model = new GLib.Menu();
+        main_model.append("New Project", "file.new");
+        main_model.append("Load Project", "file.load");
+
+        GLib.Menu pref_section = new GLib.Menu();
+        pref_section.append("Preferences", "file.preferences");
+        main_model.append_section(null, pref_section);
+        GLib.Menu app_section = new GLib.Menu();
+        app_section.append("About", "file.about");
+        app_section.append("Quit", "file.exit");
+        main_model.append_section(null, app_section);
+        button_menu.set_menu_model(main_model);
+
+
+        GLib.Menu content_model = new GLib.Menu();
+        content_model.append("Import File", "content.import");
+        content_model.append("New Folder", "new.folder");
+
+        GLib.Menu new_sub = new GLib.Menu();
+        new_sub.append("Actor", "new.actor");
+        new_sub.append("Map", "new.map");
+        new_sub.append("Sprite", "new.sprite");
+        new_sub.append("Tileset", "new.tileset");
+        content_model.append_submenu("New", new_sub);
+
+        GLib.Menu content_file_model = new GLib.Menu();
+        content_file_model.append("Open", "content.open");
+        content_file_model.append("Rename", "content.rename");
+        content_file_model.append("Delete", "content.delete");
+
+        content_menu = new Gtk.Menu.from_model(content_model);
+        content_menu.attach_to_widget(files_paned, null);
+        content_file_menu = new Gtk.Menu.from_model(content_file_model);
+        content_file_menu.attach_to_widget(files_paned, null);
     }
 
     private void add_project_directory(File f, TreeIter? parent_iter)
@@ -371,22 +572,58 @@ public class MainWindow : Window
 
             FileInfo file_info;
             while ((file_info = enumerator.next_file ()) != null) {
-                if(file_info.get_file_type () == FileType.DIRECTORY){
-                    add_project_directory(f.resolve_relative_path (file_info.get_name ()), iter);
-                } else {
-                    TreeIter temp_iter;
-                    project_tree_data.append(out temp_iter, iter);
-
-                    string name = "text-x-generic";
-                    if(file_info.get_name().has_suffix(".png"))
-                        name = "image-x-generic";
-                    project_tree_data.set(temp_iter, 0, file_info.get_name(), 1, f.get_uri() + file_info.get_name(), 2, default_icon, 3, false, 4, name);
-                }
+                add_project_file(file_info, iter);
             }
         } catch (Error e) {
             stderr.printf ("Error reading project directory: %s\n", e.message);
             return;
         }
+    }
+
+    /*
+     * This function adds a new file to the treestore representing the content
+     * directory
+     */
+    private void add_project_file(FileInfo info, TreeIter? parent_iter)
+    {
+        if(info.get_file_type () == FileType.DIRECTORY && parent_iter != null) {
+            string uri;
+            project_tree_data.get(parent_iter, 1, out uri);
+            File f = File.new_for_uri(uri);
+
+            add_project_directory(f.resolve_relative_path (info.get_name ()), parent_iter);
+            return;
+        }
+
+        TreeIter temp_iter;
+        project_tree_data.append(out temp_iter, parent_iter);
+
+        string name = "text-x-generic";
+        if(info.get_name().has_suffix(".png"))
+            name = "image-x-generic";
+        project_tree_data.set(temp_iter, 0, info.get_name(), 1, app.get_content_directory().get_uri() + info.get_name(), 2, default_icon, 3, false, 4, name);
+    }
+
+    /*
+     * This function removes file file from the treestore representing the
+     * content directory
+     */
+    private void rm_project_file(File to_remove, TreeIter? parent_iter)
+    {
+        if(parent_iter == null)
+            project_tree_data.get_iter_first(out parent_iter);
+        TreeIter child;
+        project_tree_data.iter_children(out child, parent_iter);
+
+        do {
+            string uri;
+            project_tree_data.get(child, 1, out uri);
+            if(uri == to_remove.get_uri()) {
+                // FIXME: What happens when the current directory is removed?
+                project_tree_data.remove(ref child);
+                return;
+            }
+        } while(project_tree_data.iter_next(ref child));
     }
 
     private void build_content_data(TreePath? path = null)
@@ -409,6 +646,28 @@ public class MainWindow : Window
             model.get(iter, 0, out title);
             ((CellRendererText)cell).text = title;
         }
+    }
+
+    private void import_dialog()
+    {
+        Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Import an Asset", this, Gtk.FileChooserAction.OPEN, "Cancel", Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.ACCEPT);
+        Gtk.FileFilter filter = new Gtk.FileFilter();
+        filter.add_pattern("*.png");
+        filter.set_filter_name("PNG files");
+        fc.add_filter(filter);
+        fc.response.connect((r) =>
+        {
+            if(r == Gtk.ResponseType.ACCEPT) {
+                try {
+                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + get_selected_path() + Halberd.IO.get_unique_name(get_selected_path(), fc.get_file().get_basename()));
+                    fc.get_file().copy(dest, FileCopyFlags.NONE);
+                } catch(Error e) {
+                    stderr.printf("Error importing: %s\n", e.message);
+                }
+            }
+            fc.destroy();
+        });
+        fc.run();
     }
 
     private void on_exit()
