@@ -365,7 +365,7 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
 void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count);
 
 int8_t index_by_handle(spriteset* set, const char* handle);
-uint8_t get_tileset_id(const char* name);
+uint8_t get_tileset_id(const char* resource_location, const char* resource_name);
 
 void update_camera(float w, float h);
 void update_view(float x, float y, float zoom);

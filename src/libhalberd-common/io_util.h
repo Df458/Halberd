@@ -66,6 +66,20 @@ FILE* load_resource_file(const char* resource_location, const char* resource_nam
  */
 unsigned char* load_resource_to_buffer(const char* resource_location, const char* resource_name);
 
+/*!
+ * This funcion loads a string from a file.
+ * The string should be formatted as such: <length(2 bytes)><string data>
+ * The file pointer will be advanced to the end of the string.
+ */
+char* read_string_from_file(FILE* file);
+
+/*!
+ * This funcion writes a string ito a file.
+ * The string will be formatted as such: <length(2 bytes)><string data>
+ * The file pointer will be advanced to the end of the string.
+ */
+void write_string_to_file(FILE* file, const char* str);
+
 //-----------------------------------------------------------------------------
 // Other code
 //-----------------------------------------------------------------------------

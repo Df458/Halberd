@@ -24,20 +24,21 @@ void mapcp(uint8_t from, uint8_t to)
 {
     if(from > 8 || to > 8)
         return;
-    /*maps[from].position_x = maps[to].position_x;*/
-    /*maps[from].position_y = maps[to].position_y;*/
-    /*memcpy(&maps[to], &maps[from], sizeof(tilemap));*/
     maps[to].loaded = maps[from].loaded;
     GLuint id_temp = maps[to].tile_id_buffer;
     GLuint set_temp = maps[to].tile_set_buffer;
+    GLuint conv_temp = maps[to].tile_id_conversion_buffer;
     maps[to].tile_id_buffer = maps[from].tile_id_buffer;
     maps[to].tile_set_buffer = maps[from].tile_set_buffer;
+    maps[to].tile_id_conversion_buffer = maps[from].tile_id_conversion_buffer;
     maps[from].tile_id_buffer = id_temp;
     maps[from].tile_set_buffer = set_temp;
+    maps[from].tile_id_conversion_buffer = conv_temp;
     memcpy(maps[to].tile_id_data, maps[from].tile_id_data, TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS * sizeof(GLuint));
     memcpy(maps[to].tile_set_data, maps[from].tile_set_data, TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS * sizeof(GLuint));
-    /*maps[to].position_x = maps[from].position_x;*/
-    /*maps[to].position_y = maps[from].position_y;*/
+    maps[to].tileset_count = maps[from].tileset_count;
+    memcpy(maps[to].tileset_names, maps[from].tileset_names, maps[from].tileset_count * sizeof(char*));
+    memcpy(maps[to].tileset_ids, maps[from].tileset_ids, maps[from].tileset_count * sizeof(uint8_t));
 }
 
 void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y)
@@ -96,6 +97,12 @@ void destroy_maps()
     for(uint8_t i = 0; i < 9; ++i) {
         glDeleteBuffers(1, &maps[i].tile_id_buffer);
         glDeleteBuffers(1, &maps[i].tile_set_buffer);
+        for(uint8_t j = 0; i < maps[j].tileset_count; ++i) {
+            free(maps[i].tileset_names[j]);
+        }
+        free(maps[i].tileset_ids);
+        free(maps[i].tileset_names);
+        maps[i].tileset_count = 0;
         maps[i].loaded = 0;
     }
 }
@@ -273,6 +280,32 @@ void update_tile(uint16_t x, uint16_t y, uint16_t z, uint32_t tile, uint8_t map_
     maps[map_id].tile_id_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * TILEMAP_DIMS * z)] = tile;
     glBindBuffer(GL_ARRAY_BUFFER, maps[map_id].tile_id_buffer);
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(GLuint) * (x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * TILEMAP_DIMS * z)), sizeof(GLuint), &maps[map_id].tile_id_data[x + (TILEMAP_DIMS * y) + (TILEMAP_DIMS * TILEMAP_DIMS * z)]);
+}
+
+int16_t add_tileset_from_resource(const char* resource_location, const char* resource_name, tilemap* map)
+{
+    uint8_t id = get_tileset_id(resource_location, resource_name);
+    for(uint8_t i = 0; i < map->tileset_count; ++i) {
+        if(map->tileset_ids[i] == id)
+            return i;
+    }
+    map->tileset_count++;
+    map->tileset_ids = realloc(map->tileset_ids, map->tileset_count * sizeof(uint8_t));
+    map->tileset_ids[map->tileset_count - 1] = id;
+    map->tileset_names = realloc(maps->tileset_names, map->tileset_count * sizeof(char*));
+    map->tileset_names[map->tileset_count - 1] = strdup(resource_name);
+
+    return map->tileset_count;
+}
+
+int16_t add_tileset_to_all_from_resource(const char* resource_location, const char* resource_name)
+{
+    int16_t id = -1;
+    for(uint8_t i = 0; i < 9; ++i) {
+        id = add_tileset_from_resource(resource_location, resource_name, &maps[i]);
+    }
+
+    return id;
 }
 
 uint8_t get_solid(uint32_t tile)

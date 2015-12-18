@@ -89,8 +89,8 @@ public class StartupWindow : Window
         load_last_check.active = load_last_setting;
 
         empty_box.pack_start(empty_image, true, true);
-        empty_box.pack_start(empty_label, true, false);
-        empty_box.pack_end(empty_separator, true, false);
+        empty_box.pack_start(empty_label, false, false);
+        empty_box.pack_end(empty_separator, false, false);
         main_box.pack_start(load_last_check, false, false);
         action_box.pack_start(button_new, true, false);
         action_box.pack_start(button_load, true, false);

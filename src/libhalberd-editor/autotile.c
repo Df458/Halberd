@@ -1,4 +1,5 @@
 #include "autotile.h"
+#include "io_util.h"
 #include "util.h"
 
 #include <stdio.h>
@@ -113,12 +114,18 @@ void init_automaps()
 bool automap_loader(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
 {
     rewind(infile);
-    size_t header_size = sizeof(uint16_t) * 2;
+    size_t header_size = 0;
     size_t chunk_size = TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS;
     uint16_t width = 0;
     uint16_t height = 0;
+    fread(&header_size, sizeof(size_t), 1, infile);
     fread(&width, sizeof(uint16_t), 1, infile);
     fread(&height, sizeof(uint16_t), 1, infile);
+    fread(&(map->tileset_count), sizeof(uint8_t), 1, infile);
+    for(int i = 0; i < map->tileset_count; ++i) {
+        add_tileset_from_resource(read_string_from_file(infile), read_string_from_file(infile), map);
+    }
+
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
     fread(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);
     fread(automaps[x + y * 3].tile_data, sizeof(uint8_t), chunk_size, infile);
@@ -135,8 +142,11 @@ bool automap_saver(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
     size_t chunk_size = TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS;
     uint16_t width = 3;
     uint16_t height = 3;
+    fwrite(&header_size, sizeof(size_t), 1, infile);
     fwrite(&width, sizeof(uint16_t), 1, infile);
     fwrite(&height, sizeof(uint16_t), 1, infile);
+    fwrite(&(map->tileset_count), sizeof(uint8_t), 1, infile);
+
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
     fwrite(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);
     fwrite(automaps[x + y * 3].tile_data, sizeof(uint8_t), chunk_size, infile);

@@ -12,15 +12,27 @@
 
 typedef struct tilemap
 {
+    // General Map Data
     uint16_t position_x;
     uint16_t position_y;
+    uint8_t flags;
+    uint8_t loaded;
     
+    // Tile Data
     GLuint tile_id_data[TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS];
     GLuint tile_set_data[TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS];
-    uint8_t flags;
+
+    // Tileset Information
+    uint8_t  tileset_count;
+    char**   tileset_names;
+    uint8_t* tileset_ids;
+
+    // Render Buffers
     GLuint tile_id_buffer;
     GLuint tile_set_buffer;
-    uint8_t loaded;
+    // This buffer holds tileset_ids, and is used to convert from the id in
+    // tile_id_buffer to the actual id of the loaded tileset
+    GLuint tile_id_conversion_buffer;
 }
 tilemap;
 
@@ -38,14 +50,14 @@ void draw_maps(mat4 transform);
 void move_maps(int16_t x, int16_t y);
 
 void clear_maps();
-//void save_tilemap_to_resource(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
 void save_maps_to_resource(const char* resource_location, const char* resource_name);
-//void load_resource_to_tilemap(const char* resource_location, const char* resource_name, tilemap* map, uint16_t x, uint16_t y);
 void load_maps_from_resource(const char* resource_location, const char* resource_name);
 
 void get_true_tile_position(uint16_t* X, uint16_t* Y, int16_t* x, int16_t* y);
 uint32_t get_tile(uint16_t X, uint16_t Y, int16_t x, int16_t y, uint16_t z);
 void update_tile(uint16_t x, uint16_t y, uint16_t z, uint32_t tile, uint8_t map_id);
+int16_t add_tileset_from_resource(const char* resource_location, const char* resource_name, tilemap* map);
+int16_t add_tileset_to_all_from_resource(const char* resource_location, const char* resource_name);
 uint8_t get_solid(uint32_t tile);
 
 #endif
