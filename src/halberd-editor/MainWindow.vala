@@ -28,14 +28,12 @@ public class MainWindow : Window
     private ProjectFilePane project_view;
 
     // Inspector Pane
-    //private ComboBox tileset_selector;
-    //private Toolbar  tileset_toolbar;
+    private SidePane inspector_pane;
 
     // Containers
     private Paned main_paned;
-    //private Paned inspector_paned;
+    private Paned inspector_paned;
     private Box   toolbar_box;
-    //private Box   tile_select_box;
     private Gtk.Stack view_stack;
 
     string current_map_name = "";
@@ -72,6 +70,7 @@ public class MainWindow : Window
     {
         topbar = new HeaderBar();
         main_paned = new Paned(Orientation.VERTICAL);
+        inspector_paned = new Paned(Orientation.HORIZONTAL);
         toolbar_box = new Box(Orientation.HORIZONTAL, 0);
         tool_separator = new Separator(Orientation.VERTICAL);
         toolbar = new Toolbar();
@@ -93,7 +92,8 @@ public class MainWindow : Window
 
         toolbar_box.pack_start(toolbar, false, false);
         toolbar_box.pack_start(tool_separator, false, false);
-        view_stack.add_named(toolbar_box, "map");
+        inspector_paned.pack1(toolbar_box, true, false);
+        view_stack.add_named(inspector_paned, "map");
         main_paned.pack1(view_stack, true, false);
         this.add(main_paned);
         this.set_titlebar(topbar);
@@ -108,6 +108,7 @@ public class MainWindow : Window
         button_play = new ToggleButton();
         button_menu = new MenuButton();
         project_view = new ProjectFilePane();
+        inspector_pane = new SidePane();
 
         button_draw = new ToggleToolButton();
         button_fill = new ToggleToolButton();
@@ -130,6 +131,7 @@ public class MainWindow : Window
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
+        inspector_paned.pack2(inspector_pane, true, true);
         main_paned.pack2(project_view, true, false);
         toolbar_box.pack_start(viewport, true, true);
         toolbar.insert(button_draw,  0);
@@ -237,7 +239,6 @@ public class MainWindow : Window
     }
 
     // TODO: Move this out of the class
-    // FIXME: This is commented. Fix it!
     private void import_dialog()
     {
         Gtk.FileChooserDialog fc = new Gtk.FileChooserDialog("Import an Asset", this, Gtk.FileChooserAction.OPEN, "Cancel", Gtk.ResponseType.CANCEL, "Open", Gtk.ResponseType.ACCEPT);
@@ -249,7 +250,7 @@ public class MainWindow : Window
         {
             if(r == Gtk.ResponseType.ACCEPT) {
                 try {
-                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + project_view.get_selected_path() + Halberd.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
+                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + Halberd.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
                     fc.get_file().copy(dest, FileCopyFlags.NONE);
                 } catch(Error e) {
                     stderr.printf("Error importing: %s\n", e.message);

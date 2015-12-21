@@ -9,38 +9,6 @@
     <property name="step_increment">8</property>
     <property name="page_increment">32</property>
   </object>
-  <object class="GtkAboutDialog" id="aboutdialog1">
-    <property name="can_focus">False</property>
-    <property name="type">popup</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">Halberd RPG Editor</property>
-    <property name="version">0.0.1</property>
-    <property name="website">http://www.github.com/Df458/Halberd</property>
-    <property name="website_label" translatable="yes">Github</property>
-    <property name="authors">Hugues Ross</property>
-    <property name="logo_icon_name">go-home</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="aboutdialog-vbox1">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="aboutdialog-action_area1">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkListStore" id="liststore1">
     <columns>
       <!-- column-name Name -->
@@ -237,6 +205,7 @@
                 <property name="margin_top">12</property>
                 <property name="margin_bottom">12</property>
                 <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
                 <child>
                   <object class="GtkComboBoxText" id="comboboxtext1">
                     <property name="visible">True</property>
@@ -333,21 +302,21 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="box3">
+          <object class="GtkBox" id="project_view">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">6</property>
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkBox" id="box2">
+              <object class="GtkBox" id="control_box">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_left">12</property>
                 <property name="margin_right">12</property>
                 <property name="spacing">6</property>
                 <child>
-                  <object class="GtkSearchEntry" id="searchentry1">
+                  <object class="GtkSearchEntry" id="filter_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="primary_icon_name">edit-find-symbolic</property>
@@ -362,19 +331,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label1">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">File path goes here</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkButton" id="button6">
+                  <object class="GtkButton" id="import_button">
                     <property name="label" translatable="yes">Import</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -398,29 +355,37 @@
               </packing>
             </child>
             <child>
-              <object class="GtkPaned" id="paned2">
+              <object class="GtkPaned" id="view_paned">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="position">500</property>
                 <property name="position_set">True</property>
                 <child>
-                  <object class="GtkTreeView" id="treeview1">
+                  <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="model">liststore2</property>
-                    <property name="headers_visible">False</property>
-                    <child internal-child="selection">
-                      <object class="GtkTreeSelection" id="treeview-selection1"/>
-                    </child>
+                    <property name="hscrollbar_policy">never</property>
+                    <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                        <property name="sizing">autosize</property>
-                        <property name="title" translatable="yes">column</property>
+                      <object class="GtkTreeView" id="sidebar_view">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="model">liststore2</property>
+                        <property name="headers_visible">False</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection" id="treeview-selection1"/>
+                        </child>
                         <child>
-                          <object class="GtkCellRendererText" id="cellrenderertext1"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
+                          <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+                            <property name="sizing">autosize</property>
+                            <property name="title" translatable="yes">column</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext1"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
@@ -431,28 +396,36 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkOverlay" id="overlay1">
+                  <object class="GtkOverlay" id="view_overlay">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkIconView" id="iconview1">
+                      <object class="GtkScrolledWindow" id="scrolledwindow2">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="margin">6</property>
-                        <property name="model">liststore1</property>
+                        <property name="hscrollbar_policy">never</property>
+                        <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkCellRendererPixbuf" id="cellrenderertext3">
-                            <property name="stock_size">6</property>
+                          <object class="GtkIconView" id="icon_view">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="margin">6</property>
+                            <property name="model">liststore1</property>
+                            <child>
+                              <object class="GtkCellRendererPixbuf" id="cellrenderertext3">
+                                <property name="stock_size">6</property>
+                              </object>
+                              <attributes>
+                                <attribute name="icon-name">1</attribute>
+                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext2"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
                           </object>
-                          <attributes>
-                            <attribute name="icon-name">1</attribute>
-                          </attributes>
-                        </child>
-                        <child>
-                          <object class="GtkCellRendererText" id="cellrenderertext2"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
                         </child>
                       </object>
                       <packing>
@@ -460,7 +433,7 @@
                       </packing>
                     </child>
                     <child type="overlay">
-                      <object class="GtkScale" id="scale1">
+                      <object class="GtkScale" id="icon_scale">
                         <property name="width_request">128</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>

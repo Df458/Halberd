@@ -25,6 +25,19 @@ class HalberdEditor : Gtk.Application
         return File.new_for_path(Halberd.IO.get_path());
     }
 
+    public string? path_to_content_path(string path)
+    {
+        string cpath = Halberd.IO.get_path();
+
+        if(path.substring(0, cpath.length) == cpath) {
+            if(path.length <= cpath.length + 1)
+                return null;
+            return path.substring(cpath.length + 1, path.length - cpath.length - 1);
+        }
+
+        return path;
+    }
+
     public int runall()
     {
         string? last_path;
