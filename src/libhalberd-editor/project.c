@@ -62,7 +62,7 @@ bool load_project(const char* path)
 
     char* content_path = calloc(strlen(path) - strlen(title_ptr) + 8 + 1, sizeof(char));
     strncpy(content_path, path, strlen(path) - strlen(title_ptr));
-    strcat(content_path, "/content");
+    strcat(content_path, "content");
     set_resource_path(content_path);
     return true;
 }
