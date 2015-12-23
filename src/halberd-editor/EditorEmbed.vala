@@ -48,14 +48,14 @@ public class EditorEmbed : EmbeddableView
         else if(event.button == 1) {
             switch(current_tool) {
                 case Tool.DRAW:
-                    Editor.Cursor.place_tile(1);
+                    Editor.Cursor.place_tile();
                     dragging_line = true;
                     break;
                 case Tool.FILL:
                     Editor.Cursor.flood_fill(1);
                     break;
                 case Tool.ERASE:
-                    Editor.Cursor.place_tile(0);
+                    Editor.Cursor.place_tile_id(0);
                     dragging_line = true;
                     break;
             }
@@ -93,9 +93,9 @@ public class EditorEmbed : EmbeddableView
                 Editor.Cursor.drag_map((int)event.x, (int)event.y);
         } else if(dragging_line) {
             if(current_tool == Tool.DRAW)
-                Editor.Cursor.place_line(1, (int)event.x, (int)event.y);
+                Editor.Cursor.place_line((int)event.x, (int)event.y);
             else if(current_tool == Tool.ERASE)
-                Editor.Cursor.place_line(0, (int)event.x, (int)event.y);
+                Editor.Cursor.place_line_id(0, (int)event.x, (int)event.y);
         }
         Editor.Cursor.set_position((int)event.x, (int)event.y);
         viewport.queue_draw();

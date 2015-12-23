@@ -36,6 +36,8 @@ namespace Editor {
         void init();
         [CCode (cname="cursor_set_position")]
         void set_position(int x, int y);
+        [CCode (cname="cursor_set_id")]
+        void set_id(uint id);
         [CCode (cname="map_set_position")]
         void set_map_position(int x, int y);
         [CCode (cname="map_drag")]
@@ -43,9 +45,13 @@ namespace Editor {
         [CCode (cname="cursor_zoom")]
         void zoom(double input);
         [CCode (cname="cursor_place_tile")]
-        void place_tile(ushort tile);
+        void place_tile();
+        [CCode (cname="cursor_place_tile_id")]
+        void place_tile_id(ushort tile);
         [CCode (cname="cursor_place_line")]
-        void place_line(ushort tile, int x, int y);
+        void place_line(int x, int y);
+        [CCode (cname="cursor_place_line_id")]
+        void place_line_id(ushort tile, int x, int y);
         [CCode (cname="cursor_flood_fill")]
         void flood_fill(ushort tile);
     }

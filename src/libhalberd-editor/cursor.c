@@ -22,6 +22,8 @@ void cursor_init()
     main_cursor.control_button = 0;
 
     main_cursor.selected_map = 0;
+    main_cursor.set_id = 0;
+    main_cursor.current_id = 1;
 
     mview.x = 0;
     mview.y = 0;
@@ -37,6 +39,11 @@ void cursor_set_position(int32_t x, int32_t y)
     main_cursor.selected_map = (main_cursor.selected_tile_x / TILEMAP_DIMS) + (main_cursor.selected_tile_y / TILEMAP_DIMS * 3);
     main_cursor.selected_tile_x %= TILEMAP_DIMS;
     main_cursor.selected_tile_y %= TILEMAP_DIMS;
+}
+
+void cursor_set_id(uint32_t id)
+{
+    main_cursor.current_id = id;
 }
 
 void map_set_position(int32_t x, int32_t y)
@@ -66,7 +73,12 @@ bool cursor_in_bounds(int32_t true_x, int32_t true_y)
     return true_x >= 0 && true_y >= 0;
 }
 
-void cursor_place_tile(uint8_t tile)
+void cursor_place_tile()
+{
+    cursor_place_tile_id(main_cursor.current_id);
+}
+
+void cursor_place_tile_id(uint8_t tile)
 {
     /*update_tile(main_cursor.selected_tile_x, main_cursor.selected_tile_y, 0, tile, main_cursor.selected_map);*/
     /*place_autotile(main_cursor.selected_map % 3, main_cursor.selected_map / 3, main_cursor.selected_tile_x, main_cursor.selected_tile_y, 0, tile);*/
@@ -77,10 +89,15 @@ void cursor_place_tile(uint8_t tile)
 void cursor_place_tile_at(uint8_t tile, int32_t x, int32_t y)
 {
     update_tile(x, y, 0, tile, main_cursor.selected_map);
-    place_autotile(main_cursor.selected_map % 3, main_cursor.selected_map / 3, x, y, 0, tile);
+    /*place_autotile(main_cursor.selected_map % 3, main_cursor.selected_map / 3, x, y, 0, tile);*/
 }
 
-void cursor_place_line(uint8_t tile, int32_t x, int32_t y)
+void cursor_place_line(int32_t x, int32_t y)
+{
+    cursor_place_line_id(main_cursor.current_id, x, y);
+}
+
+void cursor_place_line_id(uint8_t tile, int32_t x, int32_t y)
 {
     // TODO: Implement this (Bresenham's Algorithm)
     cursor prev = cursor_get();

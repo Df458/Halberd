@@ -118,13 +118,16 @@ bool automap_loader(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
     size_t chunk_size = TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS;
     uint16_t width = 0;
     uint16_t height = 0;
-    fread(&header_size, sizeof(size_t), 1, infile);
+    uint8_t tileset_count = 0;
     fread(&width, sizeof(uint16_t), 1, infile);
     fread(&height, sizeof(uint16_t), 1, infile);
-    fread(&(map->tileset_count), sizeof(uint8_t), 1, infile);
-    for(int i = 0; i < map->tileset_count; ++i) {
-        add_tileset_from_resource(read_string_from_file(infile), read_string_from_file(infile), map);
+    fread(&tileset_count, sizeof(uint8_t), 1, infile);
+    for(int i = 0; i < tileset_count; ++i) {
+        char* loc = read_string_from_file(infile);
+        char* name = read_string_from_file(infile);
+        add_tileset_from_resource(loc, name, map);
     }
+    header_size = ftell(infile);
 
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
     fread(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);
@@ -138,14 +141,19 @@ bool automap_loader(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
 bool automap_saver(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
 {
     rewind(infile);
-    size_t header_size = sizeof(uint16_t) * 2;
+    size_t header_size = 0;
     size_t chunk_size = TILEMAP_DIMS * TILEMAP_DIMS * TILEMAP_LAYERS;
     uint16_t width = 3;
     uint16_t height = 3;
-    fwrite(&header_size, sizeof(size_t), 1, infile);
     fwrite(&width, sizeof(uint16_t), 1, infile);
     fwrite(&height, sizeof(uint16_t), 1, infile);
     fwrite(&(map->tileset_count), sizeof(uint8_t), 1, infile);
+    for(int i = 0; i < map->tileset_count; ++i) {
+        tileset* t = get_tileset_from_id(map->tileset_ids[i]);
+        write_string_to_file(infile, t->resource_location);
+        write_string_to_file(infile, t->resource_name);
+    }
+    header_size = ftell(infile);
 
     fseek(infile, header_size + (x + y * width) * chunk_size * 2, SEEK_SET);
     fwrite(map->tile_id_data, sizeof(uint8_t), chunk_size, infile);

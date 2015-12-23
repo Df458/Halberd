@@ -86,11 +86,20 @@ public class SidePane : Box
                 select_pop.hide();
                 tileset_list.add(select_widget.get_selected());
                 tileset_selector.append_text(tileset_list[tileset_list.size - 1].name);
+                Halberd.Game.Maps.add_tileset_from_resource(tileset_list[tileset_list.size - 1].path, tileset_list[tileset_list.size - 1].name);
             });
             select_pop.show_all();
         });
 
         tileset_selector.changed.connect(build_tiles);
+        tile_selector.selection_changed.connect(() =>
+        {
+            TreePath path;
+            CellRenderer r;
+            tile_selector.get_cursor(out path, out r);
+            if(path != null)
+                Halberd.Editor.Cursor.set_id(path.get_indices()[0] + 1);
+        });
     }
 
     private void build_tiles()

@@ -119,7 +119,7 @@ $(OBJPATH)$(COMMONTARGET)/%.o: $(SRCPATH)$(COMMONTARGET)/%.c
 	$(CC) -c $< -o $@ $(CFLAGS) $(LIBGAMEFLAGS)
 
 # Target rules
-all: $(GAMETARGET) $(EDITORTARGET)
+all: $(GAMETARGET) $(EDITORTARGET) tags
 
 $(GAMETARGET): $(LIBGAMETARGET) $(GAMEDEPS) $(GAMESRCS) $(GAMEOBJS)
 	@echo -e "Building \e[1;35m$@\e[0m..."
@@ -153,6 +153,9 @@ $(COMMONTARGET): $(COMMONDEPS) $(COMMONSRCS) $(COMMONOBJS)
 settings: data/org.df458.halberd.gschema.xml
 	cp -f data/org.df458.halberd.gschema.xml /usr/share/glib-2.0/schemas
 	glib-compile-schemas /usr/share/glib-2.0/schemas
+
+tags: $(COMMONSRCS) $(LIBEDITORSRCS) $(LIBGAMESRCS) $(EDITORSRCS) $(GAMESRCS)
+	ctags -R
 
 install: settings
 

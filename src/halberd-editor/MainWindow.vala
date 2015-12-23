@@ -57,7 +57,7 @@ public class MainWindow : Window
     }
 
     // TODO: This should probably be moved out of this class
-    public void load_file(string resource_path, string resource_name)
+    public void load_file(string? resource_path, string resource_name)
     {
         // TODO: Make this open differently for different filetypes
         current_map_path = resource_path;

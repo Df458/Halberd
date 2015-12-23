@@ -18,8 +18,6 @@ GLuint grid_dash_texture = 0;
 GLuint grid_buffer = 0;
 GLuint grid_horiz_buffer = 0;
 GLuint grid_position_buffer = 0;
-uint8_t set_id = 0;
-uint32_t current_id = 0;
 
 bool init_render()
 {
@@ -54,7 +52,7 @@ bool render_editor()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     update_view(v.x, v.y, v.zoom);
     /*update_cursor_data(&selected_map, &selected_tile_x, &selected_tile_y);*/
-    uint8_t can_place = cursor_in_bounds(c.selected_tile_x, c.selected_tile_y);
+    bool can_place = cursor_in_bounds(c.selected_tile_x, c.selected_tile_y);
 
     mat4 t = ident;
     mat4 cursor_pos = ident;
@@ -67,7 +65,7 @@ bool render_editor()
     translate(&cursor_pos, c.selected_tile_x * TILE_WIDTH + (c.selected_map % 3 * TILEMAP_DIMS * TILE_WIDTH), c.selected_tile_y * TILE_HEIGHT + (c.selected_map / 3 * TILEMAP_DIMS * TILE_HEIGHT), 0);
     draw_maps(t);
     if(can_place) {
-        draw_single_tile(set_id, current_id + 1, cursor_pos);
+        draw_single_tile(c.set_id, c.current_id, cursor_pos);
     }
     for(int i = 0; i < 3; ++i)
         for(int j = 0; j < 3; ++j) {

@@ -134,22 +134,26 @@ unsigned char* load_resource_to_buffer(const char* resource_location, const char
     return filedata;
 }
 
-// TODO: Implement string IO
 char* read_string_from_file(FILE* file)
 {
-    char* str;
+    char* str = 0;
     uint16_t len;
     fread(&len, sizeof(uint16_t), 1, file);
-    str = calloc(len + 1, sizeof(char));
-    fread(str, sizeof(char), len, file);
+    if(len != 0) {
+        str = calloc(len + 1, sizeof(char));
+        fread(str, sizeof(char), len, file);
+    }
     return str;
 }
 
 void write_string_to_file(FILE* file, const char* str)
 {
-    uint16_t len = strlen(str);
+    uint16_t len = 0;
+    if(str)
+        len = strlen(str);
     fwrite(&len, sizeof(uint16_t), 1, file);
-    fwrite(str, sizeof(char), len, file);
+    if(len != 0)
+        fwrite(str, sizeof(char), len, file);
 }
 
 char* get_unique_resource_name(const char* resource_location, const char* resource_name)

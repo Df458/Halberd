@@ -561,15 +561,15 @@ int8_t index_by_handle(spriteset* set, const char* handle)
     return -1;
 }
 
-uint8_t get_tileset_id(const char* name)
+uint8_t get_tileset_id(const char* resource_location, const char* resource_name)
 {
     uint8_t i;
     for(i = 0; i < loaded_tilesets; ++i)
-        if(!strcmp(tilesets[i].name, name))
+        if(!strcmp(tilesets[i].resource_name, resource_name))
             return i;
 
     for(i = 0; i < 32; ++i) {
-        bool found = 1;
+        bool found = true;
         for(uint8_t j = 0; j < loaded_tilesets; ++j) {
             if(tilesets[j].layer == i) {
                 found = false;
@@ -585,10 +585,15 @@ uint8_t get_tileset_id(const char* name)
         return 0;
 
     // TODO: Load the tileset here
-    tilesets[loaded_tilesets] = load_resource_to_tileset("tilesets", name, tile_buffer, i);
+    tilesets[loaded_tilesets] = load_resource_to_tileset(resource_location, resource_name, tile_buffer, i);
     loaded_tilesets++;
 
     return i;
+}
+
+tileset* get_tileset_from_id(uint8_t id)
+{
+    return &tilesets[id];
 }
 
 void update_camera(float w, float h)

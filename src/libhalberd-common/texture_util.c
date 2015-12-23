@@ -381,6 +381,11 @@ tileset load_resource_to_tileset(const char* resource_location, const char* reso
             free(image_data);
         // TODO: Fail this out
     }
+    if(resource_location)
+        new_tileset.resource_location = strdup(resource_location);
+    else
+        new_tileset.resource_location = 0;
+    new_tileset.resource_name = strdup(resource_name);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, texture_handle);
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);

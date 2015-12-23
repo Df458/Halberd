@@ -43,6 +43,8 @@ namespace Game {
         void load(string? location, string name);
         [CCode (cname = "save_maps_to_resource")]
         void save(string? location, string name);
+        [CCode (cname = "add_tileset_to_all_from_resource")]
+        int add_tileset_from_resource(string? location, string name);
 
         [CCode (cname = "draw_maps")]
         void draw(Mat4 mat);

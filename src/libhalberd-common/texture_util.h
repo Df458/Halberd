@@ -73,11 +73,14 @@ typedef struct ui_box
 }
 ui_box;
 
+// FIXME: Tileset resource info is never freed
 typedef struct tileset // TODO: Fit all tilesets into a texture array(up to 256 simultaneous layers, 32 to be safe!) for extra speed and fewer texture changes
 {
     uint8_t layer;
-    const char* name;
     uint8_t solid[1024];
+
+    char* resource_location;
+    char* resource_name;
 }
 tileset;
 
