@@ -169,7 +169,7 @@ void draw_grid(mat4 transform)
     checkGLError();
 
     mat4 tt = ident;
-    translate(&tt, 1, 1, -10);
+    translate(&tt, 0, 0, -10);
     mat4 camera = get_camera();
     mat4 view = get_view();
     mat4 final = mul(mul(camera, view), mul(transform, tt));
