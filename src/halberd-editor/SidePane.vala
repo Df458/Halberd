@@ -20,6 +20,7 @@ public class SidePane : Box
         this.orientation = Orientation.VERTICAL;
         this.spacing = 6;
         this.margin = 12;
+        this.width_request = 250;
         tileset_list = new Gee.ArrayList<ResourceEntry>();
 
         init_structure();

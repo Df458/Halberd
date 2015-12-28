@@ -12,6 +12,8 @@ public class ProjectFilePane : Box
     private TreeModelFilter sidebar_filter;
     private IconView        icon_view;
     private TreeModelFilter view_filter;
+    ScrolledWindow          sidebar_scroll;
+    ScrolledWindow          icon_scroll;
 
     private Overlay         view_overlay;
     private Scale           icon_scale;
@@ -97,10 +99,14 @@ public class ProjectFilePane : Box
         control_box = new Box(Orientation.HORIZONTAL, 6);
         view_paned = new Paned(Orientation.HORIZONTAL);
         view_overlay = new Overlay();
+        sidebar_scroll = new ScrolledWindow(null, null);
+        icon_scroll = new ScrolledWindow(null, null);
 
         control_box.margin_start = 12;
         control_box.margin_end = 12;
 
+        view_paned.pack1(sidebar_scroll, false, false);
+        view_overlay.add(icon_scroll);
         view_paned.pack2(view_overlay, true, false);
         this.pack_start(control_box, false, false);
         this.pack_end(view_paned, true, true);
@@ -151,8 +157,8 @@ public class ProjectFilePane : Box
 
         control_box.pack_start(filter_entry, false, false);
         control_box.pack_start(import_button, false, false);
-        view_paned.pack1(sidebar_view, false, false);
-        view_overlay.add(icon_view);
+        sidebar_scroll.add(sidebar_view);
+        icon_scroll.add(icon_view);
         view_overlay.add_overlay(icon_scale);
     }
 

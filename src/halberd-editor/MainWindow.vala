@@ -136,7 +136,7 @@ public class MainWindow : Window
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
-        inspector_paned.pack2(inspector_pane, true, true);
+        inspector_paned.pack2(inspector_pane, false, true);
         main_paned.pack2(project_view, true, false);
         toolbar_box.pack_start(viewport, true, true);
         toolbar.insert(button_draw,  0);
