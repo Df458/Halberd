@@ -10,6 +10,12 @@ public class ResourceEntry : Object
         path = app.path_to_content_path(file.get_parent().get_path());
     }
 
+    public ResourceEntry.from_entry(string? inpath, string inname)
+    {
+        path = inpath;
+        name = inname;
+    }
+
     public string construct_path()
     {
         return make_path(path, name);

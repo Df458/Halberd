@@ -27,6 +27,12 @@ public class SidePane : Box
         connect_signals();
     }
 
+    public void add_tileset(ResourceEntry set_entry)
+    {
+        tileset_list.add(set_entry);
+        tileset_selector.append_text(tileset_list[tileset_list.size - 1].name);
+    }
+
     private void init_structure()
     {
         control_box = new Box(Orientation.HORIZONTAL, 6);
@@ -84,8 +90,7 @@ public class SidePane : Box
             select_widget.respond.connect((response) =>
             {
                 select_pop.hide();
-                tileset_list.add(select_widget.get_selected());
-                tileset_selector.append_text(tileset_list[tileset_list.size - 1].name);
+                add_tileset(select_widget.get_selected());
                 Halberd.Game.Maps.add_tileset_from_resource(tileset_list[tileset_list.size - 1].path, tileset_list[tileset_list.size - 1].name);
             });
             select_pop.show_all();

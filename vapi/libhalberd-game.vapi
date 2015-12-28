@@ -45,6 +45,12 @@ namespace Game {
         void save(string? location, string name);
         [CCode (cname = "add_tileset_to_all_from_resource")]
         int add_tileset_from_resource(string? location, string name);
+        [CCode (cname = "get_tileset_count")]
+        uint8 get_tileset_count();
+        [CCode (cname = "get_tileset_name")]
+        unowned string? get_tileset_name(uint8 id);
+        [CCode (cname = "get_tileset_location")]
+        unowned string? get_tileset_location(uint8 id);
 
         [CCode (cname = "draw_maps")]
         void draw(Mat4 mat);

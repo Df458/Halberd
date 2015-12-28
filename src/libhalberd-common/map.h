@@ -25,6 +25,7 @@ typedef struct tilemap
     // Tileset Information
     uint8_t  tileset_count;
     char**   tileset_names;
+    char**   tileset_paths;
     uint8_t* tileset_ids;
 
     // Render Buffers
@@ -58,6 +59,10 @@ uint32_t get_tile(uint16_t X, uint16_t Y, int16_t x, int16_t y, uint16_t z);
 void update_tile(uint16_t x, uint16_t y, uint16_t z, uint32_t tile, uint8_t map_id);
 int16_t add_tileset_from_resource(const char* resource_location, const char* resource_name, tilemap* map);
 int16_t add_tileset_to_all_from_resource(const char* resource_location, const char* resource_name);
+uint8_t get_tileset_count();
+// TODO: Replace this with a way of getting a list of loaded tilesets
+const char* get_tileset_name(uint8_t id);
+const char* get_tileset_location(uint8_t id);
 uint8_t get_solid(uint32_t tile);
 
 #endif

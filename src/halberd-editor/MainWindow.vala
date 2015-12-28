@@ -63,6 +63,11 @@ public class MainWindow : Window
         current_map_path = resource_path;
         current_map_name = resource_name;
         Halberd.Game.Maps.load(current_map_path, current_map_name);
+        for(uint8 i = 0; i < Halberd.Game.Maps.get_tileset_count(); ++i) {
+            string? path = Halberd.Game.Maps.get_tileset_location(i);
+            string name = Halberd.Game.Maps.get_tileset_name(i);
+            inspector_pane.add_tileset(new ResourceEntry.from_entry(path, name));
+        }
         viewport.queue_draw();
     }
 

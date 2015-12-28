@@ -294,6 +294,11 @@ int16_t add_tileset_from_resource(const char* resource_location, const char* res
     map->tileset_ids[map->tileset_count - 1] = id;
     map->tileset_names = realloc(maps->tileset_names, map->tileset_count * sizeof(char*));
     map->tileset_names[map->tileset_count - 1] = strdup(resource_name);
+    map->tileset_paths = realloc(maps->tileset_paths, map->tileset_count * sizeof(char*));
+    if(resource_location != 0)
+        map->tileset_paths[map->tileset_count - 1] = strdup(resource_location);
+    else
+        map->tileset_paths[map->tileset_count - 1] = 0;
 
     return map->tileset_count;
 }
@@ -306,6 +311,21 @@ int16_t add_tileset_to_all_from_resource(const char* resource_location, const ch
     }
 
     return id;
+}
+
+uint8_t get_tileset_count()
+{
+    return maps[0].tileset_count;
+}
+
+const char* get_tileset_name(uint8_t id)
+{
+    return maps[0].tileset_names[id];
+}
+
+const char* get_tileset_location(uint8_t id)
+{
+    return maps[0].tileset_paths[id];
 }
 
 uint8_t get_solid(uint32_t tile)
