@@ -219,3 +219,12 @@ char* swap_extension(const char* file_name, const char* file_extension)
 
     return new_name;
 }
+
+const char* get_extension(const char* file_name)
+{
+    const char* ext = strchr(file_name, (int)'.');
+    if(ext == NULL || strlen(ext) <= 1)
+        return NULL;
+    else
+        return ext + 1;
+}

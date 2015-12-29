@@ -28,6 +28,7 @@ png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
     FILE* infile = fopen(path, "rb");
     if(!infile) {
         warn("Could not open file.");
+        fprintf(stderr, "Error Path: %s\n", path);
         return 0;
     }
     
@@ -159,6 +160,7 @@ sprite load_resource_to_sprite(const char* resource_location, const char* resour
     return new_sprite;
 }
 
+// TODO: Add support for paths in spriteset files
 spriteset* load_resource_to_spriteset(const char* resource_location, const char* resource_name)
 {
     xmlDocPtr doc = load_resource_to_xml(resource_location, resource_name);
@@ -234,9 +236,9 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
             a = 0;
             uint8_t keep = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"file"))) {
-                // TODO: Load the file here to an array
                 uint16_t w, h;
-                buffers[set->animation_count - 1] = load_png_to_buffer((char*)a, &w, &h);
+                char* ex_path = construct_extended_resource_path(resource_location, (char*)a);
+                buffers[set->animation_count - 1] = load_png_to_buffer(ex_path, &w, &h);
                 boxes[set->animation_count - 1].size_x = w;
                 boxes[set->animation_count - 1].size_y = h;
                 boxes[set->animation_count - 1].pos_x = 0;

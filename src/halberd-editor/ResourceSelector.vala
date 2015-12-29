@@ -1,5 +1,6 @@
 using Gtk;
 
+// TODO: Update the way objects are selected to match the mockup
 public class ResourceSelector : Box
 {
     string  title;

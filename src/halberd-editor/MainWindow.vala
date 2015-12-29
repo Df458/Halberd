@@ -30,6 +30,9 @@ public class MainWindow : Window
     // Inspector Pane
     private SidePane inspector_pane;
 
+    // Editors
+    private BlankEditor empty_view;
+
     // Containers
     private Paned main_paned;
     private Paned inspector_paned;
@@ -62,13 +65,23 @@ public class MainWindow : Window
         // TODO: Make this open differently for different filetypes
         current_map_path = resource_path;
         current_map_name = resource_name;
-        Halberd.Game.Maps.load(current_map_path, current_map_name);
-        for(uint8 i = 0; i < Halberd.Game.Maps.get_tileset_count(); ++i) {
-            string? path = Halberd.Game.Maps.get_tileset_location(i);
-            string name = Halberd.Game.Maps.get_tileset_name(i);
-            inspector_pane.add_tileset(new ResourceEntry.from_entry(path, name));
+        unowned string? ext = Halberd.IO.get_extension(resource_name);
+        switch(ext) {
+            case "map":
+                view_stack.set_visible_child(inspector_paned);
+                Halberd.Game.Maps.load(current_map_path, current_map_name);
+                for(uint8 i = 0; i < Halberd.Game.Maps.get_tileset_count(); ++i) {
+                    string? path = Halberd.Game.Maps.get_tileset_location(i);
+                    string name = Halberd.Game.Maps.get_tileset_name(i);
+                    inspector_pane.add_tileset(new ResourceEntry.from_entry(path, name));
+                }
+                viewport.queue_draw();
+                break;
+            default:
+                view_stack.set_visible_child(empty_view);
+                break;
         }
-        viewport.queue_draw();
+
     }
 
     private void init_structure()
@@ -114,6 +127,7 @@ public class MainWindow : Window
         button_menu = new MenuButton();
         project_view = new ProjectFilePane();
         inspector_pane = new SidePane();
+        empty_view = new BlankEditor();
 
         button_draw = new ToggleToolButton();
         button_fill = new ToggleToolButton();
@@ -133,6 +147,9 @@ public class MainWindow : Window
         viewport.can_focus = true;
         viewport.set_required_version(3, 3);
 
+        view_stack.add_named(empty_view, "");
+        view_stack.set_visible_child(empty_view);
+        empty_view.show();
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);

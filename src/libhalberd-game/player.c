@@ -1,7 +1,7 @@
 #include "player.h"
 #include "controls.h"
 #include "io.h"
-#include "render_util.h"
+#include "texture_util.h"
 
 #include <stdlib.h>
 
@@ -22,7 +22,7 @@ void init_player(uint32_t x, uint32_t y)
     player->data.animation_timer = 0;
     player->data.animation_index = 0;
     // TODO: Figure out how to properly get player info
-    /*player->data.sprites = get_spriteset("test.spr");*/
+    player->data.sprites = load_resource_to_spriteset(0, "test.spr");
     if(player->data.sprites != 0) {
         player->data.animation_index = 0;
         player->data.animation_playing = player->data.sprites->animations[0].play;

@@ -32,5 +32,8 @@ namespace Halberd {
 
         [CCode (cname="construct_extended_resource_path")]
         string make_path(string? location, string name);
+
+        [CCode (cname="get_extension")]
+        unowned string? get_extension(string filename);
     }
 }

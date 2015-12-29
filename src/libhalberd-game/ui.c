@@ -14,7 +14,7 @@ bool init_ui()
 {
     default_font = malloc(sizeof(font));
     // TODO: Get the default font from elsewhere
-    *default_font = load_resource_to_font("fonts", "Testfont.png");
+    *default_font = load_resource_to_font(0, "Testfont.png");
     return true;
 }
 

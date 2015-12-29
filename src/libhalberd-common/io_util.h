@@ -108,4 +108,10 @@ bool ensure_directory(const char* path);
  * Note that the resulting string must be freed by the user.
  */
 char* swap_extension(const char* file_name, const char* file_extension);
+
+/*!
+ * Returns a substring with a file's extension.
+ * This substring doesn't need freeing; it's a pointer to the original string.
+ */
+const char* get_extension(const char* file_name);
 #endif
