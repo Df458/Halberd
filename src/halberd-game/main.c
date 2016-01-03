@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
     destroy_player();
     destroy_actors();
-    destroy_maps();
+    /*destroy_maps();*/
     destroy_ui();
     destroy_graphics();
     cleanup_settings();

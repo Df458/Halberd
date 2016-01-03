@@ -1,5 +1,14 @@
 using Gtk;
 
+public enum AssetType
+{
+    NONE = 0,
+    ACTOR,
+    MAP,
+    SPRITE,
+    TILESET
+}
+
 public class ProjectFilePane : Box
 {
     private Box             control_box;
@@ -58,6 +67,7 @@ public class ProjectFilePane : Box
      */
     public string? get_selected_path()
     {
+        // TODO: Cache this value
         string path_string = "";
         TreePath path;
 
@@ -93,6 +103,11 @@ public class ProjectFilePane : Box
      * This signal indicates that the import dialog should be opened
      */
     public signal void file_import();
+
+    /*!
+     * This signal indicates that a file should be created
+     */
+    public signal void file_new(AssetType type);
 
     private void init_structure()
     {
@@ -349,20 +364,28 @@ public class ProjectFilePane : Box
         });
         content_new_group.add_action(act_new_folder);
         SimpleAction act_new_actor = new SimpleAction("actor", null);
-        // TODO: Implement this
-        act_new_actor.set_enabled(false);
+        act_new_actor.activate.connect(() =>
+        {
+            file_new(AssetType.ACTOR);
+        });
         content_new_group.add_action(act_new_actor);
         SimpleAction act_new_map = new SimpleAction("map", null);
-        // TODO: Implement this
-        act_new_map.set_enabled(false);
+        act_new_map.activate.connect(() =>
+        {
+            file_new(AssetType.MAP);
+        });
         content_new_group.add_action(act_new_map);
         SimpleAction act_new_sprite = new SimpleAction("sprite", null);
-        // TODO: Implement this
-        act_new_sprite.set_enabled(false);
+        act_new_sprite.activate.connect(() =>
+        {
+            file_new(AssetType.SPRITE);
+        });
         content_new_group.add_action(act_new_sprite);
         SimpleAction act_new_tileset = new SimpleAction("tileset", null);
-        // TODO: Implement this
-        act_new_tileset.set_enabled(false);
+        act_new_tileset.activate.connect(() =>
+        {
+            file_new(AssetType.TILESET);
+        });
         content_new_group.add_action(act_new_tileset);
         view_paned.insert_action_group("new", content_new_group);
     }

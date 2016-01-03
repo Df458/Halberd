@@ -32,6 +32,7 @@ public class MainWindow : Window
 
     // Editors
     private BlankEditor empty_view;
+    private ActorEditor actor_view;
 
     // Containers
     private Paned main_paned;
@@ -50,6 +51,8 @@ public class MainWindow : Window
         add_actions();
         init_menus();
 
+        view_stack.set_visible_child(empty_view);
+
         this.show_all();
     }
 
@@ -62,20 +65,23 @@ public class MainWindow : Window
     // TODO: This should probably be moved out of this class
     public void load_file(string? resource_path, string resource_name)
     {
-        // TODO: Make this open differently for different filetypes
-        current_map_path = resource_path;
-        current_map_name = resource_name;
         unowned string? ext = Halberd.IO.get_extension(resource_name);
         switch(ext) {
             case "map":
                 view_stack.set_visible_child(inspector_paned);
                 Halberd.Game.Maps.load(current_map_path, current_map_name);
+                current_map_path = resource_path;
+                current_map_name = resource_name;
                 for(uint8 i = 0; i < Halberd.Game.Maps.get_tileset_count(); ++i) {
                     string? path = Halberd.Game.Maps.get_tileset_location(i);
                     string name = Halberd.Game.Maps.get_tileset_name(i);
                     inspector_pane.add_tileset(new ResourceEntry.from_entry(path, name));
                 }
                 viewport.queue_draw();
+                break;
+            case "actr":
+                view_stack.set_visible_child(actor_view);
+                actor_view.load(new ResourceEntry.from_entry(resource_path, resource_name));
                 break;
             default:
                 view_stack.set_visible_child(empty_view);
@@ -128,6 +134,7 @@ public class MainWindow : Window
         project_view = new ProjectFilePane();
         inspector_pane = new SidePane();
         empty_view = new BlankEditor();
+        actor_view = new ActorEditor();
 
         button_draw = new ToggleToolButton();
         button_fill = new ToggleToolButton();
@@ -148,8 +155,7 @@ public class MainWindow : Window
         viewport.set_required_version(3, 3);
 
         view_stack.add_named(empty_view, "");
-        view_stack.set_visible_child(empty_view);
-        empty_view.show();
+        view_stack.add_named(actor_view, "act");
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
@@ -169,11 +175,18 @@ public class MainWindow : Window
         // FIXME: New button doesn't load the new project correctly
         button_save.clicked.connect(() =>
         {
-            if(current_map_name.length == 0) {
-                current_map_path = project_view.get_selected_path();
-                current_map_name = Halberd.IO.get_unique_name(current_map_path, "Untitled.map");
+            switch(view_stack.visible_child_name) {
+                case "map":
+                    if(current_map_name.length == 0) {
+                        current_map_path = project_view.get_selected_path();
+                        current_map_name = Halberd.IO.get_unique_name(current_map_path, "Untitled.map");
+                    }
+                    Game.Maps.save(current_map_path, current_map_name);
+                    break;
+                case "act":
+                    actor_view.save();
+                    break;
             }
-            Game.Maps.save(current_map_path, current_map_name);
         });
         button_play.toggled.connect(() =>
         {
@@ -194,6 +207,24 @@ public class MainWindow : Window
 
         project_view.file_opened.connect((path, name) => { load_file(path, name); });
         project_view.file_import.connect(import_dialog);
+        project_view.file_new.connect((type) =>
+        {
+            string name = "Untitled";
+            AssetEditor selected_editor = null;
+            switch(type) {
+                case AssetType.ACTOR:
+                    name = name.concat(".actr");
+                    selected_editor = actor_view;
+                break;
+            }
+            stderr.printf(name);
+
+            if(selected_editor == null)
+                return;
+
+            ResourceEntry entry = new ResourceEntry.from_entry(project_view.get_selected_path(), name, true);
+            selected_editor.create_new(entry);
+        });
 
         viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
         viewport.realize.connect(editor.prepare);

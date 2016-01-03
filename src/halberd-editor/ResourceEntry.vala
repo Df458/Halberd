@@ -10,10 +10,12 @@ public class ResourceEntry : Object
         path = app.path_to_content_path(file.get_parent().get_path());
     }
 
-    public ResourceEntry.from_entry(string? inpath, string inname)
+    public ResourceEntry.from_entry(string? inpath, string inname, bool new_file = false)
     {
         path = inpath;
         name = inname;
+        if(new_file)
+            name = Halberd.IO.get_unique_name(path, name);
     }
 
     public string construct_path()

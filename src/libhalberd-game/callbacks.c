@@ -4,31 +4,6 @@
 #include "io_util.h"
 #include "ui.h"
 
-/*struct actordata*/
-/*{*/
-    /*uint32_t position_x;*/
-    /*uint32_t position_y;*/
-    /*int16_t grid_x;*/
-    /*int16_t grid_y;*/
-    /*int16_t super_grid_x;*/
-    /*int16_t super_grid_y;*/
-    /*uint16_t speed;*/
-    /*uint8_t moving;*/
-    /*uint8_t orientation;*/
-    /*uint8_t flags;*/
-    /*int8_t animation_index;*/
-    /*uint8_t animation_playing;*/
-    /*float animation_timer;*/
-
-    /*spriteset* sprites;*/
-/*};*/
-
-/*typedef struct Actor*/
-/*{*/
-    /*struct actordata data;*/
-    /*lua_State* callbacks[CALLBACK_COUNT];*/
-/*} Actor;*/
-
 void build_actor_states(actor a_new, xmlNodePtr node)
 {
     xmlChar* a = 0;

@@ -4,7 +4,9 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include <stdbool.h>
 #include "render_util.h"
+#include "xml_util.h"
 
 #define FLAG_SOLID            0b10000000
 #define FLAG_VISIBLE          0b01000000
@@ -60,12 +62,17 @@ struct actordata
     spriteset* sprites;
 };
 
-typedef struct Actor
+struct Actor
 {
     struct actordata data;
     lua_State* callbacks[CALLBACK_COUNT];
-} _Actor;
+};
 
 typedef struct Actor* actor;
+typedef bool (*callback_loader)(xmlNodePtr ptr, actor a, const char* resource_location, const char* resource_name);
+
+void set_actor_callback_loader(callback_loader loader);
+
+actor load_actor_from_resource(const char* resource_location, const char* resource_name);
 
 #endif

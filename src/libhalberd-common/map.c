@@ -1,4 +1,3 @@
-#include "actor.h"
 #include "io_util.h"
 #include "map.h"
 #include "render_util.h"

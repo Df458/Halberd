@@ -37,7 +37,7 @@ COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
 
 # Flags
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC)
-VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
+VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
 CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl`
 CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua`
 GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng`

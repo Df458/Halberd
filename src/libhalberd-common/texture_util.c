@@ -264,7 +264,7 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
         free(set);
         free(boxes);
         xmlFreeDoc(doc);
-        xmlCleanupParser();
+        /*xmlCleanupParser();*/
         return 0;
     }
     // TODO: Sort by width
@@ -365,7 +365,7 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
     set->atlas.texture_width = f_height;
 
     xmlFreeDoc(doc);
-    xmlCleanupParser();
+    /*xmlCleanupParser();*/
     return set;
 
 }

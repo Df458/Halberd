@@ -1,6 +1,7 @@
 #include "player.h"
 #include "controls.h"
 #include "io.h"
+#include "map.h"
 #include "texture_util.h"
 
 #include <stdlib.h>
