@@ -57,6 +57,7 @@ actor load_actor_from_resource(const char* resource_location, const char* resour
         }
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"display")) {
             xmlChar* a = 0;
+            // FIXME: The path extension shouldn't be hardcoded
             if((a = xmlGetProp(node, (const xmlChar*)"id"))) {
                 a_new->data.sprites = load_resource_to_spriteset("sprites", (char*)a);
                 free(a);

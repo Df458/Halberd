@@ -35,4 +35,10 @@ actor create_blank_actor_for_resource(const char* resource_location, const char*
  */
 void save_actor();
 
+/*!
+ * Sets the spriteset for the registered actor.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+void set_actor_spriteset_from_resource(const char* resource_location, const char* resource_name);
+
 // TODO: Need an easy way to retrieve actor callback information

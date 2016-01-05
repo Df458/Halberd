@@ -1,20 +1,12 @@
 using Gtk;
 
-public class ActorEditor : AssetEditor, Grid
+public class ActorEditor : AssetEditor, SettingsGrid
 {
-    private Separator separator;
-
-    // Labels
-    private Label sprite_label;
-    private Label speed_label;
-    private Label script_label;
-    private Label flag_label;
-
-    // Inputs
+    private Box        sprite_box;
+    private Label      sprite_value_label;
     private Button     sprite_button;
     private SpinButton speed_input;
 
-    private Box         flag_box;
     private CheckButton visible_check;
     private CheckButton solid_check;
     private CheckButton lock_check;
@@ -24,35 +16,20 @@ public class ActorEditor : AssetEditor, Grid
 
     public ActorEditor()
     {
-        this.row_spacing = 6;
-        this.column_spacing = 12;
         this.margin = 18;
 
-        init_structure();
         init_content();
         connect_signals();
 
         this.show_all();
     }
-
-    private void init_structure()
-    {
-        flag_box = new Box(Orientation.VERTICAL, 0);
-        separator = new Separator(Orientation.HORIZONTAL);
-
-        this.attach(separator, 0, 1, 2);
-        this.attach(flag_box, 1, 4);
-    }
     
     private void init_content()
     {
-        sprite_label = new Label("Spriteset");
-        speed_label  = new Label("Default Speed");
-        script_label = new Label("Scripts");
-        flag_label   = new Label("Flags");
-
-        sprite_button = new Button.with_label("Choose\u2026");
-        speed_input   = new SpinButton.with_range(0, 100, 1);
+        sprite_box         = new Box(Orientation.HORIZONTAL, 6);
+        sprite_value_label = new Label("None");
+        sprite_button      = new Button.with_label("Choose\u2026");
+        speed_input        = new SpinButton.with_range(0, 100, 1);
 
         visible_check = new CheckButton.with_label("Visible");
         solid_check   = new CheckButton.with_label("Solid");
@@ -60,28 +37,41 @@ public class ActorEditor : AssetEditor, Grid
         orient_check  = new CheckButton.with_label("Orientable");
         ghost_check   = new CheckButton.with_label("Ghost");
 
-        sprite_label.halign = Align.END;
-        speed_label.halign  = Align.END;
-        script_label.halign = Align.END;
-        script_label.valign = Align.START;
-        flag_label.halign   = Align.END;
-        flag_label.valign   = Align.START;
+        Pango.FontDescription descript = new Pango.FontDescription();
+        descript.set_style(Pango.Style.ITALIC);
+        Pango.AttrList attributes = new Pango.AttrList();
+        attributes.insert(new Pango.AttrFontDesc(descript));
+        sprite_value_label.set_attributes(attributes);
+        sprite_value_label.sensitive = false;
 
-        this.attach(sprite_label, 0, 0);
-        this.attach(speed_label,  0, 2);
-        this.attach(script_label, 0, 3);
-        this.attach(flag_label,   0, 4);
-        this.attach(sprite_button, 1, 0);
-        this.attach(speed_input,   1, 2);
-        flag_box.add(visible_check);
-        flag_box.add(solid_check);
-        flag_box.add(lock_check);
-        flag_box.add(orient_check);
-        flag_box.add(ghost_check);
+        speed_input.sensitive = false;
+
+        sprite_box.add(sprite_button);
+        sprite_box.add(sprite_value_label);
+        add("Spriteset", sprite_box, 0);
+        add("Default Speed", speed_input, 1);
+        add("Flags", visible_check, 2);
+        add(null, solid_check, 2);
+        add(null, lock_check, 2);
+        add(null, orient_check, 2);
+        add(null, ghost_check, 2);
     }
 
     private void connect_signals()
     {
+        sprite_button.clicked.connect(() =>
+        {
+            Popover select_pop = new Popover(sprite_button);
+            ResourceSelector select_widget = new ResourceSelector("Sewlect a spriteset", "spr");
+            select_pop.add(select_widget);
+            select_pop.modal = true;
+            select_widget.respond.connect((response) =>
+            {
+                select_pop.hide();
+                ResourceEntry entry = select_widget.get_selected();
+            });
+            select_pop.show_all();
+        });
     }
 
     public bool create_new(ResourceEntry entry)
@@ -112,7 +102,6 @@ public class ActorEditor : AssetEditor, Grid
             flags += Halberd.ActorFlags.BLOCK_WITH_SOLID;
         actor.data.flags = flags;
 
-        stderr.printf("Data: %u, %d\n", actor.data.flags, actor.data.flags & Halberd.ActorFlags.VISIBLE);
         Halberd.save_actor();
         return true;
     }
@@ -135,7 +124,5 @@ public class ActorEditor : AssetEditor, Grid
         lock_check.active    = (actor.data.flags & Halberd.ActorFlags.LOCK_TO_GRID) != 0;
         orient_check.active  = (actor.data.flags & Halberd.ActorFlags.CAN_ORIENT) != 0;
         ghost_check.active   = (actor.data.flags & Halberd.ActorFlags.BLOCK_WITH_SOLID) == 0;
-
-        stderr.printf("Data: %u, %d\n", actor.data.flags, actor.data.flags & Halberd.ActorFlags.VISIBLE);
     }
 }

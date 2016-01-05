@@ -2,6 +2,7 @@
 *.un~
 *.swp
 *.glade~
+*.glade#
 tags
 
 # Ignore object files

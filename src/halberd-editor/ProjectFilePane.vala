@@ -164,6 +164,7 @@ public class ProjectFilePane : Box
         icon_scale.width_request = 128;
         icon_scale.set_value(4);
         icon_scale.get_style_context().add_class(STYLE_CLASS_OSD);
+        icon_scale.margin = 6;
 
         import_button.image = new Image.from_icon_name("document-open-symbolic", IconSize.SMALL_TOOLBAR);
         import_button.get_style_context().add_class(STYLE_CLASS_SUGGESTED_ACTION);

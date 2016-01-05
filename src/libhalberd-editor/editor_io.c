@@ -105,3 +105,8 @@ void save_actor()
 
     xmlFreeTextWriter(writer);
 }
+
+void set_actor_spriteset_from_resource(const char* resource_location, const char* resource_name)
+{
+    // TODO: Implement this
+}

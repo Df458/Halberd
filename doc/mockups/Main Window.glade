@@ -165,10 +165,10 @@
                   <object class="GtkStack" id="stack1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="margin_right">12</property>
-                    <property name="margin_top">12</property>
-                    <property name="margin_bottom">12</property>
+                    <property name="margin_left">18</property>
+                    <property name="margin_right">18</property>
+                    <property name="margin_top">18</property>
+                    <property name="margin_bottom">18</property>
                     <child>
                       <object class="GtkImage" id="image1">
                         <property name="visible">True</property>
@@ -353,7 +353,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
+                            <property name="top_attach">1</property>
                           </packing>
                         </child>
                         <child>
@@ -396,7 +396,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">0</property>
+                            <property name="top_attach">1</property>
                           </packing>
                         </child>
                         <child>
@@ -408,7 +408,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">1</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -457,7 +457,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">1</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -629,21 +629,8 @@
                       <object class="GtkGrid" id="grid4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="row_spacing">6</property>
+                        <property name="row_spacing">18</property>
                         <property name="column_spacing">12</property>
-                        <child>
-                          <object class="GtkButton" id="button8">
-                            <property name="label" translatable="yes">Spriteset Name</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="halign">start</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">1</property>
-                            <property name="top_attach">0</property>
-                          </packing>
-                        </child>
                         <child>
                           <object class="GtkLabel" id="label8">
                             <property name="visible">True</property>
@@ -657,17 +644,6 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSeparator" id="separator3">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">1</property>
-                            <property name="width">2</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkLabel" id="label13">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -677,7 +653,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">4</property>
+                            <property name="top_attach">2</property>
                           </packing>
                         </child>
                         <child>
@@ -685,6 +661,8 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="orientation">vertical</property>
+                            <property name="spacing">6</property>
+                            <property name="homogeneous">True</property>
                             <child>
                               <object class="GtkCheckButton" id="checkbutton3">
                                 <property name="label" translatable="yes">Visible</property>
@@ -767,7 +745,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">4</property>
+                            <property name="top_attach">2</property>
                           </packing>
                         </child>
                         <child>
@@ -779,7 +757,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">0</property>
-                            <property name="top_attach">2</property>
+                            <property name="top_attach">1</property>
                           </packing>
                         </child>
                         <child>
@@ -789,7 +767,7 @@
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
-                            <property name="top_attach">2</property>
+                            <property name="top_attach">1</property>
                           </packing>
                         </child>
                         <child>
@@ -803,6 +781,46 @@
                           <packing>
                             <property name="left_attach">0</property>
                             <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="box11">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkButton" id="button8">
+                                <property name="label" translatable="yes">Choose…</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="halign">start</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="label16">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">None</property>
+                                <attributes>
+                                  <attribute name="style" value="italic"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="top_attach">0</property>
                           </packing>
                         </child>
                         <child>
@@ -1071,6 +1089,8 @@
                         <property name="can_focus">True</property>
                         <property name="halign">end</property>
                         <property name="valign">end</property>
+                        <property name="margin_right">6</property>
+                        <property name="margin_bottom">6</property>
                         <property name="adjustment">Scale Adjustment</property>
                         <property name="restrict_to_fill_level">False</property>
                         <property name="fill_level">0</property>
