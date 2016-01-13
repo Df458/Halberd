@@ -82,7 +82,7 @@ void destroy_render()
 {
     // TODO: Re-enable these
     /*destroy_maps();*/
-    destroy_graphics();
+    /*destroy_graphics();*/
     fprintf(stderr, "Exiting gracefully...\n");
 }
 

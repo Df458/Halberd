@@ -152,7 +152,7 @@ uint32_t get_id_from_resource(const char* resource_location, const char* resourc
     //       a tree search, possibly with hashing
     uint32_t i;
     for(i = 0; i < next_id; ++i) {
-        if(((!resource_list[i].path && !resource_location) || !strcmp(resource_list[i].path, resource_location)) && !strcmp(resource_list[i].name, resource_name))
+        if(resource_eq(resource_location, resource_name, resource_list[i].path, resource_list[i].name))
             break;
     }
     if(i == next_id && should_create) {

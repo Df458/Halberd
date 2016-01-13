@@ -29,10 +29,14 @@ public class ProjectFilePane : Box
 
     private Gtk.Menu content_menu;
     private Gtk.Menu content_file_menu;
-    FileMonitor? content_monitor = null;
+    Gee.TreeMap<File, FileMonitor> project_monitors;
 
     public int icon_size = 5;
 
+    /*
+     * This enum assigns numerical values to each column of the project's
+     * treemodel.
+     */
     private enum ProjectTreeColumn
     {
         FILENAME = 0,
@@ -49,6 +53,7 @@ public class ProjectFilePane : Box
         this.spacing = 6;
         this.margin_top = 6;
         this.set_homogeneous(false);
+        project_monitors = new Gee.TreeMap<File, FileMonitor>();
 
         init_structure();
         init_content();
@@ -62,7 +67,7 @@ public class ProjectFilePane : Box
         sidebar_view.set_cursor(path, null, false);
     }
 
-    /*!
+    /*
      * This function returns the current sub-path of the resource directory
      */
     public string? get_selected_path()
@@ -94,21 +99,24 @@ public class ProjectFilePane : Box
         return path_string;
     }
 
-    /*!
+    /*
      * This signal indicates that a file has been opened
      */
     public signal void file_opened(string? resource_path, string resource_name);
 
-    /*!
+    /*
      * This signal indicates that the import dialog should be opened
      */
     public signal void file_import();
 
-    /*!
+    /*
      * This signal indicates that a file should be created
      */
     public signal void file_new(AssetType type);
 
+    /*
+     * Initializes the structural widgets
+     */
     private void init_structure()
     {
         control_box = new Box(Orientation.HORIZONTAL, 6);
@@ -127,6 +135,9 @@ public class ProjectFilePane : Box
         this.pack_end(view_paned, true, true);
     }
 
+    /*
+     * Initializes display and interactive widgets
+     */
     private void init_content()
     {
         import_button = new Button.with_label("Import");
@@ -178,6 +189,9 @@ public class ProjectFilePane : Box
         view_overlay.add_overlay(icon_scale);
     }
 
+    /*
+     * Connects functions to signals on added widgets
+     */
     private void connect_signals()
     {
         sidebar_view.cursor_changed.connect(() =>
@@ -192,58 +206,6 @@ public class ProjectFilePane : Box
             sidebar_filter.get(iter, ProjectTreeColumn.URI, out uri);
             path = sidebar_filter.convert_path_to_child_path(path);
             view_filter.get_iter(out iter, path);
-
-            File dir_file = File.new_for_uri(uri);
-            if(content_monitor != null)
-                content_monitor.cancel();
-            try {
-                content_monitor = dir_file.monitor_directory(FileMonitorFlags.WATCH_MOVES);
-                content_monitor.set_rate_limit(1000);
-                // TODO: Clean this up. "dir" is actually usually the target file, whereas file is often a new target.
-                content_monitor.changed.connect((dir, file, type) =>
-                {
-                    TreePath current_path = view_filter.virtual_root;
-                    TreeIter current_iter;
-                    file_data.get_iter(out current_iter, current_path);
-
-                    switch(type) {
-                        case FileMonitorEvent.RENAMED:
-                            TreeIter? file_iter = get_iter_for_file(dir);
-                            if(file_iter == null)
-                                break;
-                            view_filter.convert_iter_to_child_iter(out file_iter, file_iter);
-                            file_data.set(file_iter, ProjectTreeColumn.FILENAME,  file.get_basename());
-                            file_data.set(file_iter, ProjectTreeColumn.URI,       file.get_uri());
-                            ResourceEntry prev_entry = new ResourceEntry(dir);
-                            ResourceEntry next_entry = new ResourceEntry(file);
-                            Halberd.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
-                        break;
-
-                        // TODO: Update the following to update resources
-
-                        case FileMonitorEvent.CREATED:
-                        case FileMonitorEvent.MOVED_IN:
-                            try {
-                                add_project_file(dir.query_info("standard::*", FileQueryInfoFlags.NONE), current_iter);
-                            } catch(Error e) {
-                                app.display_warning("Can't get file info: " + e.message);
-                            }
-                        break;
-
-                        case FileMonitorEvent.DELETED:
-                            ResourceEntry deleted_entry = new ResourceEntry(dir);
-                            Halberd.IO.delete_resource(deleted_entry.path, deleted_entry.name);
-                            rm_project_file(dir, current_iter);
-                        break;
-
-                        case FileMonitorEvent.MOVED_OUT:
-                            rm_project_file(dir, current_iter);
-                        break;
-                    }
-                });
-            } catch(IOError e) {
-                app.display_warning("Can't watch content directory: " + e.message);
-            }
 
             build_view_filter(path);
         });
@@ -321,6 +283,9 @@ public class ProjectFilePane : Box
         import_button.clicked.connect(() => { file_import(); });
     }
 
+    /*
+     * Adds actions for use with menus and shortcuts
+     */
     private void add_actions()
     {
         // Main group
@@ -413,6 +378,9 @@ public class ProjectFilePane : Box
         view_paned.insert_action_group("new", content_new_group);
     }
 
+    /*
+     * Creates and attaches menus to widgets
+     */
     private void init_menus()
     {
         GLib.Menu content_model = new GLib.Menu();
@@ -444,10 +412,94 @@ public class ProjectFilePane : Box
         icon_view.set_model(view_filter);
     }
 
+    /*
+     * This function handles changes to the files in the project.
+     * It is responsible for adding/removing files from the view, as well as
+     * updating the asset registry.
+     */
+    private void monitor_event(File src, File? dest, FileMonitorEvent type)
+    {
+        TreeIter? file_iter = get_iter_for_file(src);
+
+        switch(type) {
+            case FileMonitorEvent.RENAMED:
+                if(src.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
+                    FileMonitor? m = null;
+                    project_monitors.unset(src, out m);
+                    if(m != null)
+                        project_monitors.set(dest, m);
+                }
+
+                if(file_iter == null)
+                    break;
+                file_data.set(file_iter, ProjectTreeColumn.FILENAME,  dest.get_basename());
+                file_data.set(file_iter, ProjectTreeColumn.URI,       dest.get_uri());
+                ResourceEntry prev_entry = new ResourceEntry(src);
+                ResourceEntry next_entry = new ResourceEntry(dest);
+                Halberd.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
+                break;
+
+                // TODO: Update the following to update resources
+
+            case FileMonitorEvent.CREATED:
+            case FileMonitorEvent.MOVED_IN:
+                try {
+                    TreeIter? parent_iter = get_iter_for_file(src.get_parent());
+                    add_project_file(src.query_info("standard::*", FileQueryInfoFlags.NONE), parent_iter);
+                } catch(Error e) {
+                    app.display_warning("Can't get file info: " + e.message);
+                }
+                break;
+
+            case FileMonitorEvent.DELETED:
+                if(src.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
+                    FileMonitor? m = null;
+                    project_monitors.unset(src, out m);
+                    if(m != null) {
+                        m.cancel();
+                        m.unref();
+                    }
+                }
+                ResourceEntry deleted_entry = new ResourceEntry(src);
+                Halberd.IO.delete_resource(deleted_entry.path, deleted_entry.name);
+                if(file_iter != null)
+                    file_data.remove(ref file_iter);
+                break;
+
+            case FileMonitorEvent.MOVED_OUT:
+                if(src.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
+                    FileMonitor? m = null;
+                    project_monitors.unset(src, out m);
+                    if(m != null) {
+                        m.cancel();
+                        m.unref();
+                    }
+                }
+                ResourceEntry moved_entry = new ResourceEntry(src);
+                ResourceEntry new_entry = new ResourceEntry(dest);
+                if(!file_is_content(dest)) {
+                    Halberd.IO.delete_resource(moved_entry.path, moved_entry.name);
+                } else {
+                    Halberd.IO.move_resource(moved_entry.path, moved_entry.name, new_entry.path, new_entry.name);
+                }
+                file_data.remove(ref file_iter);
+                break;
+        }
+    }
+
     private void add_project_directory(File f, TreeIter? parent_iter)
     {
         TreeIter iter;
         file_data.append(out iter, parent_iter);
+        try {
+            FileMonitor? m = f.monitor_directory(FileMonitorFlags.WATCH_MOVES);
+            m.set_rate_limit(1000);
+            m.changed.connect(monitor_event);
+            if(m != null)
+                project_monitors.set(f, m);
+        } catch(IOError e) {
+            app.display_warning("Can't watch content directory: " + e.message);
+        }
 
         file_data.set(iter, ProjectTreeColumn.FILENAME, f.get_basename(), ProjectTreeColumn.URI, f.get_uri(), ProjectTreeColumn.SIDEBAR_FILTER, true, ProjectTreeColumn.ICON_NAME, "folder");
         FileInfo info;
@@ -486,29 +538,13 @@ public class ProjectFilePane : Box
         string name = "text-x-generic";
         if(info.get_name().has_suffix(".png"))
             name = "image-x-generic";
-        file_data.set(temp_iter, ProjectTreeColumn.FILENAME, info.get_name(), ProjectTreeColumn.URI, app.get_content_directory().get_uri() + "/" + info.get_name(), ProjectTreeColumn.SIDEBAR_FILTER, false, ProjectTreeColumn.ICON_NAME, name);
-    }
 
-    /*
-     * This function removes file file from the treestore representing the
-     * content directory
-     */
-    private void rm_project_file(File to_remove, TreeIter? parent_iter)
-    {
+        string parent_uri;
         if(parent_iter == null)
-            file_data.get_iter_first(out parent_iter);
-        TreeIter child;
-        file_data.iter_children(out child, parent_iter);
-
-        do {
-            string uri;
-            file_data.get(child, ProjectTreeColumn.URI, out uri);
-            if(uri == to_remove.get_uri()) {
-                // FIXME: What happens when the current directory is removed?
-                file_data.remove(ref child);
-                return;
-            }
-        } while(file_data.iter_next(ref child));
+            parent_uri = app.get_content_directory().get_uri();
+        else
+            file_data.get(parent_iter, ProjectTreeColumn.URI, out parent_uri);
+        file_data.set(temp_iter, ProjectTreeColumn.FILENAME, info.get_name(), ProjectTreeColumn.URI, parent_uri + "/" + info.get_name(), ProjectTreeColumn.SIDEBAR_FILTER, false, ProjectTreeColumn.ICON_NAME, name);
     }
 
     private void iconview_cell_data(CellLayout layout, CellRenderer cell, TreeModel model, TreeIter iter)
@@ -525,18 +561,20 @@ public class ProjectFilePane : Box
         }
     }
 
-    // TODO: At some point, this system needs to watch the full proect tree. When that happens, this will need a rewrite.
     private TreeIter? get_iter_for_file(File infile)
     {
+        TreeIter? search_iter = null;
         string uri = infile.get_uri();
-        TreeIter? iter = null;
-        for(view_filter.get_iter_first(out iter); iter != null; view_filter.iter_next(ref iter)) {
+        file_data.foreach((model, path, iter) =>
+        {
             string? uri_present = null;
-            view_filter.get(iter, ProjectTreeColumn.URI, out uri_present);
-
-            if(uri == uri_present)
-                return iter;
-        }
-        return null;
+            file_data.get(iter, ProjectTreeColumn.URI, out uri_present);
+            if(uri == uri_present) {
+                search_iter = iter;
+                return true;
+            }
+            return false;
+        });
+        return search_iter;
     }
 }

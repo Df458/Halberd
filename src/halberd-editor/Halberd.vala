@@ -174,3 +174,21 @@ public File file_from_resource(string? ext, string name, bool new_file = false)
     File f = File.new_for_path(path);
     return f;
 }
+
+/*
+ * Returns whether or not a file is part of the current project's content
+ */
+public bool file_is_content(File file)
+{
+    string? path = file.get_path();
+    string cpath = Halberd.IO.get_path();
+
+    if(path != null && path.length > cpath.length) {
+        if(path.substring(0, cpath.length) == cpath) {
+            return true;
+        }
+    }
+
+    g_free(path);
+    return false;
+}

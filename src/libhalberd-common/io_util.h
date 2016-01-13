@@ -122,4 +122,9 @@ const char* get_extension(const char* file_name);
  */
 void* load_anonymous_resource(const char* resource_location, const char* resource_name);
 
+/*!
+ * Tests to see if two pairs of resource data refer to the same path
+ */
+bool resource_eq(const char* resource_location, const char* resource_name, const char* resource2_location, const char* resource2_name);
+
 #endif

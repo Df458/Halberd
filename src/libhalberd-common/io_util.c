@@ -235,3 +235,18 @@ void* load_anonymous_resource(const char* resource_location, const char* resourc
     fprintf(stderr, "Load called: %s, %s\n", resource_location, resource_name);
     return 0;
 }
+
+bool resource_eq(const char* resource_location, const char* resource_name, const char* resource2_location, const char* resource2_name)
+{
+    if(!resource_location) {
+        if(resource2_location)
+            return false;
+    } else {
+        if(!resource2_location)
+            return false;
+        if(strcmp(resource_location, resource2_location) || strcmp(resource_name, resource2_name))
+            return false;
+    }
+
+    return true;
+}

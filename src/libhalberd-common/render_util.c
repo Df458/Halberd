@@ -267,11 +267,12 @@ uint8_t init_graphics(void)
 
 void destroy_graphics()
 {
-    for(int16_t i = 0; i < loaded_boxes && loaded_boxes >= 0; ++i) {
+    for(int16_t i = 0; i < loaded_boxes; ++i) {
         glDeleteTextures(1, &boxes[i].texture_data.texture_id);
         glDeleteBuffers(1, &boxes[i].uv_buffer);
     }
-    free(boxes);
+    if(boxes)
+        free(boxes);
 
     glDeleteProgram(sprite_program);
     glDeleteProgram(tile_program);
