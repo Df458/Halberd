@@ -412,7 +412,6 @@ public class ProjectFilePane : Box
         icon_view.set_model(view_filter);
     }
 
-// FIXME: This probably still breaks if the parent of a registered asset changes.
     /*
      * This function handles changes to the files in the project.
      * It is responsible for adding/removing files from the view, as well as
@@ -462,20 +461,49 @@ public class ProjectFilePane : Box
                         m.cancel();
                         m.unref();
                     }
+
+                    FileInfo info;
+                    try {
+                        info = src.query_info ("standard::*", 0);
+                        FileEnumerator enumerator = src.enumerate_children (FileAttribute.STANDARD_NAME, 0);
+
+                        FileInfo file_info;
+                        while ((file_info = enumerator.next_file ()) != null) {
+                            monitor_event(enumerator.get_child(file_info), null, FileMonitorEvent.DELETED);
+                        }
+                    } catch (Error e) {
+                        stderr.printf ("Error reading project directory: %s\n", e.message);
+                    }
                 }
                 ResourceEntry deleted_entry = new ResourceEntry(src);
                 Halberd.IO.delete_resource(deleted_entry.path, deleted_entry.name);
-                if(file_iter != null)
+                if(file_iter != null) {
                     file_data.remove(ref file_iter);
+                }
                 break;
 
             case FileMonitorEvent.MOVED_OUT:
-                if(src.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
+                if(dest.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
                     FileMonitor? m = null;
                     project_monitors.unset(src, out m);
                     if(m != null) {
                         m.cancel();
                         m.unref();
+                    }
+
+                    FileInfo info;
+                    try {
+                        info = dest.query_info ("standard::*", 0);
+                        FileEnumerator enumerator = dest.enumerate_children (FileAttribute.STANDARD_NAME, 0);
+
+                        FileInfo file_info;
+                        while ((file_info = enumerator.next_file ()) != null) {
+                            File next_file = enumerator.get_child(file_info);
+                            string new_path = src.get_path().concat("/").concat(dest.get_relative_path(next_file));
+                            monitor_event(File.new_for_path(new_path), next_file, FileMonitorEvent.MOVED_OUT);
+                        }
+                    } catch (Error e) {
+                        stderr.printf ("Error reading project directory: %s\n", e.message);
                     }
                 }
                 ResourceEntry moved_entry = new ResourceEntry(src);
