@@ -1,5 +1,6 @@
 #include <string.h>
 #include "actor.h"
+#include "asset_registry.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hidden variables
@@ -41,6 +42,7 @@ actor load_actor_from_resource(const char* resource_location, const char* resour
     a_new->data.animation_index = 0;
     a_new->data.animation_playing = 0;
     a_new->data.animation_timer = 0;
+    a_new->data.sprites_id = UINT32_MAX;
 
     for(xmlNodePtr node = root->children; node; node = node->next) {
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"position")) {
@@ -57,9 +59,9 @@ actor load_actor_from_resource(const char* resource_location, const char* resour
         }
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"display")) {
             xmlChar* a = 0;
-            // FIXME: The path extension shouldn't be hardcoded
             if((a = xmlGetProp(node, (const xmlChar*)"id"))) {
-                a_new->data.sprites = load_resource_to_spriteset("sprites", (char*)a);
+                a_new->data.sprites_id = atoi((char*)a);
+                a_new->data.sprites = (spriteset*)get_data_from_id(a_new->data.sprites_id);/*load_resource_to_spriteset("sprites", (char*)a);*/
                 free(a);
             }
         }

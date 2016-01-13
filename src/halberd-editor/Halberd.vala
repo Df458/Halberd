@@ -13,11 +13,11 @@ class HalberdEditor : Gtk.Application
     public HalberdEditor(string[] args)
     {
         settings = new GLib.Settings("org.df458.halberd");
-        Halberd.Game.Settings.init();
-        Halberd.Editor.Cursor.init();
         if(!init_main_directory()) {
             failed_init = true;
         }
+        Halberd.Game.Settings.init();
+        Halberd.Editor.Cursor.init();
     }
 
     public File get_content_directory()

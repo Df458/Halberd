@@ -33,17 +33,18 @@ namespace Halberd {
     public struct ActorData {
         uint32 position_x;
         uint32 position_y;
-        int16 grid_x;
-        int16 grid_y;
-        int16 super_grid_x;
-        int16 super_grid_y;
+        int16  grid_x;
+        int16  grid_y;
+        int16  super_grid_x;
+        int16  super_grid_y;
         uint16 speed;
-        uint8 moving;
-        uint8 orientation;
-        uint8 flags;
-        int8 animation_index;
-        uint8 animation_playing;
-        float animation_timer;
+        uint8  moving;
+        uint8  orientation;
+        uint8  flags;
+        int8   animation_index;
+        uint8  animation_playing;
+        float  animation_timer;
+        uint32 sprites_id;
     }
 
     [CCode (cname="struct Actor", destroy_function="")]
@@ -80,5 +81,31 @@ namespace Halberd {
 
         [CCode (cname="get_extension")]
         unowned string? get_extension(string filename);
+
+        [CCode (cname="resource_loader", has_target=false)]
+        public delegate void* resource_loader(string? location, string name);
+
+        [CCode (cname="resources_init")]
+        public bool init(resource_loader loader);
+        [CCode (cname="resources_cleanup")]
+        public void cleanup();
+
+        [CCode (cname="load_anonymous_resource")]
+        public void* load(string? location, string name);
+
+        [CCode (cname="get_id_from_resource")]
+        public uint32 get_id_from_resource(string? location, string name, bool should_create);
+
+        [CCode (cname="get_name_from_id")]
+        public string? get_name_from_id(uint32 id);
+
+        [CCode (cname="get_path_from_id")]
+        public string? get_path_from_id(uint32 id);
+
+        [CCode (cname="move_resource")]
+        public void move_resource(string? prev_location, string prev_name, string? next_location, string next_name);
+
+        [CCode (cname="delete_resource")]
+        public void delete_resource(string? resource_location, string resource_name);
     }
 }

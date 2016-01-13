@@ -197,8 +197,9 @@ public class ProjectFilePane : Box
             if(content_monitor != null)
                 content_monitor.cancel();
             try {
-                content_monitor = dir_file.monitor_directory(FileMonitorFlags.NONE);
+                content_monitor = dir_file.monitor_directory(FileMonitorFlags.WATCH_MOVES);
                 content_monitor.set_rate_limit(1000);
+                // TODO: Clean this up. "dir" is actually usually the target file, whereas file is often a new target.
                 content_monitor.changed.connect((dir, file, type) =>
                 {
                     TreePath current_path = view_filter.virtual_root;
@@ -206,7 +207,22 @@ public class ProjectFilePane : Box
                     file_data.get_iter(out current_iter, current_path);
 
                     switch(type) {
+                        case FileMonitorEvent.RENAMED:
+                            TreeIter? file_iter = get_iter_for_file(dir);
+                            if(file_iter == null)
+                                break;
+                            view_filter.convert_iter_to_child_iter(out file_iter, file_iter);
+                            file_data.set(file_iter, ProjectTreeColumn.FILENAME,  file.get_basename());
+                            file_data.set(file_iter, ProjectTreeColumn.URI,       file.get_uri());
+                            ResourceEntry prev_entry = new ResourceEntry(dir);
+                            ResourceEntry next_entry = new ResourceEntry(file);
+                            Halberd.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
+                        break;
+
+                        // TODO: Update the following to update resources
+
                         case FileMonitorEvent.CREATED:
+                        case FileMonitorEvent.MOVED_IN:
                             try {
                                 add_project_file(dir.query_info("standard::*", FileQueryInfoFlags.NONE), current_iter);
                             } catch(Error e) {
@@ -215,6 +231,12 @@ public class ProjectFilePane : Box
                         break;
 
                         case FileMonitorEvent.DELETED:
+                            ResourceEntry deleted_entry = new ResourceEntry(dir);
+                            Halberd.IO.delete_resource(deleted_entry.path, deleted_entry.name);
+                            rm_project_file(dir, current_iter);
+                        break;
+
+                        case FileMonitorEvent.MOVED_OUT:
                             rm_project_file(dir, current_iter);
                         break;
                     }
@@ -501,5 +523,20 @@ public class ProjectFilePane : Box
             model.get(iter, ProjectTreeColumn.FILENAME, out title);
             ((CellRendererText)cell).text = title;
         }
+    }
+
+    // TODO: At some point, this system needs to watch the full proect tree. When that happens, this will need a rewrite.
+    private TreeIter? get_iter_for_file(File infile)
+    {
+        string uri = infile.get_uri();
+        TreeIter? iter = null;
+        for(view_filter.get_iter_first(out iter); iter != null; view_filter.iter_next(ref iter)) {
+            string? uri_present = null;
+            view_filter.get(iter, ProjectTreeColumn.URI, out uri_present);
+
+            if(uri == uri_present)
+                return iter;
+        }
+        return null;
     }
 }

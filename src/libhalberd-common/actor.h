@@ -60,6 +60,7 @@ struct actordata
     float animation_timer;
 
     spriteset* sprites;
+    uint32_t   sprites_id;
 };
 
 struct Actor

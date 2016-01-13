@@ -1,4 +1,5 @@
 #include "io_util.h"
+#include "asset_registry.h"
 #include "xml_util.h"
 #include "project.h"
 #include <stdio.h>
@@ -51,6 +52,12 @@ bool create_project(const char* path)
     xmlTextWriterEndDocument(writer);
 
     xmlFreeTextWriter(writer);
+
+    FILE* asset_registry = load_resource_file(NULL, ".asset_registry", "w");
+    uint32_t count = 0;
+    fwrite(&count, sizeof(uint32_t), 1, asset_registry);
+    fclose(asset_registry);
+
     return true;
 }
 
@@ -64,6 +71,7 @@ bool load_project(const char* path)
     strncpy(content_path, path, strlen(path) - strlen(title_ptr));
     strcat(content_path, "content");
     set_resource_path(content_path);
+    resources_init(load_anonymous_resource);
     return true;
 }
 

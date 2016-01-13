@@ -228,3 +228,10 @@ const char* get_extension(const char* file_name)
     else
         return ext + 1;
 }
+
+void* load_anonymous_resource(const char* resource_location, const char* resource_name)
+{
+    // TODO: Implement this
+    fprintf(stderr, "Load called: %s, %s\n", resource_location, resource_name);
+    return 0;
+}

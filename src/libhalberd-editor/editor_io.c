@@ -96,7 +96,9 @@ void save_actor()
     */
     xmlTextWriterStartElement(writer, "display");
     // TODO: Spriteset needs resource information*/
-    //xmlTextWriterWriteAttribute(writer, "id", loaded_actor->data.sprites.);
+    char id_str[10] = { 0 };
+    sprintf(id_str, "%010u", loaded_actor->data.sprites_id);
+    xmlTextWriterWriteAttribute(writer, "id", id_str);
     xmlTextWriterEndElement(writer);
     // TODO: Write callback nodes
     //--------------------------------------------------------------------------

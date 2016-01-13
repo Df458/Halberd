@@ -13,6 +13,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
     private CheckButton orient_check;
     private CheckButton ghost_check;
     private unowned Halberd.Actor? actor = null;
+    private uint32  selected_sprite;
 
     public ActorEditor()
     {
@@ -62,13 +63,15 @@ public class ActorEditor : AssetEditor, SettingsGrid
         sprite_button.clicked.connect(() =>
         {
             Popover select_pop = new Popover(sprite_button);
-            ResourceSelector select_widget = new ResourceSelector("Sewlect a spriteset", "spr");
+            ResourceSelector select_widget = new ResourceSelector("Select a spriteset", "spr");
             select_pop.add(select_widget);
             select_pop.modal = true;
             select_widget.respond.connect((response) =>
             {
                 select_pop.hide();
                 ResourceEntry entry = select_widget.get_selected();
+                selected_sprite = Halberd.IO.get_id_from_resource(entry.path, entry.name, true);
+                sprite_value_label.set_text(entry.name);
             });
             select_pop.show_all();
         });
@@ -101,6 +104,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
         if(!ghost_check.active)
             flags += Halberd.ActorFlags.BLOCK_WITH_SOLID;
         actor.data.flags = flags;
+        actor.data.sprites_id = selected_sprite;
 
         Halberd.save_actor();
         return true;
@@ -118,11 +122,14 @@ public class ActorEditor : AssetEditor, SettingsGrid
 
     public void sync()
     {
-        speed_input.value = actor.data.speed;
-        visible_check.active = (actor.data.flags & Halberd.ActorFlags.VISIBLE) != 0;
-        solid_check.active   = (actor.data.flags & Halberd.ActorFlags.SOLID) != 0;
-        lock_check.active    = (actor.data.flags & Halberd.ActorFlags.LOCK_TO_GRID) != 0;
-        orient_check.active  = (actor.data.flags & Halberd.ActorFlags.CAN_ORIENT) != 0;
-        ghost_check.active   = (actor.data.flags & Halberd.ActorFlags.BLOCK_WITH_SOLID) == 0;
+        speed_input.value       = actor.data.speed;
+        visible_check.active    = (actor.data.flags & Halberd.ActorFlags.VISIBLE) != 0;
+        solid_check.active      = (actor.data.flags & Halberd.ActorFlags.SOLID) != 0;
+        lock_check.active       = (actor.data.flags & Halberd.ActorFlags.LOCK_TO_GRID) != 0;
+        orient_check.active     = (actor.data.flags & Halberd.ActorFlags.CAN_ORIENT) != 0;
+        ghost_check.active      = (actor.data.flags & Halberd.ActorFlags.BLOCK_WITH_SOLID) == 0;
+        selected_sprite         = actor.data.sprites_id;
+        stderr.printf("Sprite: %u, %s\n", selected_sprite, Halberd.IO.get_name_from_id(selected_sprite));
+        sprite_value_label.set_text(Halberd.IO.get_name_from_id(selected_sprite));
     }
 }

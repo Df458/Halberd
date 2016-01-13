@@ -114,4 +114,12 @@ char* swap_extension(const char* file_name, const char* file_extension);
  * This substring doesn't need freeing; it's a pointer to the original string.
  */
 const char* get_extension(const char* file_name);
+
+/*!
+ * Loads a resource of undefined type, and returns a void pointer.
+ * This shouldn't generally be called manually, as it is used by the resource
+ * system.
+ */
+void* load_anonymous_resource(const char* resource_location, const char* resource_name);
+
 #endif
