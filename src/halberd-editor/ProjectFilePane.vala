@@ -412,6 +412,7 @@ public class ProjectFilePane : Box
         icon_view.set_model(view_filter);
     }
 
+// FIXME: This probably still breaks if the parent of a registered asset changes.
     /*
      * This function handles changes to the files in the project.
      * It is responsible for adding/removing files from the view, as well as
@@ -443,11 +444,13 @@ public class ProjectFilePane : Box
 
             case FileMonitorEvent.CREATED:
             case FileMonitorEvent.MOVED_IN:
-                try {
-                    TreeIter? parent_iter = get_iter_for_file(src.get_parent());
-                    add_project_file(src.query_info("standard::*", FileQueryInfoFlags.NONE), parent_iter);
-                } catch(Error e) {
-                    app.display_warning("Can't get file info: " + e.message);
+                if(file_iter == null) {
+                    try {
+                        TreeIter? parent_iter = get_iter_for_file(src.get_parent());
+                        add_project_file(src.query_info("standard::*", FileQueryInfoFlags.NONE), parent_iter);
+                    } catch(Error e) {
+                        app.display_warning("Can't get file info: " + e.message);
+                    }
                 }
                 break;
 
