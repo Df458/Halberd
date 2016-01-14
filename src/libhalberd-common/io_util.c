@@ -111,7 +111,7 @@ FILE* load_resource_file(const char* resource_location, const char* resource_nam
         }
 
         if(!file) {
-            error("Failed to load file: File not found.");
+            warn("Failed to load file: File not found.");
             return NULL;
         }
     }
@@ -249,4 +249,13 @@ bool resource_eq(const char* resource_location, const char* resource_name, const
     }
 
     return true;
+}
+
+bool resource_exists(const char* resource_location, const char* resource_name)
+{
+    struct stat dir_stat = {0};
+    char* path  = construct_extended_resource_path(resource_location, resource_name);
+    bool exists = stat(path, &dir_stat) != -1;
+    free(path);
+    return exists;
 }

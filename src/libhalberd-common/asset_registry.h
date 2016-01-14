@@ -21,10 +21,15 @@ bool resources_init(resource_loader loader);
 void resources_cleanup();
 
 /*!
+ * Creates a new empty resource definition file
+ */
+bool create_resource_definition_file();
+
+/*!
  * Returns the ID of a registered resource. If the resource is not registered,
  * a new ID is returned.
  */
-uint32_t get_id_from_resource(const char* resource_location, const char* resource_nam, bool should_create);
+uint32_t get_id_from_resource(const char* resource_location, const char* resource_name, bool should_create);
 
 /*!
  * Returns the data from the resource with the specified id, if it's loaded.

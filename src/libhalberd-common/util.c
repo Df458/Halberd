@@ -10,12 +10,13 @@
 #include <unistd.h>
 #endif
 
-void _warn (const char* file, unsigned line, char* const message)
+// TODO: Use the extra variables
+void _warn (const char* file, unsigned line, char* const message, ...)
 {
     fprintf(stderr, "%s:%d, WARNING: %s\n", file, line, message);
 }
 
-void _error(const char* file, unsigned line, char* const message)
+void _error(const char* file, unsigned line, char* const message, ...)
 {
     fprintf(stderr, "%s:%d, FATAL ERROR: %s\n", file, line, message);
     exit(1);

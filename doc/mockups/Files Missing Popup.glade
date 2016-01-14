@@ -2,23 +2,28 @@
 <!-- Generated with glade 3.19.0 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
+  <object class="GtkActionGroup" id="actiongroup1"/>
   <object class="GtkListStore" id="liststore1">
     <columns>
       <!-- column-name Name -->
       <column type="gchararray"/>
       <!-- column-name Location -->
       <column type="gchararray"/>
-      <!-- column-name File Type -->
+      <!-- column-name File -->
       <column type="gchararray"/>
-      <!-- column-name New Location -->
+      <!-- column-name New -->
       <column type="gchararray"/>
-      <!-- column-name Keep Icon -->
+      <!-- column-name Keep -->
       <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkDialog" id="dialog1">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Missing Assets</property>
+    <property name="modal">True</property>
     <property name="type_hint">dialog</property>
+    <property name="urgency_hint">True</property>
+    <property name="deletable">False</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox1">
         <property name="can_focus">False</property>
@@ -33,6 +38,19 @@
             <child>
               <object class="GtkButton" id="button4">
                 <property name="label" translatable="yes">Confirm</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button2">
+                <property name="label" translatable="yes">Exit</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -70,9 +88,9 @@
           <object class="GtkLabel" id="label1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Warning message goes here</property>
+            <property name="label" translatable="yes">Several game assets were either moved or deleted while the application was not running.
+Please select replacements or remove them.</property>
             <property name="wrap">True</property>
-            <property name="xalign">0</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -92,6 +110,7 @@
               <object class="GtkTreeViewColumn" id="treeviewcolumn1">
                 <property name="title" translatable="yes">Name</property>
                 <property name="sort_indicator">True</property>
+                <property name="sort_column_id">0</property>
                 <child>
                   <object class="GtkCellRendererText" id="cellrenderertext1"/>
                   <attributes>
@@ -103,6 +122,7 @@
             <child>
               <object class="GtkTreeViewColumn" id="treeviewcolumn2">
                 <property name="title" translatable="yes">Location</property>
+                <property name="sort_column_id">1</property>
                 <child>
                   <object class="GtkCellRendererText" id="cellrenderertext2"/>
                   <attributes>
@@ -114,25 +134,13 @@
             <child>
               <object class="GtkTreeViewColumn" id="treeviewcolumn3">
                 <property name="title" translatable="yes">Asset Type</property>
+                <property name="sort_column_id">2</property>
                 <child>
                   <object class="GtkCellRendererText" id="cellrenderertext3">
                     <property name="style">italic</property>
                   </object>
                   <attributes>
                     <attribute name="text">2</attribute>
-                  </attributes>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkTreeViewColumn" id="treeviewcolumn4">
-                <property name="title" translatable="yes">Replace?</property>
-                <child>
-                  <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
-                    <property name="icon_name">object-select-symbolic</property>
-                  </object>
-                  <attributes>
-                    <attribute name="visible">4</attribute>
                   </attributes>
                 </child>
               </object>

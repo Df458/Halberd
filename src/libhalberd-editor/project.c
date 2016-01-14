@@ -53,10 +53,7 @@ bool create_project(const char* path)
 
     xmlFreeTextWriter(writer);
 
-    FILE* asset_registry = load_resource_file(NULL, ".asset_registry", "w");
-    uint32_t count = 0;
-    fwrite(&count, sizeof(uint32_t), 1, asset_registry);
-    fclose(asset_registry);
+    create_resource_definition_file();
 
     return true;
 }

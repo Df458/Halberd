@@ -127,4 +127,9 @@ void* load_anonymous_resource(const char* resource_location, const char* resourc
  */
 bool resource_eq(const char* resource_location, const char* resource_name, const char* resource2_location, const char* resource2_name);
 
+/*!
+ * Test if a given resource exists
+ */
+bool resource_exists(const char* resource_location, const char* resource_name);
+
 #endif

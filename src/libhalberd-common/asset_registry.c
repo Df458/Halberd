@@ -1,5 +1,6 @@
 #include "asset_registry.h"
 #include "io_util.h"
+#include "util.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,11 +18,13 @@ struct resource
     void*    data;
 };
 
-struct resource* resource_list;
+struct resource* resource_list = 0;
+struct resource* failed_list = 0;
 resource_loader  load_func = 0;
 
 static uint32_t next_id = 0;
 static uint32_t resource_count = 0;
+static uint32_t failed_count = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hidden functions
@@ -106,8 +109,14 @@ bool resources_init(resource_loader loader)
     load_func = loader;
 
     FILE* definition_file = load_resource_file(NULL, ".asset_registry", "r");
-    if(!definition_file)
-        return false;
+    if(!definition_file) {
+        // TODO: Provide a descriptive failure message
+        create_resource_definition_file();
+        definition_file = load_resource_file(NULL, ".asset_registry", "r");
+        if(!definition_file)
+            return false;
+        warn("The asset registry was missing. A new one has been created, but links between assets have been broken.");
+    }
 
     fread(&next_id, sizeof(uint32_t), 1, definition_file);
     fprintf(stderr, "Resource count: %u\n", next_id);
@@ -121,20 +130,28 @@ bool resources_init(resource_loader loader)
 
     for(int i = 0; i < next_id; ++i) {
         char is_valid = fgetc(definition_file);
-        fprintf(stderr, "Got %d for valid byte\n", is_valid);
         resource_list[i].loaded = false;
         if(is_valid) {
             resource_list[i].path  = read_string_from_file(definition_file);
             resource_list[i].name  = read_string_from_file(definition_file);
             resource_list[i].id    = i;
-            resource_list[i].valid = true;
+            resource_list[i].valid = resource_exists(resource_list[i].path, resource_list[i].name);
+            if(!resource_list[i].valid) {
+                ++failed_count;
+                failed_list = realloc(failed_list, sizeof(struct resource) * failed_count);
+                failed_list[failed_count - 1] = resource_list[i];
+            }
         } else {
             resource_list[i].path = 0;
             resource_list[i].name = 0;
+            resource_list[i].id    = i;
             resource_list[i].valid = false;
         }
         fprintf(stderr, "Loaded resource %d:\n%s, %s\n", i, resource_list[i].path, resource_list[i].name);
     }
+
+    if(failed_count > 0)
+        warn("Some assets have been moved or deleted since the last load.");
 
     fclose(definition_file);
 
@@ -144,6 +161,19 @@ bool resources_init(resource_loader loader)
 void resources_cleanup()
 {
     // TODO: Implement this
+}
+
+bool create_resource_definition_file()
+{
+    uint32_t count = 0;
+    FILE* asset_registry = load_resource_file(NULL, ".asset_registry", "w");
+    if(!asset_registry)
+        return false;
+
+    fwrite(&count, sizeof(uint32_t), 1, asset_registry);
+    fclose(asset_registry);
+
+    return true;
 }
 
 uint32_t get_id_from_resource(const char* resource_location, const char* resource_name, bool should_create)

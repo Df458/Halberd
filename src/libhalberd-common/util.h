@@ -5,10 +5,10 @@
 #include <inttypes.h>
 #include <string.h>
 
-void _warn (const char* file, unsigned line, char* const message);
-void _error(const char* file, unsigned line, char* const message);
-#define warn(message) _warn(__FILE__, __LINE__, message)
-#define error(message) _error(__FILE__, __LINE__, message)
+void _warn (const char* file, unsigned line, char* const message, ...);
+void _error(const char* file, unsigned line, char* const message, ...);
+#define warn(message, ...) _warn(__FILE__, __LINE__, message, ## __VA_ARGS__)
+#define error(message, ...) _error(__FILE__, __LINE__, message, ## __VA_ARGS__)
 #define error_code() _error(__FILE__, __LINE__, strerror(errno))
 #define nulltest(ptr) if(!ptr) error("Recieved unexpected null pointer")
 
