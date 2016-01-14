@@ -1,3 +1,5 @@
+using HLog;
+
 class HalberdEditor : Gtk.Application
 {
     StartupWindow startup_win;
@@ -54,6 +56,7 @@ class HalberdEditor : Gtk.Application
             current_win = startup_win;
         }
 
+        register_log_handler((file, line, level, message) => { log_message(level, message); });
         if(!failed_init)
             Gtk.main();
         Halberd.Game.Settings.cleanup();
@@ -160,6 +163,21 @@ class HalberdEditor : Gtk.Application
         about_dialog.set_transient_for(current_win);
         about_dialog.run();
     }
+
+}
+
+public void log_message(LogLevel level, string message)
+{
+    Gtk.MessageType type = Gtk.MessageType.INFO;
+    switch(level) {
+        case LogLevel.INFO:    type = Gtk.MessageType.INFO;    break;
+        case LogLevel.WARNING: type = Gtk.MessageType.WARNING; break;
+        case LogLevel.ERROR:   type = Gtk.MessageType.ERROR;   break;
+        case LogLevel.FATAL:   type = Gtk.MessageType.ERROR;   break;
+    }
+    Gtk.MessageDialog dialog = new Gtk.MessageDialog(app.current_win, Gtk.DialogFlags.MODAL, type, Gtk.ButtonsType.OK, message);
+    dialog.response.connect((r) => { dialog.destroy(); });
+    dialog.show();
 }
 
 /*

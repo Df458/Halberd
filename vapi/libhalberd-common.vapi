@@ -109,3 +109,29 @@ namespace Halberd {
         public void delete_resource(string? resource_location, string resource_name);
     }
 }
+[CCode (cheader_filename = "util.h")]
+namespace HLog {
+    [CCode (cname = "log_level", cprefix = "LOG_", has_type_id = false)]
+    public enum LogLevel {
+        INFO,
+        WARNING,
+        ERROR,
+        FATAL
+    }
+    [CCode (cname = "_log")]
+    public void log(string file, uint line, LogLevel level, string message, ...);
+    [CCode (cname = "info")]
+    public void log_info(string message, ...);
+    [CCode (cname = "warn")]
+    public void log_warning(string message, ...);
+    [CCode (cname = "error")]
+    public void log_error(string message, ...);
+    [CCode (cname = "fatal")]
+    public void log_fatal(string message, ...);
+
+    [CCode (cname = "log_handler", has_target = "false")]
+    public delegate void LogHandler(string file, uint line, LogLevel level, string message);
+
+    [CCode (cname = "register_log_handler")]
+    public void register_log_handler(LogHandler handler);
+}
