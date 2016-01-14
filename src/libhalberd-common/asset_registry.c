@@ -151,7 +151,7 @@ bool resources_init(resource_loader loader)
     }
 
     if(failed_count > 0)
-        warn("Some assets have been moved or deleted since the last load.");
+        warn("%d assets have been moved or deleted since the last load.", failed_count);
 
     fclose(definition_file);
 
