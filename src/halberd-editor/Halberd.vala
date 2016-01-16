@@ -112,6 +112,22 @@ class HalberdEditor : Gtk.Application
         current_win = window;
         if(startup_win != null)
             startup_win.destroy();
+
+        if(Halberd.IO.get_failed_count() > 0) {
+            MissingFilesDialog dialog = new MissingFilesDialog();
+            dialog.set_transient_for(window);
+            dialog.response.connect((id) =>
+            {
+                if(id == 0) {
+                    dialog.apply();
+                    dialog.close();
+                } else if(id == 1) {
+                    window.close();
+                }
+            });
+
+            dialog.run();
+        }
     }
 
     public void window_destroyed(Gtk.Window win)

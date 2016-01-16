@@ -68,7 +68,7 @@ namespace Halberd {
     [CCode (cname="ident")]
     const Mat4 Ident;
 
-    [CCode (cheader_filename="io_util.h")]
+    [CCode (cheader_filename="io_util.h", cheader_filename="asset_registry.h")]
     namespace IO {
         [CCode (cname="get_base_resource_path")]
         unowned string? get_path();
@@ -107,6 +107,18 @@ namespace Halberd {
 
         [CCode (cname="delete_resource")]
         public void delete_resource(string? resource_location, string resource_name);
+
+        [CCode (cname="move_id")]
+        public void move_id(uint32 id, string? next_location, string next_name);
+
+        [CCode (cname="delete_id")]
+        public void delete_id(uint32 id);
+
+        [CCode (cname="get_failed_count")]
+        public int32 get_failed_count();
+
+        [CCode (cname="get_failed_ids")]
+        public int32[] get_failed_ids();
     }
 }
 [CCode (cheader_filename = "util.h")]

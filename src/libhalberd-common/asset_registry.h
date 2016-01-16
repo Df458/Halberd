@@ -71,3 +71,25 @@ bool     move_resource(const char* prev_location, const char* prev_name, const c
  * this point, and it is the user's responsibility to free it.
  */
 void*    delete_resource(const char* resource_location, const char* resource_name);
+
+/*!
+ * Changes a registered resource's location.
+ */
+bool     move_id(uint32_t id, const char* next_location, const char* next_name);
+
+/*!
+ * Unregisters a resource, returning the data. This data will be disregarded at
+ * this point, and it is the user's responsibility to free it.
+ */
+void*    delete_id(uint32_t id);
+
+/*!
+ * Returns the number of failed resources
+ */
+uint32_t get_failed_count();
+
+/*!
+ * Returns an array with the ids of all failed resources.
+ * Note that the calling function is responsible for freeing the data.
+ */
+uint32_t* get_failed_ids();

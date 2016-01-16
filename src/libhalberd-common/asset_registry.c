@@ -250,6 +250,18 @@ void* get_data_from_resource(const char* resource_location, const char* resource
 bool move_resource(const char* prev_location, const char* prev_name, const char* next_location, const char* next_name)
 {
     uint32_t id = get_id_from_resource(prev_location, prev_name, false);
+    return move_id(id, next_location, next_name);
+}
+
+void* delete_resource(const char* resource_location, const char* resource_name)
+{
+    uint32_t id = get_id_from_resource(resource_location, resource_name, false);
+
+    return delete_id(id);
+}
+
+bool move_id(uint32_t id, const char* next_location, const char* next_name)
+{
     if(id == UINT32_MAX)
         return false;
 
@@ -266,9 +278,8 @@ bool move_resource(const char* prev_location, const char* prev_name, const char*
     return update_resource_definition(id);
 }
 
-void* delete_resource(const char* resource_location, const char* resource_name)
+void* delete_id(uint32_t id)
 {
-    uint32_t id = get_id_from_resource(resource_location, resource_name, false);
     if(id == UINT32_MAX)
         return 0;
 
@@ -285,4 +296,20 @@ void* delete_resource(const char* resource_location, const char* resource_name)
         free(r->name);
 
     return r->data;
+}
+
+uint32_t get_failed_count()
+{
+    return failed_count;
+}
+
+uint32_t* get_failed_ids()
+{
+    // TODO: Implement this
+    uint32_t* id_list = calloc(failed_count, sizeof(uint32_t));
+    for(uint32_t i = 0; i < failed_count; ++i) {
+        id_list[i] = failed_list[i].id;
+    }
+    
+    return id_list;
 }

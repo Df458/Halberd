@@ -14,8 +14,31 @@
       <!-- column-name New -->
       <column type="gchararray"/>
       <!-- column-name Keep -->
-      <column type="gchararray"/>
+      <column type="gboolean"/>
     </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Boulder.act</col>
+        <col id="1" translatable="yes">Actors</col>
+        <col id="2" translatable="yes">Actor</col>
+        <col id="3" translatable="yes">Maps/Cave1/Boulder.act</col>
+        <col id="4">True</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Slime.act</col>
+        <col id="1" translatable="yes">Actors</col>
+        <col id="2" translatable="yes">Actor</col>
+        <col id="3" translatable="yes">Nothing</col>
+        <col id="4">False</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Boulder.spr</col>
+        <col id="1" translatable="yes">Sprites</col>
+        <col id="2" translatable="yes">Sprite</col>
+        <col id="3" translatable="yes">Maps/Cave1/Boulder.spr</col>
+        <col id="4">True</col>
+      </row>
+    </data>
   </object>
   <object class="GtkDialog" id="dialog1">
     <property name="can_focus">False</property>
@@ -61,22 +84,6 @@
                 <property name="position">1</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkButton" id="button1">
-                <property name="label" translatable="yes">Delete All</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <style>
-                  <class name="destructive-action"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -89,7 +96,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">Several game assets were either moved or deleted while the application was not running.
-Please select replacements or remove them.</property>
+Please select their new locations or remove them.</property>
             <property name="wrap">True</property>
           </object>
           <packing>
@@ -105,6 +112,19 @@ Please select replacements or remove them.</property>
             <property name="model">liststore1</property>
             <child internal-child="selection">
               <object class="GtkTreeSelection" id="treeview-selection1"/>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn" id="treeviewcolumn4">
+                <property name="title" translatable="yes">Replace</property>
+                <property name="clickable">True</property>
+                <property name="sort_column_id">4</property>
+                <child>
+                  <object class="GtkCellRendererToggle" id="cellrenderertoggle1"/>
+                  <attributes>
+                    <attribute name="active">4</attribute>
+                  </attributes>
+                </child>
+              </object>
             </child>
             <child>
               <object class="GtkTreeViewColumn" id="treeviewcolumn1">
@@ -149,16 +169,10 @@ Please select replacements or remove them.</property>
               <object class="GtkTreeViewColumn" id="treeviewcolumn5">
                 <property name="title" translatable="yes">Replace With</property>
                 <child>
-                  <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf2">
-                    <property name="icon_name">object-select-symbolic</property>
-                  </object>
-                  <attributes>
-                    <attribute name="visible">4</attribute>
-                  </attributes>
-                </child>
-                <child>
                   <object class="GtkCellRendererText" id="cellrenderertext4"/>
                   <attributes>
+                    <attribute name="sensitive">4</attribute>
+                    <attribute name="style">4</attribute>
                     <attribute name="text">3</attribute>
                   </attributes>
                 </child>
