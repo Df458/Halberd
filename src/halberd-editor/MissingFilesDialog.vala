@@ -22,11 +22,15 @@ public class MissingFilesDialog : Dialog
         COLUMN_COUNT
     }
 
-    public MissingFilesDialog()
+    public MissingFilesDialog(Window win)
     {
+        this.set_transient_for(win);
+        this.window_position = WindowPosition.CENTER;
+        this.set_default_size(800, 600);
         init_content();
         connect_signals();
         populate_data();
+        this.show_all();
     }
 
     public void apply()
@@ -37,14 +41,14 @@ public class MissingFilesDialog : Dialog
     private void init_content()
     {
         message_label  = new Label("Several game assets were either moved or deleted while the application was not running.\nPlease select their new locations or remove them.");
-        missing_data   = new TreeStore(MissingTreeColumn.COLUMN_COUNT, typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(bool));
+        missing_data   = new TreeStore(MissingTreeColumn.COLUMN_COUNT, typeof(int), typeof(string), typeof(string), typeof(string), typeof(string?), typeof(bool));
         missing_list   = new TreeView.with_model(missing_data);
         missing_scroll = new ScrolledWindow(null, null);
 
         missing_data.set_sort_column_id(MissingTreeColumn.ID, SortType.ASCENDING);
-        CellRendererToggle toggle_renderer = new CellRendererToggle();
+        toggle_renderer = new CellRendererToggle();
 
-        col_keep  = new TreeViewColumn.with_attributes("Keep",         toggle_renderer,          "active", MissingTreeColumn.KEEP);
+        col_keep                 = new TreeViewColumn.with_attributes("Keep",         toggle_renderer,          "active", MissingTreeColumn.KEEP);
         TreeViewColumn col_src   = new TreeViewColumn.with_attributes("Missing File", new CellRendererText(),   "text",   MissingTreeColumn.SRCPATH);
         TreeViewColumn col_dest  = new TreeViewColumn.with_attributes("Replacement",  new CellRendererText(),   "text",   MissingTreeColumn.DESTDISP, "sensitive", MissingTreeColumn.KEEP);
         missing_list.append_column(col_keep);
@@ -55,8 +59,11 @@ public class MissingFilesDialog : Dialog
         this.set_default_response(0);
 
         missing_scroll.add(missing_list);
+        this.get_content_area().margin_top    = 18;
+        this.get_content_area().margin_bottom = 18;
+        this.get_content_area().spacing       = 12;
         this.get_content_area().add(message_label);
-        this.get_content_area().add(missing_scroll);
+        this.get_content_area().pack_start(missing_scroll, true, true);
     }
 
     private void connect_signals()
@@ -71,7 +78,7 @@ public class MissingFilesDialog : Dialog
             missing_data.get_iter(out iter, tpath);
             if(iter == null)
                 return;
-            missing_data.get(iter, MissingTreeColumn.KEEP, out keep, MissingTreeColumn.SRCPATH, src, -1);
+            missing_data.get(iter, MissingTreeColumn.KEEP, out keep, MissingTreeColumn.SRCPATH, out src, -1);
             extension = get_extension(src);
             if(!keep) {
                 Popover select_pop = new Popover(missing_list);
@@ -85,7 +92,11 @@ public class MissingFilesDialog : Dialog
                 {
                     select_pop.hide();
                     ResourceEntry entry = select_widget.get_selected();
-                    missing_data.set(iter, MissingTreeColumn.KEEP, true, MissingTreeColumn.DESTDISP, entry.path + "/" + entry.name, MissingTreeColumn.DESTNAME, entry.name, MissingTreeColumn.DESTPATH, entry.path, -1);
+                    string disp = "";
+                    if(entry.path != null)
+                        disp = entry.path + "/";
+                    disp += entry.name;
+                    missing_data.set(iter, MissingTreeColumn.KEEP, true, MissingTreeColumn.DESTDISP, disp, MissingTreeColumn.DESTNAME, entry.name, MissingTreeColumn.DESTPATH, entry.path, -1);
                 });
                 select_pop.show_all();
             } else {
@@ -101,8 +112,12 @@ public class MissingFilesDialog : Dialog
 
         for(int i = 0; i < entry_count; ++i) {
             TreeIter iter;
-            string? srcpath = get_path_from_id(entries[i]) + "/" + get_name_from_id(entries[i]);
-            missing_data.insert_with_values(out iter, null, -1, MissingTreeColumn.ID, entries[i], MissingTreeColumn.SRCPATH, srcpath, MissingTreeColumn.KEEP, false, -1);
+            string? path = get_path_from_id(entries[i], true);
+            string srcpath = "";
+            if(path != null)
+                srcpath = path + "/";
+            srcpath += get_name_from_id(entries[i], true);
+            missing_data.insert_with_values(out iter, null, -1, MissingTreeColumn.ID, entries[i], MissingTreeColumn.SRCPATH, srcpath, MissingTreeColumn.KEEP, false, MissingTreeColumn.DESTDISP, "None", -1);
         }
     }
 
@@ -110,7 +125,7 @@ public class MissingFilesDialog : Dialog
     {
         int id;
         bool keep;
-        string dest_path;
+        string? dest_path;
         string dest_name;
         model.get(iter, MissingTreeColumn.ID, out id, MissingTreeColumn.KEEP, out keep, MissingTreeColumn.DESTNAME, out dest_name, MissingTreeColumn.DESTPATH, out dest_path, -1);
         if(keep) {

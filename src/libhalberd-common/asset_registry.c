@@ -222,17 +222,17 @@ void* get_data_from_id(uint32_t id)
         return 0;
 }
 
-char* get_name_from_id(uint32_t id)
+char* get_name_from_id(uint32_t id, bool force_invalid)
 {
-    if(id < next_id && resource_list[id].valid) {
+    if(id < next_id && (resource_list[id].valid || force_invalid)) {
         return strdup(resource_list[id].name);
     } else
         return 0;
 }   
 
-char* get_path_from_id(uint32_t id)
+char* get_path_from_id(uint32_t id, bool force_invalid)
 {
-    if(id < next_id && resource_list[id].valid && resource_list[id].path != 0) {
+    if(id < next_id && (resource_list[id].valid || force_invalid) && resource_list[id].path != 0) {
         return strdup(resource_list[id].path);
     } else
         return 0;
@@ -273,7 +273,10 @@ bool move_id(uint32_t id, const char* next_location, const char* next_name)
 
     if(next_location)
         r->path = strdup(next_location);
+    else
+        r->path = 0;
     r->name = strdup(next_name);
+    r->valid = true;
 
     return update_resource_definition(id);
 }

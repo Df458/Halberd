@@ -97,10 +97,10 @@ namespace Halberd {
         public uint32 get_id_from_resource(string? location, string name, bool should_create);
 
         [CCode (cname="get_name_from_id")]
-        public string? get_name_from_id(uint32 id);
+        public string? get_name_from_id(uint32 id, bool force_invalid = false);
 
         [CCode (cname="get_path_from_id")]
-        public string? get_path_from_id(uint32 id);
+        public string? get_path_from_id(uint32 id, bool force_invalid = false);
 
         [CCode (cname="move_resource")]
         public void move_resource(string? prev_location, string prev_name, string? next_location, string next_name);

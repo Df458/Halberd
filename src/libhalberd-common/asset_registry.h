@@ -44,13 +44,13 @@ void*    get_data_from_id(uint32_t id);
  * Returns the name of the resource with the specified id. The returned data
  * must be freed by the caller.
  */
-char*    get_name_from_id(uint32_t id);
+char*    get_name_from_id(uint32_t id, bool force_invalid);
 
 /*!
  * Returns the path of the resource with the specified id. The returned data
  * must be freed by the caller.
  */
-char*    get_path_from_id(uint32_t id);
+char*    get_path_from_id(uint32_t id, bool force_invalid);
 
 /*!
  * Returns the data from the resource with the specified location, if it's loaded.
@@ -78,8 +78,9 @@ void*    delete_resource(const char* resource_location, const char* resource_nam
 bool     move_id(uint32_t id, const char* next_location, const char* next_name);
 
 /*!
- * Unregisters a resource, returning the data. This data will be disregarded at
- * this point, and it is the user's responsibility to free it.
+ * Unregisters a resource, returning any data it currently contains. This data
+ * will be disregarded at this point, and it is the user's responsibility to
+ * free it.
  */
 void*    delete_id(uint32_t id);
 

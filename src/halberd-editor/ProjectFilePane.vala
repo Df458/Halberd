@@ -127,6 +127,7 @@ public class ProjectFilePane : Box
 
         control_box.margin_start = 12;
         control_box.margin_end = 12;
+        view_paned.position = 128;
 
         view_paned.pack1(sidebar_scroll, false, false);
         view_overlay.add(icon_scroll);
@@ -554,6 +555,9 @@ public class ProjectFilePane : Box
      */
     private void add_project_file(FileInfo info, TreeIter? parent_iter)
     {
+        string filename = info.get_name();
+        if(info.get_is_hidden() || filename[0] == '.')
+            return;
         if(info.get_file_type () == FileType.DIRECTORY && parent_iter != null) {
             string uri;
             file_data.get(parent_iter, ProjectTreeColumn.URI, out uri);
@@ -567,8 +571,19 @@ public class ProjectFilePane : Box
         file_data.append(out temp_iter, parent_iter);
 
         string name = "text-x-generic";
-        if(info.get_name().has_suffix(".png"))
-            name = "image-x-generic";
+        string extension = Halberd.IO.get_extension(filename);
+        // TODO: Use custom non-placeholder icons
+        switch(extension) {
+            case "png":
+                name = "image-x-generic";
+                break;
+            case "actr":
+                name = "avatar-default-symbolic";
+                break;
+            case "map":
+                name = "mark-location";
+                break;
+        }
 
         string parent_uri;
         if(parent_iter == null)

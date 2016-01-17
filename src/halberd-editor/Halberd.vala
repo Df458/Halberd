@@ -56,7 +56,7 @@ class HalberdEditor : Gtk.Application
             current_win = startup_win;
         }
 
-        register_log_handler((file, line, level, message) => { log_message(level, message); });
+        //register_log_handler((file, line, level, message) => { log_message(level, message); });
         if(!failed_init)
             Gtk.main();
         Halberd.Game.Settings.cleanup();
@@ -114,8 +114,7 @@ class HalberdEditor : Gtk.Application
             startup_win.destroy();
 
         if(Halberd.IO.get_failed_count() > 0) {
-            MissingFilesDialog dialog = new MissingFilesDialog();
-            dialog.set_transient_for(window);
+            MissingFilesDialog dialog = new MissingFilesDialog(window);
             dialog.response.connect((id) =>
             {
                 if(id == 0) {
