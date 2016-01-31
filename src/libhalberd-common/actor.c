@@ -61,7 +61,7 @@ actor load_actor_from_resource(const char* resource_location, const char* resour
             xmlChar* a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"id"))) {
                 a_new->data.sprites_id = atoi((char*)a);
-                a_new->data.sprites = (spriteset*)get_data_from_id(a_new->data.sprites_id);/*load_resource_to_spriteset("sprites", (char*)a);*/
+                a_new->data.sprites = (sprite*)get_data_from_id(a_new->data.sprites_id);/*load_resource_to_spriteset("sprites", (char*)a);*/
                 free(a);
             }
         }

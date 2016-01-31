@@ -59,7 +59,7 @@ struct actordata
     uint8_t animation_playing;
     float animation_timer;
 
-    spriteset* sprites;
+    sprite* sprites;
     uint32_t   sprites_id;
 };
 

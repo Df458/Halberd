@@ -17,17 +17,9 @@ typedef struct texture
 }
 texture;
 
-typedef struct sprite
-{
-    texture texture_data;
-    int16_t origin_x;
-    int16_t origin_y;
-}
-sprite;
-
 typedef struct font
 {
-    texture texture_data;
+    texture* texture_data;
     uint16_t glyph_width;
     uint16_t glyph_height;
 }
@@ -51,19 +43,17 @@ struct animation
     char* handle;
 };
 
-typedef struct spriteset
+typedef struct sprite
 {
-    texture atlas;
+    texture* atlas;
     struct animation* animations;
     uint8_t animation_count;
-
-    uint16_t _refcount;
 }
-spriteset;
+sprite;
 
 typedef struct ui_box
 {
-    texture texture_data;
+    texture* texture_data;
     GLuint uv_buffer;
 
     uint16_t w;
@@ -90,45 +80,80 @@ tileset;
 //-----------------------------------------------------------------------------
 
 /*!
+ * Creates an empty texture
+ */
+texture* create_texture(uint16_t w, uint16_t h);
+
+/*!
+ * Frees a texture and its resources
+ */
+void destroy_texture(texture* tex);
+
+/*!
  * This loads a png file to a texture.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-texture load_resource_to_texture(const char* resource_location, const char* resource_name);
+texture* load_resource_to_texture(const char* resource_location, const char* resource_name);
 
 /*!
- * This loads a png file as a font. The width/height for the glyphs is
- * expected to be 1/16th of the texture width/height.
+ * This saves a texture to a png file.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-font load_resource_to_font(const char* resource_location, const char* resource_name);
+bool save_texture_to_resource(texture* tex, const char* resource_location, const char* resource_name);
+
+
+// TODO: Use XML-based font files
+/*!
+ * Creates an empty font
+ */
+font* create_font(uint16_t w, uint16_t h);
 
 /*!
- * This loads a png file as a sprite. The sprite origin is set to 0x0, the
- * upper-left corner.
+ * Frees a font and its resources
+ */
+void destroy_font(font* fnt);
+
+/*!
+ * This loads a font.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-sprite load_resource_to_sprite(const char* resource_location, const char* resource_name);
+font* load_resource_to_font(const char* resource_location, const char* resource_name);
 
 /*!
- * This loads a spriteset file, and constructs a texture atlas from the
+ * This saves a font.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+bool save_font_to_resource(font* fnt, const char* resource_location, const char* resource_name);
+
+
+/*!
+ * Creates an empty sprite
+ */
+sprite* create_sprite();
+
+/*!
+ * Frees a sprite and its resources
+ */
+void destroy_sprite(sprite* fnt);
+
+/*!
+ * This loads a sprite file, and constructs a texture atlas from the
  * necessary spritesheets.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-spriteset* load_resource_to_spriteset(const char* resource_location, const char* resource_name);
+sprite* load_resource_to_sprite(const char* resource_location, const char* resource_name);
+
+/*!
+ * This saves a sprite.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+bool save_sprite_to_resource(sprite* fnt, const char* resource_location, const char* resource_name);
+
 
 /*!
  * This loads a tileset from a png file.
  * See get_extended_resource_path(io_util.h) for usage details
  */
 tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer);
-
-//-----------------------------------------------------------------------------
-// Freeing section
-//-----------------------------------------------------------------------------
-
-/*!
- * This frees an existing spriteset, and all contained resources.
- */
-void free_spriteset(spriteset* set);
 
 #endif

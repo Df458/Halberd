@@ -69,17 +69,14 @@ namespace Halberd {
         string handle;
     }
 
-    [CCode (cname="spriteset", destroy_function="")]
-    public struct SpriteSet {
+    [CCode (cheader_filename="texture_util.h", cname="sprite", destroy_function="")]
+    public struct Sprite{
         Animation[] animations;
         uint8 animation_count;
     }
 
     [CCode (cheader_filename="editor_io.h", cname="create_blank_actor_for_resource")]
     public unowned Actor? create_actor_for_resource(string? path, string name);
-
-    [CCode (cheader_filename="editor_io.h", cname="create_blank_spriteset_for_resource")]
-    public unowned SpriteSet? create_spriteset_for_resource(string? path, string name);
 
     [CCode (cheader_filename="editor_io.h", cname="save_actor")]
     public void save_actor();

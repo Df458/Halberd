@@ -35,7 +35,7 @@ actor create_blank_actor_for_resource(const char* resource_location, const char*
  * Creates a new Spriteset. Fields are set to sane defaults.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-spriteset* create_blank_spriteset_for_resource(const char* resource_location, const char* resource_name);
+//sprite* create_blank_spriteset_for_resource(const char* resource_location, const char* resource_name);
 
 /*!
  * Saves the registered actor.

@@ -268,7 +268,7 @@ uint8_t init_graphics(void)
 void destroy_graphics()
 {
     for(int16_t i = 0; i < loaded_boxes; ++i) {
-        glDeleteTextures(1, &boxes[i].texture_data.texture_id);
+        glDeleteTextures(1, &boxes[i].texture_data->texture_id);
         glDeleteBuffers(1, &boxes[i].uv_buffer);
     }
     if(boxes)
@@ -289,7 +289,7 @@ void destroy_graphics()
     glDeleteBuffers(1, &font_buffer);
 }
 
-void draw_sprite(struct sprite sprite, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)
+void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)
 {
     glUseProgram(sprite_program);
 
@@ -299,53 +299,21 @@ void draw_sprite(struct sprite sprite, float position_x, float position_y, float
     checkGLError();
 
     glUniform4f(sprite_color_uniform, col.r, col.g, col.b, col.a);
+    glUniform2f(sprite_uv_dims_uniform, spr->animations[a_index].size_x, spr->animations[a_index].size_y / o_count);
+    glUniform2f(sprite_uv_offs_uniform, spr->animations[a_index].offset_x + (spr->animations[a_index].size_x * f_index), spr->animations[a_index].offset_y + (spr->animations[a_index].size_y * ((float)o_index / o_count)));
 
     mat4 tt = ident;
     mat4 rt = ident;
     mat4 st = ident;
-    translate(&tt, position_x + sprite.texture_data.texture_width * 0.5 - sprite.origin_x, position_y + sprite.texture_data.texture_height * 0.5 - sprite.origin_y, 0);
+    translate(&tt, position_x + spr->animations[a_index].dimensions_x * 0.5 - spr->animations[a_index].origin_x, position_y + (spr->animations[a_index].dimensions_y / (float)o_count) * 0.5 - spr->animations[a_index].origin_y, 0);
     rotate(&rt, rotation, 0);
-    scale(&st, scale_x * sprite.texture_data.texture_width, scale_y * sprite.texture_data.texture_height, 0);
-    mat4 transform = mul(mul(tt, rt), st);
-    mat4 final = mul(camera, transform);
-    glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sprite.texture_data.texture_id); // TODO: Use actual sprite
-    glUniform1i(sprite_texture_uniform, 0);
-    checkGLError();
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    checkGLError();
-
-    glDisableVertexAttribArray(sprite_vertex_attrib);
-}
-
-void draw_spriteset(struct spriteset* sprite, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)
-{
-    glUseProgram(sprite_program);
-
-    glEnableVertexAttribArray(sprite_vertex_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(sprite_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    checkGLError();
-
-    glUniform4f(sprite_color_uniform, col.r, col.g, col.b, col.a);
-    glUniform2f(sprite_uv_dims_uniform, sprite->animations[a_index].size_x, sprite->animations[a_index].size_y / o_count);
-    glUniform2f(sprite_uv_offs_uniform, sprite->animations[a_index].offset_x + (sprite->animations[a_index].size_x * f_index), sprite->animations[a_index].offset_y + (sprite->animations[a_index].size_y * ((float)o_index / o_count)));
-
-    mat4 tt = ident;
-    mat4 rt = ident;
-    mat4 st = ident;
-    translate(&tt, position_x + sprite->animations[a_index].dimensions_x * 0.5 - sprite->animations[a_index].origin_x, position_y + (sprite->animations[a_index].dimensions_y / (float)o_count) * 0.5 - sprite->animations[a_index].origin_y, 0);
-    rotate(&rt, rotation, 0);
-    scale(&st, scale_x * sprite->animations[a_index].dimensions_x, scale_y * sprite->animations[a_index].dimensions_y / o_count, 0);
+    scale(&st, scale_x * spr->animations[a_index].dimensions_x, scale_y * spr->animations[a_index].dimensions_y / o_count, 0);
     mat4 transform = mul(mul(tt, rt), st);
     mat4 final = mul(mul(camera, view), transform);
     glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sprite->atlas.texture_id); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, spr->atlas->texture_id); // TODO: Use actual sprite
     glUniform1i(sprite_texture_uniform, 0);
     checkGLError();
 
@@ -470,7 +438,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     checkGLError();
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frame.texture_data.texture_id); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, frame.texture_data->texture_id); // TODO: Use actual sprite
     glUniform1i(box_texture_uniform, 0);
     checkGLError();
 
@@ -521,7 +489,7 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
     glVertexAttribIPointer(font_id_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font->texture_data.texture_id);
+    glBindTexture(GL_TEXTURE_2D, font->texture_data->texture_id);
     glUniform1i(font_texture_uniform, 0);
     checkGLError();
 
@@ -554,10 +522,10 @@ void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, f
     draw_text(font, text, x + frame.border_w, y + frame.border_h, char_count);
 }
 
-int8_t index_by_handle(spriteset* set, const char* handle)
+int8_t index_by_handle(sprite* spr, const char* handle)
 {
-    for(int i = 0; i < set->animation_count; ++i)
-        if(!strcmp(set->animations[i].handle, handle))
+    for(int i = 0; i < spr->animation_count; ++i)
+        if(!strcmp(spr->animations[i].handle, handle))
             return i;
     return -1;
 }

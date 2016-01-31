@@ -30,10 +30,10 @@ public class MainWindow : Window
     // Inspector Pane
     private SidePane inspector_pane;
 
-    // Editors
-    private BlankEditor     empty_view;
-    private ActorEditor     actor_view;
-    private SpritesetEditor spriteset_view;
+    //                       Editors
+    private BlankEditor      empty_view;
+    private ActorEditor      actor_view;
+    private SpriteEditor     sprite_view;
 
     // Containers
     private Paned main_paned;
@@ -85,8 +85,8 @@ public class MainWindow : Window
                 actor_view.load(new ResourceEntry.from_entry(resource_path, resource_name));
                 break;
             case "spr":
-                view_stack.set_visible_child(spriteset_view);
-                spriteset_view.load(new ResourceEntry.from_entry(resource_path, resource_name));
+                view_stack.set_visible_child(sprite_view);
+                sprite_view.load(new ResourceEntry.from_entry(resource_path, resource_name));
                 break;
             default:
                 view_stack.set_visible_child(empty_view);
@@ -140,7 +140,7 @@ public class MainWindow : Window
         inspector_pane = new SidePane();
         empty_view = new BlankEditor();
         actor_view = new ActorEditor();
-        spriteset_view = new SpritesetEditor();
+        sprite_view = new SpriteEditor();
 
         button_draw = new ToggleToolButton();
         button_fill = new ToggleToolButton();
@@ -162,7 +162,7 @@ public class MainWindow : Window
 
         view_stack.add_named(empty_view, "");
         view_stack.add_named(actor_view, "act");
-        view_stack.add_named(spriteset_view, "spr");
+        view_stack.add_named(sprite_view, "spr");
         topbar.pack_start(button_save);
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
@@ -194,7 +194,7 @@ public class MainWindow : Window
                     actor_view.save();
                     break;
                 case "spr":
-                    spriteset_view.save();
+                    sprite_view.save();
                     break;
             }
         });

@@ -115,18 +115,43 @@ uint8_t box_contains(texture_atlas_box holder, texture_atlas_box child)
 // Public functions
 ///////////////////////////////////////////////////////////////////////////////
 
-texture load_resource_to_texture(const char* resource_location, const char* resource_name)
+texture* create_texture(uint16_t w, uint16_t h)
 {
-	texture texture_data;
-	glGenTextures(1, &texture_data.texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_data.texture_id);
+	texture* texture_data = malloc(sizeof(texture));
+	glGenTextures(1, &texture_data->texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_data->texture_id);
+    texture_data->texture_width = w;
+    texture_data->texture_height = h;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data->texture_width, texture_data->texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+
+    return texture_data;
+}
+
+void destroy_texture(texture* tex)
+{
+    glDeleteTextures(1, &tex->texture_id);
+    free(tex);
+}
+
+texture* load_resource_to_texture(const char* resource_location, const char* resource_name)
+{
+	texture* texture_data = malloc(sizeof(texture));
+	glGenTextures(1, &texture_data->texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_data->texture_id);
 	
     char* path = construct_extended_resource_path(resource_location, resource_name);
     // TODO: Add support for additional types
-    png_byte* image_data = load_png_to_buffer(path, &texture_data.texture_width, &texture_data.texture_height);
+    png_byte* image_data = load_png_to_buffer(path, &texture_data->texture_width, &texture_data->texture_height);
     free(path);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data.texture_width, texture_data.texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data->texture_width, texture_data->texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -139,98 +164,134 @@ texture load_resource_to_texture(const char* resource_location, const char* reso
     return texture_data;
 }
 
-font load_resource_to_font(const char* resource_location, const char* resource_name)
+bool save_texture_to_resource(texture* tex, const char* resource_location, const char* resource_name)
 {
-    font new_font;
-    new_font.texture_data = load_resource_to_texture(resource_location, resource_name);
-    new_font.glyph_width = new_font.texture_data.texture_width  / 16;
-    new_font.glyph_width = new_font.texture_data.texture_height / 16;
+    stub(false);
+}
+
+font* create_font(uint16_t w, uint16_t h)
+{
+	font* font_data = malloc(sizeof(font));
+    font_data->glyph_width = w;
+    font_data->glyph_width = h;
+    font_data->texture_data = create_texture(font_data->glyph_width * 16, font_data->glyph_height * 16);
+
+    return font_data;
+}
+
+void destroy_font(font* fnt)
+{
+    destroy_texture(fnt->texture_data);
+    free(fnt);
+}
+
+font* load_resource_to_font(const char* resource_location, const char* resource_name)
+{
+    font* new_font         = malloc(sizeof(font));
+    new_font->texture_data = load_resource_to_texture(resource_location, resource_name);
+    new_font->glyph_width  = new_font->texture_data->texture_width  / 16;
+    new_font->glyph_width  = new_font->texture_data->texture_height / 16;
 
     return new_font;
 }
 
-sprite load_resource_to_sprite(const char* resource_location, const char* resource_name)
+bool save_font_to_resource(font* fnt, const char* resource_location, const char* resource_name)
 {
-    sprite new_sprite;
-    char* texture_name = swap_extension(resource_name, "png");
-    new_sprite.texture_data = load_resource_to_texture(resource_location, resource_name);
-    free(texture_name);
-    new_sprite.origin_x = 0;
-    new_sprite.origin_y = 0;
-    return new_sprite;
+    stub(false);
 }
 
-// TODO: Add support for paths in spriteset files
-spriteset* load_resource_to_spriteset(const char* resource_location, const char* resource_name)
+sprite* create_sprite()
+{
+	sprite* sprite_data = malloc(sizeof(sprite));
+    sprite_data->atlas = 0;
+    sprite_data->animations = 0;
+    sprite_data->animation_count = 0;
+
+    return sprite_data;
+}
+
+void destroy_sprite(sprite* spr)
+{
+    if(spr->atlas) {
+            destroy_texture(spr->atlas);
+        for(uint8_t i = 0; i < spr->animation_count; ++i)
+            free(spr->animations[i].handle);
+        free(spr->animations);
+    }
+    free(spr);
+}
+
+// TODO: Add support for paths in sprite files
+sprite* load_resource_to_sprite(const char* resource_location, const char* resource_name)
 {
     xmlDocPtr doc = load_resource_to_xml(resource_location, resource_name);
     if(!doc)
         return 0;
     xmlNodePtr root = xmlDocGetRootElement(doc);
     for(; root; root = root->next)
-        if(root->type == XML_ELEMENT_NODE && !xmlStrcmp(root->name, (const xmlChar*)"spriteset"))
+        if(root->type == XML_ELEMENT_NODE && !xmlStrcmp(root->name, (const xmlChar*)"sprite"))
             break;
     if(!root)
         return 0;
-    spriteset* set = malloc(sizeof(spriteset));
-    set->animations = malloc(sizeof(struct animation));
-    set->animation_count = 0;
+    sprite* spr = malloc(sizeof(sprite));
+    spr->animations = malloc(sizeof(struct animation));
+    spr->animation_count = 0;
     png_byte** buffers = malloc(sizeof(png_byte*));
     texture_atlas_box* boxes = malloc(sizeof(texture_atlas_box));
     for(xmlNodePtr node = root->children; node; node = node->next) {
         if(node->type == XML_ELEMENT_NODE && !xmlStrcmp(node->name, (const xmlChar*)"animation")) {
-            set->animation_count++;
-            if(set->animation_count > 1) {
-                set->animations = realloc(set->animations, set->animation_count * sizeof(struct animation));
-                buffers = realloc(buffers, set->animation_count * sizeof(png_byte*));
-                boxes = realloc(boxes, set->animation_count * sizeof(texture_atlas_box));
+            spr->animation_count++;
+            if(spr->animation_count > 1) {
+                spr->animations = realloc(spr->animations, spr->animation_count * sizeof(struct animation));
+                buffers = realloc(buffers, spr->animation_count * sizeof(png_byte*));
+                boxes = realloc(boxes, spr->animation_count * sizeof(texture_atlas_box));
             }
-            set->animations[set->animation_count - 1].handle = "idle";
-            set->animations[set->animation_count - 1].orients = 0;
-            set->animations[set->animation_count - 1].length = 1;
-            set->animations[set->animation_count - 1].delay = 1;
-            set->animations[set->animation_count - 1].loop = 0;
-            set->animations[set->animation_count - 1].play = 1;
-            set->animations[set->animation_count - 1].origin_x = 0;
-            set->animations[set->animation_count - 1].origin_y = 0;
+            spr->animations[spr->animation_count - 1].handle = "idle";
+            spr->animations[spr->animation_count - 1].orients = 0;
+            spr->animations[spr->animation_count - 1].length = 1;
+            spr->animations[spr->animation_count - 1].delay = 1;
+            spr->animations[spr->animation_count - 1].loop = 0;
+            spr->animations[spr->animation_count - 1].play = 1;
+            spr->animations[spr->animation_count - 1].origin_x = 0;
+            spr->animations[spr->animation_count - 1].origin_y = 0;
             xmlChar* a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"name"))) {
-                set->animations[set->animation_count - 1].handle = strdup((char*)a);
+                spr->animations[spr->animation_count - 1].handle = strdup((char*)a);
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"length"))) {
-                set->animations[set->animation_count - 1].length = atoi((char*)a);
+                spr->animations[spr->animation_count - 1].length = atoi((char*)a);
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"speed"))) {
-                set->animations[set->animation_count - 1].delay = atoi((char*)a);
+                spr->animations[spr->animation_count - 1].delay = atoi((char*)a);
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"orients"))) {
-                set->animations[set->animation_count - 1].orients = atoi((char*)a);
+                spr->animations[spr->animation_count - 1].orients = atoi((char*)a);
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"loop"))) {
-                set->animations[set->animation_count - 1].loop = strcmp((char*)a, "false") ? 1 : 0;
+                spr->animations[spr->animation_count - 1].loop = strcmp((char*)a, "false") ? 1 : 0;
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"play"))) {
-                set->animations[set->animation_count - 1].play = strcmp((char*)a, "false") ? 1 : 0;
+                spr->animations[spr->animation_count - 1].play = strcmp((char*)a, "false") ? 1 : 0;
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"origin_x"))) {
-                set->animations[set->animation_count - 1].origin_x = atoi((char*)a);
+                spr->animations[spr->animation_count - 1].origin_x = atoi((char*)a);
                 free(a);
             }
             a = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"origin_y"))) {
-                set->animations[set->animation_count - 1].origin_y = atoi((char*)a);
+                spr->animations[spr->animation_count - 1].origin_y = atoi((char*)a);
                 free(a);
             }
             a = 0;
@@ -238,37 +299,37 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
             if((a = xmlGetProp(node, (const xmlChar*)"file"))) {
                 uint16_t w, h;
                 char* ex_path = construct_extended_resource_path(resource_location, (char*)a);
-                buffers[set->animation_count - 1] = load_png_to_buffer(ex_path, &w, &h);
-                boxes[set->animation_count - 1].size_x = w;
-                boxes[set->animation_count - 1].size_y = h;
-                boxes[set->animation_count - 1].pos_x = 0;
-                boxes[set->animation_count - 1].pos_y = 0;
-                if(buffers[set->animation_count - 1])
+                buffers[spr->animation_count - 1] = load_png_to_buffer(ex_path, &w, &h);
+                boxes[spr->animation_count - 1].size_x = w;
+                boxes[spr->animation_count - 1].size_y = h;
+                boxes[spr->animation_count - 1].pos_x = 0;
+                boxes[spr->animation_count - 1].pos_y = 0;
+                if(buffers[spr->animation_count - 1])
                     keep = 1;
                 free(a);
             }
             if(!keep) {
-                set->animation_count--;
-                if(set->animation_count > 0) {
-                    set->animations = realloc(set->animations, set->animation_count * sizeof(struct animation));
-                    buffers = realloc(buffers, set->animation_count * sizeof(png_byte*));
-                    boxes = realloc(boxes, set->animation_count * sizeof(texture_atlas_box));
+                spr->animation_count--;
+                if(spr->animation_count > 0) {
+                    spr->animations = realloc(spr->animations, spr->animation_count * sizeof(struct animation));
+                    buffers = realloc(buffers, spr->animation_count * sizeof(png_byte*));
+                    boxes = realloc(boxes, spr->animation_count * sizeof(texture_atlas_box));
                 }
             }
         }
     }
 
-    if(set->animation_count == 0) {
-        fprintf(stderr, "Error loading spriteset: No animations found.\n");
-        free(set->animations);
-        free(set);
+    if(spr->animation_count == 0) {
+        fprintf(stderr, "Error loading sprite: No animations found.\n");
+        free(spr->animations);
+        free(spr);
         free(boxes);
         xmlFreeDoc(doc);
         /*xmlCleanupParser();*/
         return 0;
     }
     // TODO: Sort by width
-    // Set up the initial box for the texture
+    // spr up the initial box for the texture
     texture_atlas_box* available = malloc(sizeof(texture_atlas_box));
     uint16_t avail_length = 1;
     available[0].pos_x = 0;
@@ -280,7 +341,7 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
     uint16_t f_width = 0;
     uint16_t f_height = 0;
 
-    for(int i = 0; i < set->animation_count; ++i) {
+    for(int i = 0; i < spr->animation_count; ++i) {
         int16_t selected = -1;
         for(int j = 0; j < avail_length; ++j) {
             if(box_contains(available[j], boxes[i]) && (selected < 0 || available[j].size_x * available[j].size_y > available[selected].size_x * available[selected].size_y)) {
@@ -337,19 +398,19 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
     glBindTexture(GL_TEXTURE_2D, texture);
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, f_width, f_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    for(int i = 0; i < set->animation_count; ++i) {
+    for(int i = 0; i < spr->animation_count; ++i) {
         glTexSubImage2D(GL_TEXTURE_2D, 0, boxes[i].pos_x, boxes[i].pos_y, boxes[i].size_x, boxes[i].size_y, GL_RGBA, GL_UNSIGNED_BYTE, buffers[i]);
-        set->animations[i].offset_x = (float)boxes[i].pos_x / (float)f_width;
-        set->animations[i].offset_y = (float)boxes[i].pos_y / (float)f_width;
-        set->animations[i].dimensions_x = boxes[i].size_x / set->animations[i].length;
-        set->animations[i].dimensions_y = boxes[i].size_y;
-        set->animations[i].size_x = (float)boxes[i].size_x / (float)f_width / set->animations[i].length;
-        set->animations[i].size_y = (float)boxes[i].size_y / (float)f_height;
+        spr->animations[i].offset_x = (float)boxes[i].pos_x / (float)f_width;
+        spr->animations[i].offset_y = (float)boxes[i].pos_y / (float)f_width;
+        spr->animations[i].dimensions_x = boxes[i].size_x / spr->animations[i].length;
+        spr->animations[i].dimensions_y = boxes[i].size_y;
+        spr->animations[i].size_x = (float)boxes[i].size_x / (float)f_width / spr->animations[i].length;
+        spr->animations[i].size_y = (float)boxes[i].size_y / (float)f_height;
     }
 
     free(boxes);
     free(available);
-    for(uint16_t i = 0; i < set->animation_count; ++i)
+    for(uint16_t i = 0; i < spr->animation_count; ++i)
         free(buffers[i]);
     free(buffers);
 
@@ -360,15 +421,19 @@ spriteset* load_resource_to_spriteset(const char* resource_location, const char*
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 
-    set->atlas.texture_id = texture;
-    set->atlas.texture_width = f_width;
-    set->atlas.texture_width = f_height;
+    spr->atlas->texture_id = texture;
+    spr->atlas->texture_width = f_width;
+    spr->atlas->texture_width = f_height;
 
     xmlFreeDoc(doc);
-    /*xmlCleanupParser();*/
-    return set;
-
+    return spr;
 }
+
+bool save_sprite_to_resource(sprite* spr, const char* resource_location, const char* resource_name)
+{
+    stub(false);
+}
+///////////////////////////////////////////////////////////////////////////////
 
 tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer)
 {
@@ -396,13 +461,4 @@ tileset load_resource_to_tileset(const char* resource_location, const char* reso
     free(image_data);
     // TODO: Set solids
     return new_tileset;
-}
-
-void free_spriteset(spriteset* set)
-{
-    glDeleteTextures(1, &set->atlas.texture_id);
-    for(uint8_t i = 0; i < set->animation_count; ++i)
-        free(set->animations[i].handle);
-    free(set->animations);
-    free(set);
 }

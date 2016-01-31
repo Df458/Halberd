@@ -145,7 +145,7 @@ void draw_actor(actor a)
     col.b = 1;
     col.a = 1;
 
-    draw_spriteset(a->data.sprites, a->data.animation_index, a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay, a->data.orientation, actor_orients(a), a->data.position_x + a->data.super_grid_x * TILE_WIDTH * TILEMAP_DIMS, a->data.position_y + a->data.super_grid_y * TILE_HEIGHT * TILEMAP_DIMS, 0, 1, 1, col);
+    draw_sprite(a->data.sprites, a->data.animation_index, a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay, a->data.orientation, actor_orients(a), a->data.position_x + a->data.super_grid_x * TILE_WIDTH * TILEMAP_DIMS, a->data.position_y + a->data.super_grid_y * TILE_HEIGHT * TILEMAP_DIMS, 0, 1, 1, col);
 }
 
 void draw_actors()
@@ -161,7 +161,7 @@ void destroy_actor(actor a)
         if(a->callbacks[i])
             lua_close(a->callbacks[i]);
     if(a->data.sprites)
-        free_spriteset(a->data.sprites);
+        destroy_sprite(a->data.sprites);
     free(a);
 }
 

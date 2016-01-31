@@ -1,6 +1,6 @@
 using Gtk;
 
-public class SpritesetEditor : AssetEditor, SettingsGrid
+public class SpriteEditor : AssetEditor, SettingsGrid
 {
     private Box          anim_box;
     private ComboBoxText anim_combo;
@@ -8,9 +8,9 @@ public class SpritesetEditor : AssetEditor, SettingsGrid
     private SpinButton   length_entry;
     private SpinButton   speed_entry;
     private ComboBoxText orient_combo;
-    private unowned Halberd.SpriteSet? sprite = null;
+    private unowned Halberd.Sprite? sprite = null;
 
-    public SpritesetEditor()
+    public SpriteEditor()
     {
         this.margin = 18;
         init_content();
@@ -30,7 +30,7 @@ public class SpritesetEditor : AssetEditor, SettingsGrid
 
     public bool create_new(ResourceEntry entry)
     {
-        sprite = Halberd.create_spriteset_for_resource(entry.path, entry.name);
+        //sprite = Halberd.create_sprite_for_resource(entry.path, entry.name);
         if(sprite == null)
             return false;
         //sync();

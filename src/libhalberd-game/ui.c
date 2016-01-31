@@ -12,9 +12,8 @@ font* default_font = NULL;
 
 bool init_ui()
 {
-    default_font = malloc(sizeof(font));
     // TODO: Get the default font from elsewhere
-    *default_font = load_resource_to_font(0, "Testfont.png");
+    default_font = load_resource_to_font(0, "Testfont.png");
     return true;
 }
 
@@ -143,7 +142,7 @@ void destroy_ui()
 
     if(default_font) {
         // TODO: Use a texture freeing function here
-        glDeleteTextures(1, &default_font->texture_data.texture_id);
+        glDeleteTextures(1, &default_font->texture_data->texture_id);
         free(default_font);
     }
 }

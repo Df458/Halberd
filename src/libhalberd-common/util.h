@@ -22,6 +22,7 @@ void _log(const char* file, unsigned line, log_level level, char* const message,
 #define fatal(message, ...) _log(__FILE__, __LINE__, LOG_FATAL,   message, ## __VA_ARGS__)
 #define error_code() error("Error code %d recieved: %s", errno, strerror(errno))
 #define nulltest(ptr) if(!ptr) fatal("Unexpected null pointer")
+#define stub(ret) warn("%s stub!", __FUNCTION__); return ret
 
 void register_log_handler(log_handler handler);
 
