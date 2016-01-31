@@ -56,6 +56,13 @@ actor create_blank_actor_for_resource(const char* resource_location, const char*
     return a;
 }
 
+spriteset* create_blank_spriteset_for_resource(const char* resource_location, const char* resource_name)
+{
+    spriteset* s = malloc(sizeof(struct spriteset));
+
+    return s;
+}
+
 void save_actor()
 {
     // TODO: Error here

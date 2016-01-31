@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 //-----------------------------------------------------------------------------
 // Struct Section
@@ -41,8 +42,8 @@ struct animation
     int16_t origin_y;
     int8_t length;
     uint8_t delay;
-    uint8_t loop;
-    uint8_t play;
+    bool loop;
+    bool play;
     float offset_x; // offset is for the position in the texture atlas
     float offset_y;
     float size_x; // size is for the size in the texture atlas

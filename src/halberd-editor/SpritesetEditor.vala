@@ -8,6 +8,7 @@ public class SpritesetEditor : AssetEditor, SettingsGrid
     private SpinButton   length_entry;
     private SpinButton   speed_entry;
     private ComboBoxText orient_combo;
+    private unowned Halberd.SpriteSet? sprite = null;
 
     public SpritesetEditor()
     {
@@ -29,7 +30,12 @@ public class SpritesetEditor : AssetEditor, SettingsGrid
 
     public bool create_new(ResourceEntry entry)
     {
-        return false;
+        sprite = Halberd.create_spriteset_for_resource(entry.path, entry.name);
+        if(sprite == null)
+            return false;
+        //sync();
+        save();
+        return sprite == null;
     }
 
     private void init_content()

@@ -53,8 +53,33 @@ namespace Halberd {
         ActorData data;
     }
 
+    [CCode (cname="animation", destroy_function = "")]
+    public struct Animation {
+        uint8  orients;
+        uint16 dimensions_x;
+        uint16 dimensions_y;
+        int16  origin_x;
+        int16  origin_y;
+
+        int8  length;
+        uint8 delay;
+        bool  loop;
+        bool  play;
+        
+        string handle;
+    }
+
+    [CCode (cname="spriteset", destroy_function="")]
+    public struct SpriteSet {
+        Animation[] animations;
+        uint8 animation_count;
+    }
+
     [CCode (cheader_filename="editor_io.h", cname="create_blank_actor_for_resource")]
     public unowned Actor? create_actor_for_resource(string? path, string name);
+
+    [CCode (cheader_filename="editor_io.h", cname="create_blank_spriteset_for_resource")]
+    public unowned SpriteSet? create_spriteset_for_resource(string? path, string name);
 
     [CCode (cheader_filename="editor_io.h", cname="save_actor")]
     public void save_actor();

@@ -1,4 +1,5 @@
 #include "actor.h"
+#include "texture_util.h"
 
 //-----------------------------------------------------------------------------
 // Init/Destruction
@@ -29,6 +30,12 @@ void register_actor(actor a, const char* resource_location, const char* resource
  * See get_extended_resource_path(io_util.h) for usage details
  */
 actor create_blank_actor_for_resource(const char* resource_location, const char* resource_name);
+
+/*!
+ * Creates a new Spriteset. Fields are set to sane defaults.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+spriteset* create_blank_spriteset_for_resource(const char* resource_location, const char* resource_name);
 
 /*!
  * Saves the registered actor.
