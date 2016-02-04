@@ -65,7 +65,7 @@ typedef struct ui_box
 ui_box;
 
 // FIXME: Tileset resource info is never freed
-typedef struct tileset // TODO: Fit all tilesets into a texture array(up to 256 simultaneous layers, 32 to be safe!) for extra speed and fewer texture changes
+typedef struct tileset
 {
     uint8_t layer;
     uint8_t solid[1024];
@@ -151,9 +151,37 @@ bool save_sprite_to_resource(sprite* fnt, const char* resource_location, const c
 
 
 /*!
+ * Creates an empty tileset
+ */
+tileset* create_tileset();
+
+/*!
+ * Frees a tileset and its resources
+ */
+void destroy_tileset(tileset* fnt);
+
+/*!
+ * This loads a tileset file, and constructs a texture atlas from the
+ * necessary tilesetsheets.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name);
+
+int8_t index_by_handle(sprite* spr, const char* handle);
+uint8_t get_tileset_id(const char* resource_location, const char* resource_name);
+tileset* get_tileset_from_id(uint8_t id);
+
+
+/*!
+ * This saves a tileset.
+ * See get_extended_resource_path(io_util.h) for usage details
+ */
+bool save_tileset_to_resource(tileset* set, const char* resource_location, const char* resource_name);
+
+/*!
  * This loads a tileset from a png file.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer);
+//tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer);
 
 #endif

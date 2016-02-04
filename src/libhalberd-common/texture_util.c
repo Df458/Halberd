@@ -1,11 +1,18 @@
 #include "texture_util.h"
-#include "io_util.h"
-#include "util.h"
+#include "dfgame-common.h"
 #include "xml_util.h"
 #include "render_util.h"
 
 #include <png.h>
 #include <stdlib.h>
+
+///////////////////////////////////////////////////////////////////////////////
+// Hidden data
+///////////////////////////////////////////////////////////////////////////////
+
+tileset* tilesets = 0;
+uint8_t loaded_tilesets = 0;
+GLuint tile_buffer = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hidden structures
@@ -433,32 +440,97 @@ bool save_sprite_to_resource(sprite* spr, const char* resource_location, const c
 {
     stub(false);
 }
+
+tileset* create_tileset()
+{
+    stub(0);
+}
+
+void destroy_tileset(tileset* spr)
+{
+    stub();
+}
+
+// TODO: Add support for paths in tileset files
+tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name)
+{
+    stub(0);
+}
+
+bool save_tileset_to_resource(tileset* spr, const char* resource_location, const char* resource_name)
+{
+    stub(false);
+}
+
+int8_t index_by_handle(sprite* spr, const char* handle)
+{
+    for(int i = 0; i < spr->animation_count; ++i)
+        if(!strcmp(spr->animations[i].handle, handle))
+            return i;
+    return -1;
+}
+
+uint8_t get_tileset_id(const char* resource_location, const char* resource_name)
+{
+    uint8_t i;
+    for(i = 0; i < loaded_tilesets; ++i)
+        if(!strcmp(tilesets[i].resource_name, resource_name))
+            return i;
+
+    for(i = 0; i < 32; ++i) {
+        bool found = true;
+        for(uint8_t j = 0; j < loaded_tilesets; ++j) {
+            if(tilesets[j].layer == i) {
+                found = false;
+                break;
+            }
+        }
+        if(found)
+            break;
+    }
+
+    // TODO: Error out here
+    if(i == 32)
+        return 0;
+
+    // TODO: Load the tileset here
+    // FIXME: Reimplement this
+    /*tilesets[loaded_tilesets] = load_resource_to_tileset(resource_location, resource_name, tile_buffer, i);*/
+    loaded_tilesets++;
+
+    return i;
+}
+
+tileset* get_tileset_from_id(uint8_t id)
+{
+    return &tilesets[id];
+}
 ///////////////////////////////////////////////////////////////////////////////
 
-tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer)
-{
-    // TODO: Set the variables here correctly
-    tileset new_tileset;
-    uint16_t w, h;
-    char* path = construct_extended_resource_path(resource_location, resource_name);
-    png_byte* image_data = load_png_to_buffer(path, &w, &h);
-    free(path);
-    if(!image_data || w != 1024 || h != 1024) {
-        if(image_data)
-            free(image_data);
-        // TODO: Fail this out
-    }
-    if(resource_location)
-        new_tileset.resource_location = strdup(resource_location);
-    else
-        new_tileset.resource_location = 0;
-    new_tileset.resource_name = strdup(resource_name);
+/*tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name)*/
+/*{*/
+    /*// TODO: Set the variables here correctly*/
+    /*tileset new_tileset;*/
+    /*uint16_t w, h;*/
+    /*char* path = construct_extended_resource_path(resource_location, resource_name);*/
+    /*png_byte* image_data = load_png_to_buffer(path, &w, &h);*/
+    /*free(path);*/
+    /*if(!image_data || w != 1024 || h != 1024) {*/
+        /*if(image_data)*/
+            /*free(image_data);*/
+        /*// TODO: Fail this out*/
+    /*}*/
+    /*if(resource_location)*/
+        /*new_tileset.resource_location = strdup(resource_location);*/
+    /*else*/
+        /*new_tileset.resource_location = 0;*/
+    /*new_tileset.resource_name = strdup(resource_name);*/
 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, texture_handle);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-    checkGLError();
+    /*glBindTexture(GL_TEXTURE_2D_ARRAY, texture_handle);*/
+    /*glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);*/
+    /*checkGLError();*/
 
-    free(image_data);
-    // TODO: Set solids
-    return new_tileset;
-}
+    /*free(image_data);*/
+    /*// TODO: Set solids*/
+    /*return new_tileset;*/
+/*}*/

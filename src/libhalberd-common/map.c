@@ -1,4 +1,4 @@
-#include "io_util.h"
+#include "dfgame-common.h"
 #include "map.h"
 #include "render_util.h"
 

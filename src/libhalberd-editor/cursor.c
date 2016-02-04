@@ -2,7 +2,7 @@
 #include "cursor.h"
 #include "editor-render.h"
 #include "stack.h"
-#include "util.h"
+#include <dfgame-common.h>
 #include <stdio.h>
 #include <stdlib.h>
 

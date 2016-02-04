@@ -1,7 +1,7 @@
 #include "cursor.h"
 #include "editor-render.h"
 #include "render_util.h"
-#include "util.h"
+#include <dfgame-common.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>

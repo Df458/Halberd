@@ -60,7 +60,6 @@ GLuint blank_texture = 0;
 GLuint tile_position_buffer = 0;
 GLuint font_position_buffer = 0;
 GLuint font_buffer = 0;
-GLuint tile_buffer = 0;
 
 mat4 camera = ident;
 mat4 view = ident;
@@ -69,8 +68,6 @@ uint16_t view_height = 0;
 
 ui_box* boxes = 0;
 int16_t loaded_boxes;
-tileset* tilesets = 0;
-uint8_t loaded_tilesets = 0;
 
 uint8_t _checkGLError(const char* file, unsigned line)
 {
@@ -250,8 +247,9 @@ uint8_t init_graphics(void)
     if(checkGLError())
         return 0;
 
-    glGenTextures(1, &tile_buffer);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+    // TODO: Move these to texture_util
+    /*glGenTextures(1, &tile_buffer);*/
+    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
     glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 1024, 1024, 32); // TODO: Replace width/height/depth with constants
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -259,8 +257,6 @@ uint8_t init_graphics(void)
         return 0;
 
     camera = ortho(0, 800, 600, 0, -100, 100);
-
-    tilesets = calloc(32, sizeof(tileset));
 
     return 1;
 }
@@ -347,10 +343,11 @@ void draw_tiles(GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, u
     glVertexAttribIPointer(tile_tid_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
     checkGLError();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
-    glUniform1i(tile_texture_uniform, 0);
-    checkGLError();
+    // TODO: Update this
+    /*glActiveTexture(GL_TEXTURE0);*/
+    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
+    /*glUniform1i(tile_texture_uniform, 0);*/
+    /*checkGLError();*/
 
     mat4 st = ident;
     mat4 tt = ident;
@@ -385,9 +382,10 @@ void draw_single_tile(GLuint tileset_id, GLuint tile_id, mat4 transform)
     glVertexAttribPointer(single_tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     checkGLError();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
-    glUniform1i(single_tile_texture_uniform, 0);
+    // TODO: Update this
+    /*glActiveTexture(GL_TEXTURE0);*/
+    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
+    /*glUniform1i(single_tile_texture_uniform, 0);*/
     checkGLError();
 
     glUniform4f(single_tile_color_uniform, 0.9, 0.9, 0.9, 0.7);
@@ -520,49 +518,6 @@ void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, f
     ui_box frame = boxes[id];
     draw_box(id, x, y, w, h);
     draw_text(font, text, x + frame.border_w, y + frame.border_h, char_count);
-}
-
-int8_t index_by_handle(sprite* spr, const char* handle)
-{
-    for(int i = 0; i < spr->animation_count; ++i)
-        if(!strcmp(spr->animations[i].handle, handle))
-            return i;
-    return -1;
-}
-
-uint8_t get_tileset_id(const char* resource_location, const char* resource_name)
-{
-    uint8_t i;
-    for(i = 0; i < loaded_tilesets; ++i)
-        if(!strcmp(tilesets[i].resource_name, resource_name))
-            return i;
-
-    for(i = 0; i < 32; ++i) {
-        bool found = true;
-        for(uint8_t j = 0; j < loaded_tilesets; ++j) {
-            if(tilesets[j].layer == i) {
-                found = false;
-                break;
-            }
-        }
-        if(found)
-            break;
-    }
-
-    // TODO: Error out here
-    if(i == 32)
-        return 0;
-
-    // TODO: Load the tileset here
-    tilesets[loaded_tilesets] = load_resource_to_tileset(resource_location, resource_name, tile_buffer, i);
-    loaded_tilesets++;
-
-    return i;
-}
-
-tileset* get_tileset_from_id(uint8_t id)
-{
-    return &tilesets[id];
 }
 
 void update_camera(float w, float h)

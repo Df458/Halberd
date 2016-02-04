@@ -1,5 +1,5 @@
 #include "stack.h"
-#include "util.h"
+#include "dfgame-common.h"
 #include "stdio.h"
 #include "stdlib.h"
 

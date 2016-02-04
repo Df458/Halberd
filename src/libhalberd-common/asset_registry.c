@@ -1,6 +1,4 @@
 #include "asset_registry.h"
-#include "io_util.h"
-#include "util.h"
 #include <stdlib.h>
 #include <string.h>
 

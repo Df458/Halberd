@@ -1,6 +1,5 @@
 #include "xml_util.h"
-#include "io_util.h"
-#include "util.h"
+#include "dfgame-common.h"
 
 xmlDocPtr load_resource_to_xml(const char* resource_location, const char* resource_name)
 {

@@ -143,7 +143,7 @@ namespace Halberd {
         public int32[] get_failed_ids();
     }
 }
-[CCode (cheader_filename = "util.h")]
+[CCode (cheader_filename = "dfgame-common.h")]
 namespace HLog {
     [CCode (cname = "log_level", cprefix = "LOG_", has_type_id = false)]
     public enum LogLevel {

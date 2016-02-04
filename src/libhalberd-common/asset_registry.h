@@ -1,4 +1,4 @@
-#include "io_util.h"
+#include "dfgame-common.h"
 #include <inttypes.h>
 #include <stdbool.h>
 

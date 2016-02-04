@@ -37,17 +37,17 @@ COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
 
 # Flags
 VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC)
-VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=dflib --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
-CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl`
-CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua`
-GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng`
-GAMELIBS=`$(PKGCONFIG) --libs glfw3`
-EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0 gee-0.8`
-EDITORLIBS=`$(PKGCONFIG) --libs glib-2.0 gtk+-3.0 gee-0.8` -ldflib $(LIBEDITORLIBS) $(LIBGAMELIBS)
-LIBGAMEFLAGS=`$(PKGCONFIG) --cflags libpng`
-LIBGAMELIBS=-lm `$(PKGCONFIG) --libs glfw3 libpng`
-LIBEDITORFLAGS=
-LIBEDITORLIBS=
+VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=dflib --pkg=dfgame-editor-frontend --pkg dfgame-editor --pkg dfgame-game --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
+CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl dfgame-common`
+CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua dfgame-common`
+GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng dfgame-game-front`
+GAMELIBS=`$(PKGCONFIG) --libs glfw3 dfgame-game-front`
+EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0 gee-0.8 dfgame-editor-front`
+EDITORLIBS=-ldflib `$(PKGCONFIG) --libs glib-2.0 gtk+-3.0 gee-0.8 dfgame-editor-front` $(LIBEDITORLIBS) $(LIBGAMELIBS)
+LIBGAMEFLAGS=`$(PKGCONFIG) --cflags libpng dfgame-game`
+LIBGAMELIBS=-lm `$(PKGCONFIG) --libs glfw3 libpng dfgame-game`
+LIBEDITORFLAGS=`$(PKGCONFIG) --cflags dfgame-editor`
+LIBEDITORLIBS=`$(PKGCONFIG) --libs dfgame-editor`
 
 # Directory inits
 $(shell mkdir -p $(OBJPATH))

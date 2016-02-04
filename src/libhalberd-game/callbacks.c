@@ -1,7 +1,7 @@
 #include <string.h>
 #include "callbacks.h"
 #include "actor.h"
-#include "io_util.h"
+#include "dfgame-common.h"
 #include "ui.h"
 
 void build_actor_states(actor a_new, xmlNodePtr node)

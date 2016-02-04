@@ -1,7 +1,6 @@
 #include "autotile.h"
-#include "io_util.h"
-#include "util.h"
 
+#include <dfgame-common.h>
 #include <stdio.h>
 #include <stdlib.h>
 automap automaps[9];

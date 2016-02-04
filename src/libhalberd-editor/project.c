@@ -1,7 +1,8 @@
-#include "io_util.h"
 #include "asset_registry.h"
 #include "xml_util.h"
 #include "project.h"
+
+#include <dfgame-common.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

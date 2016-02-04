@@ -1,10 +1,10 @@
-#include "io.h"
-#include "util.h"
+/*#include "io.h"*/
+/*#include "util.h"*/
 
-#include <png.h>
-#include <stdlib.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+/*#include <png.h>*/
+/*#include <stdlib.h>*/
+/*#include <libxml/parser.h>*/
+/*#include <libxml/tree.h>*/
 
 /*uint8_t load_map(const char* path, tilemap* map)*/
 /*{*/

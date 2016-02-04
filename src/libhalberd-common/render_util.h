@@ -363,10 +363,6 @@ void draw_box(uint16_t id, float x, float y, float w, float h);
 void draw_text(font* font, const char* text, float x, float y, uint16_t char_count);
 void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count);
 
-int8_t index_by_handle(sprite* spr, const char* handle);
-uint8_t get_tileset_id(const char* resource_location, const char* resource_name);
-tileset* get_tileset_from_id(uint8_t id);
-
 void update_camera(float w, float h);
 void update_view(float x, float y, float zoom);
 mat4 get_camera();
