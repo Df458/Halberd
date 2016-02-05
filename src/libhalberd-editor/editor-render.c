@@ -39,9 +39,6 @@ bool init_render()
     if(!init_grid())
         return false;
 
-    /*color col = {1,1,1,1};*/
-    // TODO: Move this somewhere
-    /*set_id = get_tileset_id("Plains.png");*/
     return true;
 }
 
@@ -83,7 +80,7 @@ void destroy_render()
     // TODO: Re-enable these
     /*destroy_maps();*/
     /*destroy_graphics();*/
-    fprintf(stderr, "Exiting gracefully...\n");
+    info("Exiting gracefully...");
 }
 
 bool init_grid()

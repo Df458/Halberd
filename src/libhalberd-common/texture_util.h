@@ -5,17 +5,19 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "dfgame-common.h"
+
+#define TILE_WIDTH 32
+#define TILE_HEIGHT 32
+#define MAX_LOADED_TILESETS 32
+
+#if MAX_LOADED_TILESETS > 256
+#error "MAX_LOADED_TILESETS cannot be higher than 256 due to OpenGL limitations"
+#endif
+
 //-----------------------------------------------------------------------------
 // Struct Section
 //-----------------------------------------------------------------------------
-
-typedef struct texture
-{
-    GLuint texture_id;
-    uint16_t texture_width;
-    uint16_t texture_height;
-}
-texture;
 
 typedef struct font
 {
@@ -64,10 +66,9 @@ typedef struct ui_box
 }
 ui_box;
 
-// FIXME: Tileset resource info is never freed
 typedef struct tileset
 {
-    uint8_t layer;
+    int16_t layer;
     uint8_t solid[1024];
 
     char* resource_location;
@@ -78,29 +79,6 @@ tileset;
 //-----------------------------------------------------------------------------
 // Loading section
 //-----------------------------------------------------------------------------
-
-/*!
- * Creates an empty texture
- */
-texture* create_texture(uint16_t w, uint16_t h);
-
-/*!
- * Frees a texture and its resources
- */
-void destroy_texture(texture* tex);
-
-/*!
- * This loads a png file to a texture.
- * See get_extended_resource_path(io_util.h) for usage details
- */
-texture* load_resource_to_texture(const char* resource_location, const char* resource_name);
-
-/*!
- * This saves a texture to a png file.
- * See get_extended_resource_path(io_util.h) for usage details
- */
-bool save_texture_to_resource(texture* tex, const char* resource_location, const char* resource_name);
-
 
 // TODO: Use XML-based font files
 /*!
@@ -167,21 +145,14 @@ void destroy_tileset(tileset* fnt);
  */
 tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name);
 
-int8_t index_by_handle(sprite* spr, const char* handle);
-uint8_t get_tileset_id(const char* resource_location, const char* resource_name);
-tileset* get_tileset_from_id(uint8_t id);
-
-
 /*!
  * This saves a tileset.
  * See get_extended_resource_path(io_util.h) for usage details
  */
 bool save_tileset_to_resource(tileset* set, const char* resource_location, const char* resource_name);
 
-/*!
- * This loads a tileset from a png file.
- * See get_extended_resource_path(io_util.h) for usage details
- */
-//tileset load_resource_to_tileset(const char* resource_location, const char* resource_name, GLuint texture_handle, uint8_t layer);
+int8_t index_by_handle(sprite* spr, const char* handle);
+int16_t get_tileset_id(const char* resource_location, const char* resource_name);
+tileset* get_tileset_from_id(uint8_t id);
 
 #endif

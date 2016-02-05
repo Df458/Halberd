@@ -108,7 +108,6 @@ bool resources_init(resource_loader loader)
 
     FILE* definition_file = load_resource_file(NULL, ".asset_registry", "r");
     if(!definition_file) {
-        // TODO: Provide a descriptive failure message
         create_resource_definition_file();
         definition_file = load_resource_file(NULL, ".asset_registry", "r");
         if(!definition_file)
@@ -158,7 +157,7 @@ bool resources_init(resource_loader loader)
 
 void resources_cleanup()
 {
-    // TODO: Implement this
+    stub();
 }
 
 bool create_resource_definition_file()
@@ -306,7 +305,6 @@ uint32_t get_failed_count()
 
 uint32_t* get_failed_ids()
 {
-    // TODO: Implement this
     uint32_t* id_list = calloc(failed_count, sizeof(uint32_t));
     for(uint32_t i = 0; i < failed_count; ++i) {
         id_list[i] = failed_list[i].id;

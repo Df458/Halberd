@@ -231,7 +231,7 @@ void actor_callback(actor a, uint8_t type, void* data)
         lua_getglobal(a->callbacks[type], CALLBACK_NAMES[type]);
         int errs = lua_pcall(a->callbacks[type], 0, LUA_MULTRET, 0);
         while(errs) {
-            fprintf(stderr, "lua error: %s\n", lua_tostring(a->callbacks[type], -1));
+            error("Lua error: %s", lua_tostring(a->callbacks[type], -1));
             lua_pop(a->callbacks[type], 1);
             --errs;
         }

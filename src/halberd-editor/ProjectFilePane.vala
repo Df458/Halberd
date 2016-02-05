@@ -440,8 +440,6 @@ public class ProjectFilePane : Box
                 Halberd.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
                 break;
 
-                // TODO: Update the following to update resources
-
             case FileMonitorEvent.CREATED:
             case FileMonitorEvent.MOVED_IN:
                 if(file_iter == null) {

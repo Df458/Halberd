@@ -45,7 +45,6 @@ void translate(mat4* mat, float position_x, float position_y, uint8_t relative)
 
 void rotate(mat4* mat, float angle, uint8_t relative)
 {
-    // TODO: Do later
     //  cos sin
     // -sin cos
     // ^-Correct matrix layout(upper-left corner)

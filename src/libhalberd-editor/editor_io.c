@@ -56,18 +56,12 @@ actor create_blank_actor_for_resource(const char* resource_location, const char*
     return a;
 }
 
-/*spriteset* create_blank_spriteset_for_resource(const char* resource_location, const char* resource_name)*/
-/*{*/
-    /*spriteset* s = malloc(sizeof(struct spriteset));*/
-
-    /*return s;*/
-/*}*/
-
 void save_actor()
 {
-    // TODO: Error here
-    if(!loaded_actor)
+    if(!loaded_actor) {
+        warn("Trying to save an actor that doesn't exist");
         return;
+    }
     xmlTextWriterPtr writer = create_xml_resource(actor_path, actor_name);
     xmlTextWriterSetIndent(writer, 2);
     xmlTextWriterStartDocument(writer, NULL, NULL, NULL);
@@ -117,5 +111,5 @@ void save_actor()
 
 void set_actor_spriteset_from_resource(const char* resource_location, const char* resource_name)
 {
-    // TODO: Implement this
+    stub();
 }

@@ -1,5 +1,4 @@
 #include "texture_util.h"
-#include "dfgame-common.h"
 #include "xml_util.h"
 #include "render_util.h"
 
@@ -10,7 +9,7 @@
 // Hidden data
 ///////////////////////////////////////////////////////////////////////////////
 
-tileset* tilesets = 0;
+tileset tilesets[MAX_LOADED_TILESETS];
 uint8_t loaded_tilesets = 0;
 GLuint tile_buffer = 0;
 
@@ -30,87 +29,6 @@ typedef struct texture_atlas_box
 // Hidden functions
 ///////////////////////////////////////////////////////////////////////////////
 
-png_byte* load_png_to_buffer(const char* path, uint16_t* w, uint16_t* h)
-{
-    FILE* infile = fopen(path, "rb");
-    if(!infile) {
-        warn("Could not open file.");
-        fprintf(stderr, "Error Path: %s\n", path);
-        return 0;
-    }
-    
-    uint8_t header[8];
-    png_structp pstruct;
-    png_infop info_struct;
-    uint16_t width, height;
-    png_byte* image_data;
-    png_bytep* row_ptrs;
-    
-    fread(header, sizeof(uint8_t), 8, infile);
-    if(png_sig_cmp(header, 0, 8)) {
-        warn("File has an invalid header.");
-        return 0;
-    }
-    pstruct = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if(!pstruct) {
-        warn("Could not read structure of file.");
-        return 0;
-    }
-    info_struct = png_create_info_struct(pstruct);
-    if(!info_struct) {
-        png_destroy_read_struct(&pstruct, NULL, NULL);
-        warn("Could not create info_struct for file.");
-        return 0;
-    }
-    if(setjmp(png_jmpbuf(pstruct))) {
-        return 0;
-    }
-    
-    png_init_io(pstruct, infile);
-    png_set_sig_bytes(pstruct, 8);
-    png_read_info(pstruct, info_struct);
-    
-    width = png_get_image_width(pstruct, info_struct);
-    height = png_get_image_height(pstruct, info_struct);
-    png_byte color_type = png_get_color_type(pstruct, info_struct);
-    png_byte bit_depth = png_get_bit_depth(pstruct, info_struct);
-    int number_of_passes = png_set_interlace_handling(pstruct);
-    
-    if(color_type == PNG_COLOR_TYPE_RGB) {
-        png_set_filler(pstruct, 0xff, PNG_FILLER_AFTER);
-    }
-    
-    png_read_update_info(pstruct, info_struct);
-    
-    if(setjmp(png_jmpbuf(pstruct))){
-        return 0;
-    }
-    
-    int rowbytes = png_get_rowbytes(pstruct, info_struct);
-    //rowbytes += 3 - ((rowbytes-1) % 4);
-    
-    // TODO: This next line came out weird, please confirm that this is correct
-    image_data = (png_byte*)malloc(rowbytes * height * sizeof(png_byte)+15);
-    row_ptrs = (png_bytep*)malloc(sizeof(png_bytep) * height);
-    for(int i = 0; i < height; i++){
-        row_ptrs[height - 1 - i] = image_data + i * rowbytes;
-    }
-    
-    png_read_image(pstruct, row_ptrs);
-    
-    if(png_get_color_type(pstruct, info_struct) != PNG_COLOR_TYPE_RGBA) {
-        png_set_add_alpha(pstruct, 0xff, PNG_FILLER_AFTER);
-    }
-    
-    png_destroy_read_struct(&pstruct, &info_struct, NULL);
-    free(row_ptrs);
-    fclose(infile);
-
-    *w = width;
-    *h = height;
-    return image_data;
-}
-
 uint8_t box_contains(texture_atlas_box holder, texture_atlas_box child)
 {
     if(holder.size_x >= child.size_x && holder.size_y >= child.size_y)
@@ -121,60 +39,6 @@ uint8_t box_contains(texture_atlas_box holder, texture_atlas_box child)
 ///////////////////////////////////////////////////////////////////////////////
 // Public functions
 ///////////////////////////////////////////////////////////////////////////////
-
-texture* create_texture(uint16_t w, uint16_t h)
-{
-	texture* texture_data = malloc(sizeof(texture));
-	glGenTextures(1, &texture_data->texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_data->texture_id);
-    texture_data->texture_width = w;
-    texture_data->texture_height = h;
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data->texture_width, texture_data->texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-
-    return texture_data;
-}
-
-void destroy_texture(texture* tex)
-{
-    glDeleteTextures(1, &tex->texture_id);
-    free(tex);
-}
-
-texture* load_resource_to_texture(const char* resource_location, const char* resource_name)
-{
-	texture* texture_data = malloc(sizeof(texture));
-	glGenTextures(1, &texture_data->texture_id);
-	glBindTexture(GL_TEXTURE_2D, texture_data->texture_id);
-	
-    char* path = construct_extended_resource_path(resource_location, resource_name);
-    // TODO: Add support for additional types
-    png_byte* image_data = load_png_to_buffer(path, &texture_data->texture_width, &texture_data->texture_height);
-    free(path);
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_data->texture_width, texture_data->texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-
-	free(image_data);
-
-    return texture_data;
-}
-
-bool save_texture_to_resource(texture* tex, const char* resource_location, const char* resource_name)
-{
-    stub(false);
-}
 
 font* create_font(uint16_t w, uint16_t h)
 {
@@ -196,8 +60,8 @@ font* load_resource_to_font(const char* resource_location, const char* resource_
 {
     font* new_font         = malloc(sizeof(font));
     new_font->texture_data = load_resource_to_texture(resource_location, resource_name);
-    new_font->glyph_width  = new_font->texture_data->texture_width  / 16;
-    new_font->glyph_width  = new_font->texture_data->texture_height / 16;
+    new_font->glyph_width  = new_font->texture_data->width  / 16;
+    new_font->glyph_width  = new_font->texture_data->height / 16;
 
     return new_font;
 }
@@ -305,8 +169,7 @@ sprite* load_resource_to_sprite(const char* resource_location, const char* resou
             uint8_t keep = 0;
             if((a = xmlGetProp(node, (const xmlChar*)"file"))) {
                 uint16_t w, h;
-                char* ex_path = construct_extended_resource_path(resource_location, (char*)a);
-                buffers[spr->animation_count - 1] = load_png_to_buffer(ex_path, &w, &h);
+                buffers[spr->animation_count - 1] = load_resource_to_texture_buffer(resource_location, (char*)a, &w, &h);
                 boxes[spr->animation_count - 1].size_x = w;
                 boxes[spr->animation_count - 1].size_y = h;
                 boxes[spr->animation_count - 1].pos_x = 0;
@@ -428,9 +291,9 @@ sprite* load_resource_to_sprite(const char* resource_location, const char* resou
     float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 
-    spr->atlas->texture_id = texture;
-    spr->atlas->texture_width = f_width;
-    spr->atlas->texture_width = f_height;
+    spr->atlas->handle = texture;
+    spr->atlas->width = f_width;
+    spr->atlas->width = f_height;
 
     xmlFreeDoc(doc);
     return spr;
@@ -443,18 +306,73 @@ bool save_sprite_to_resource(sprite* spr, const char* resource_location, const c
 
 tileset* create_tileset()
 {
-    stub(0);
+    uint8_t i;
+    for(i = 0; i < MAX_LOADED_TILESETS; ++i) {
+        if(tilesets[i].layer == -1 || i > loaded_tilesets)
+            break;
+    }
+    if(i > loaded_tilesets && i < MAX_LOADED_TILESETS)
+        loaded_tilesets++;
+    else if(i == MAX_LOADED_TILESETS) {
+        error("Can't create tileset: All tileset slots are full.");
+        return 0;
+    }
+
+    tileset* set = &tilesets[i];
+    set->layer = i;
+    return set;
 }
 
-void destroy_tileset(tileset* spr)
+void destroy_tileset(tileset* set)
 {
-    stub();
+    if(set->resource_location)
+        free(set->resource_location);
+    free(set->resource_name);
+    set->layer = -1;
 }
 
 // TODO: Add support for paths in tileset files
 tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name)
 {
-    stub(0);
+    tileset* new_tileset = create_tileset();
+    if(!new_tileset)
+        return 0;
+    uint16_t w, h;
+    uint8_t* image_data = load_resource_to_texture_buffer(resource_location, resource_name, &w, &h);
+    // TODO: Make this more flexible about sizing
+    if(!image_data || w != TILE_WIDTH * 32 || h != TILE_HEIGHT * 32) {
+        if(image_data) {
+            free(image_data);
+            error("Tileset dimensions are incorrect. (expected %ux%u, got %ux%u)", TILE_WIDTH * 32, TILE_HEIGHT * 32, w, h);
+        } else
+            error("Failed to load tileset texture data.");
+        new_tileset->layer = -1;
+        return 0;
+    }
+    if(resource_location)
+        new_tileset->resource_location = strdup(resource_location);
+    else
+        new_tileset->resource_location = 0;
+    new_tileset->resource_name = strdup(resource_name);
+
+    if(tile_buffer == 0) {
+        glGenTextures(1, &tile_buffer);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+        glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, TILE_WIDTH * 32, TILE_HEIGHT * 32, MAX_LOADED_TILESETS);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if(checkGLError()) {
+            fatal("Failed to initialize the tileset buffer");
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, new_tileset->layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    checkGLError();
+
+    free(image_data);
+    // TODO: Set solids
+    return new_tileset;
 }
 
 bool save_tileset_to_resource(tileset* spr, const char* resource_location, const char* resource_name)
@@ -470,67 +388,25 @@ int8_t index_by_handle(sprite* spr, const char* handle)
     return -1;
 }
 
-uint8_t get_tileset_id(const char* resource_location, const char* resource_name)
+int16_t get_tileset_id(const char* resource_location, const char* resource_name)
 {
     uint8_t i;
     for(i = 0; i < loaded_tilesets; ++i)
-        if(!strcmp(tilesets[i].resource_name, resource_name))
+        if(tilesets[i].layer != -1 && resource_eq(resource_location, resource_name, tilesets[i].resource_location, tilesets[i].resource_name))
             return i;
 
-    for(i = 0; i < 32; ++i) {
-        bool found = true;
-        for(uint8_t j = 0; j < loaded_tilesets; ++j) {
-            if(tilesets[j].layer == i) {
-                found = false;
-                break;
-            }
-        }
-        if(found)
-            break;
-    }
+    tileset* set = load_resource_to_tileset(resource_location, resource_name);
+    if(!set)
+        return -1;
 
-    // TODO: Error out here
-    if(i == 32)
-        return 0;
-
-    // TODO: Load the tileset here
-    // FIXME: Reimplement this
-    /*tilesets[loaded_tilesets] = load_resource_to_tileset(resource_location, resource_name, tile_buffer, i);*/
-    loaded_tilesets++;
-
-    return i;
+    return loaded_tilesets - 1;
 }
 
 tileset* get_tileset_from_id(uint8_t id)
 {
+    if(id > loaded_tilesets || tilesets[id].layer == -1) {
+        error("No tileset found at ID %u", id);
+        return 0;
+    }
     return &tilesets[id];
 }
-///////////////////////////////////////////////////////////////////////////////
-
-/*tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name)*/
-/*{*/
-    /*// TODO: Set the variables here correctly*/
-    /*tileset new_tileset;*/
-    /*uint16_t w, h;*/
-    /*char* path = construct_extended_resource_path(resource_location, resource_name);*/
-    /*png_byte* image_data = load_png_to_buffer(path, &w, &h);*/
-    /*free(path);*/
-    /*if(!image_data || w != 1024 || h != 1024) {*/
-        /*if(image_data)*/
-            /*free(image_data);*/
-        /*// TODO: Fail this out*/
-    /*}*/
-    /*if(resource_location)*/
-        /*new_tileset.resource_location = strdup(resource_location);*/
-    /*else*/
-        /*new_tileset.resource_location = 0;*/
-    /*new_tileset.resource_name = strdup(resource_name);*/
-
-    /*glBindTexture(GL_TEXTURE_2D_ARRAY, texture_handle);*/
-    /*glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);*/
-    /*checkGLError();*/
-
-    /*free(image_data);*/
-    /*// TODO: Set solids*/
-    /*return new_tileset;*/
-/*}*/

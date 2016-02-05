@@ -2,6 +2,7 @@
 #include "cursor.h"
 #include "editor-render.h"
 #include "stack.h"
+#include "tile_util.h"
 #include <dfgame-common.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,7 +100,7 @@ void cursor_place_line(int32_t x, int32_t y)
 
 void cursor_place_line_id(uint8_t tile, int32_t x, int32_t y)
 {
-    // TODO: Implement this (Bresenham's Algorithm)
+    // FIXME: Lines that go out of bounds of a map segment glitch out
     cursor prev = cursor_get();
     cursor_set_position(x, y);
     int x1 = prev.selected_tile_x;

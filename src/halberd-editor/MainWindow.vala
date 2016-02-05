@@ -286,7 +286,6 @@ public class MainWindow : Window
      */
     private void init_menus()
     {
-        // TODO: Implement this
         GLib.Menu main_model = new GLib.Menu();
         main_model.append("New Project", "file.new");
         main_model.append("Load Project", "file.load");

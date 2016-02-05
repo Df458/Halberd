@@ -247,15 +247,6 @@ uint8_t init_graphics(void)
     if(checkGLError())
         return 0;
 
-    // TODO: Move these to texture_util
-    /*glGenTextures(1, &tile_buffer);*/
-    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 1024, 1024, 32); // TODO: Replace width/height/depth with constants
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    if(checkGLError())
-        return 0;
-
     camera = ortho(0, 800, 600, 0, -100, 100);
 
     return 1;
@@ -264,7 +255,7 @@ uint8_t init_graphics(void)
 void destroy_graphics()
 {
     for(int16_t i = 0; i < loaded_boxes; ++i) {
-        glDeleteTextures(1, &boxes[i].texture_data->texture_id);
+        glDeleteTextures(1, &boxes[i].texture_data->handle);
         glDeleteBuffers(1, &boxes[i].uv_buffer);
     }
     if(boxes)
@@ -309,7 +300,7 @@ void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index,
     glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, spr->atlas->texture_id); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, spr->atlas->handle); // TODO: Use actual sprite
     glUniform1i(sprite_texture_uniform, 0);
     checkGLError();
 
@@ -436,7 +427,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     checkGLError();
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frame.texture_data->texture_id); // TODO: Use actual sprite
+    glBindTexture(GL_TEXTURE_2D, frame.texture_data->handle); // TODO: Use actual sprite
     glUniform1i(box_texture_uniform, 0);
     checkGLError();
 
@@ -487,7 +478,7 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
     glVertexAttribIPointer(font_id_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font->texture_data->texture_id);
+    glBindTexture(GL_TEXTURE_2D, font->texture_data->handle);
     glUniform1i(font_texture_uniform, 0);
     checkGLError();
 

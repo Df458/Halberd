@@ -141,8 +141,7 @@ void destroy_ui()
     }
 
     if(default_font) {
-        // TODO: Use a texture freeing function here
-        glDeleteTextures(1, &default_font->texture_data->texture_id);
+        destroy_texture(default_font->texture_data);
         free(default_font);
     }
 }
