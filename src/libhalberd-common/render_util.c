@@ -69,6 +69,7 @@ uint16_t view_height = 0;
 ui_box* boxes = 0;
 int16_t loaded_boxes;
 
+// TODO: Move this to dfgame and use the logging system
 uint8_t _checkGLError(const char* file, unsigned line)
 {
     GLenum error;
@@ -116,13 +117,13 @@ void create_program(GLuint* program, const char** vs, const char** fs)
         return;
     glGetShaderInfoLog(vertex_shader, 1024, &len, log);
     if(len)
-        fprintf(stderr, "Vertex Shader Log\n%s\n", log);
+        info("Vertex Shader Log\n%s\n", log);
     glGetShaderInfoLog(fragment_shader, 1024, &len, log);
     if(len)
-        fprintf(stderr, "Fragment Shader Log\n%s\n", log);
+        info("Fragment Shader Log\n%s\n", log);
     glGetProgramInfoLog(*program, 1024, &len, log);
     if(len)
-        fprintf(stderr, "Program Log\n%s\n", log);
+        info("Program Log\n%s\n", log);
     if(checkGLError())
         return;
 
@@ -310,7 +311,7 @@ void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index,
     glDisableVertexAttribArray(sprite_vertex_attrib);
 }
 
-void draw_tiles(GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y)
+void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y)
 {
     glUseProgram(tile_program);
 
@@ -334,15 +335,13 @@ void draw_tiles(GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, u
     glVertexAttribIPointer(tile_tid_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
     checkGLError();
 
-    // TODO: Update this
-    /*glActiveTexture(GL_TEXTURE0);*/
-    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
-    /*glUniform1i(tile_texture_uniform, 0);*/
-    /*checkGLError();*/
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+    glUniform1i(tile_texture_uniform, 0);
+    checkGLError();
 
     mat4 st = ident;
     mat4 tt = ident;
-    /*translate(&tt, data->width * -TILEMAP_DIMS * 0.5f * x, data->height * -TILEMAP_DIMS * 0.5f * y, 0);*/
     translate(&tt, data->width * 0.5f + (TILEMAP_DIMS * data->width * x), data->height * 0.5f + (TILEMAP_DIMS * data->height * y), 0);
     scale(&st, data->width, data->height, 0);
     mat4 final = mul(mul(camera, view), mul(mul(transform, tt), st));
@@ -362,7 +361,7 @@ void draw_tiles(GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, u
     glVertexAttribDivisor(tile_tid_attrib, 0);
 }
 
-void draw_single_tile(GLuint tileset_id, GLuint tile_id, mat4 transform)
+void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat4 transform)
 {
     glUseProgram(single_tile_program);
 
@@ -373,10 +372,9 @@ void draw_single_tile(GLuint tileset_id, GLuint tile_id, mat4 transform)
     glVertexAttribPointer(single_tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     checkGLError();
 
-    // TODO: Update this
-    /*glActiveTexture(GL_TEXTURE0);*/
-    /*glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);*/
-    /*glUniform1i(single_tile_texture_uniform, 0);*/
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+    glUniform1i(single_tile_texture_uniform, 0);
     checkGLError();
 
     glUniform4f(single_tile_color_uniform, 0.9, 0.9, 0.9, 0.7);
@@ -389,6 +387,7 @@ void draw_single_tile(GLuint tileset_id, GLuint tile_id, mat4 transform)
     glUniformMatrix4fv(single_tile_transform_uniform, 1, GL_FALSE, final.data);
     glUniform1i(single_tile_id_uniform, tile_id);
     glUniform1i(single_tile_tid_uniform, tileset_id);
+    info("SET ID: %d", tileset_id);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

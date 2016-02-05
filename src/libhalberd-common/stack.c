@@ -36,7 +36,6 @@ void* stack_pop(stack* s, uint8_t clean)
     s->top_node = s->top_node->next_node;
     free(temp);
     if(data && clean) {
-        /*fprintf(stderr, "Cleaning stack data...\n");*/
         free(data);
         data = NULL;
     }

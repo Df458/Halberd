@@ -62,7 +62,7 @@ bool render_editor()
     translate(&cursor_pos, c.selected_tile_x * TILE_WIDTH + (c.selected_map % 3 * TILEMAP_DIMS * TILE_WIDTH), c.selected_tile_y * TILE_HEIGHT + (c.selected_map / 3 * TILEMAP_DIMS * TILE_HEIGHT), 0);
     draw_maps(t);
     if(can_place) {
-        draw_single_tile(c.set_id, c.current_id, cursor_pos);
+        draw_single_tile(get_tileset_texture(), c.set_id, c.current_id, cursor_pos);
     }
     for(int i = 0; i < 3; ++i)
         for(int j = 0; j < 3; ++j) {

@@ -155,4 +155,7 @@ int8_t index_by_handle(sprite* spr, const char* handle);
 int16_t get_tileset_id(const char* resource_location, const char* resource_name);
 tileset* get_tileset_from_id(uint8_t id);
 
+// TODO: Find a more graceful way to pass this around
+GLuint get_tileset_texture();
+
 #endif

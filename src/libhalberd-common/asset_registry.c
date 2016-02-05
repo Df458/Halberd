@@ -116,13 +116,12 @@ bool resources_init(resource_loader loader)
     }
 
     fread(&next_id, sizeof(uint32_t), 1, definition_file);
-    fprintf(stderr, "Resource count: %u\n", next_id);
+    info("Resource count: %u\n", next_id);
 
     resource_count = RESOURCE_BLOCK_COUNT + next_id;
     resource_list = calloc(resource_count, sizeof(struct resource));
     if(!resource_list) {
-        fclose(definition_file);
-        return false;
+        fatal("Cannot allocate resource registry");
     }
 
     for(int i = 0; i < next_id; ++i) {
@@ -144,7 +143,7 @@ bool resources_init(resource_loader loader)
             resource_list[i].id    = i;
             resource_list[i].valid = false;
         }
-        fprintf(stderr, "Loaded resource %d:\n%s, %s\n", i, resource_list[i].path, resource_list[i].name);
+        info("Loaded resource %d:\n%s, %s\n", i, resource_list[i].path, resource_list[i].name);
     }
 
     if(failed_count > 0)

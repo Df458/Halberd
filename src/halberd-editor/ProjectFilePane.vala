@@ -471,7 +471,7 @@ public class ProjectFilePane : Box
                             monitor_event(enumerator.get_child(file_info), null, FileMonitorEvent.DELETED);
                         }
                     } catch (Error e) {
-                        stderr.printf ("Error reading project directory: %s\n", e.message);
+                        DF.Logger.log_error("Error reading project directory: %s\n", e.message);
                     }
                 }
                 ResourceEntry deleted_entry = new ResourceEntry(src);
@@ -502,7 +502,7 @@ public class ProjectFilePane : Box
                             monitor_event(File.new_for_path(new_path), next_file, FileMonitorEvent.MOVED_OUT);
                         }
                     } catch (Error e) {
-                        stderr.printf ("Error reading project directory: %s\n", e.message);
+                        DF.Logger.log_error("Error reading project directory: %s\n", e.message);
                     }
                 }
                 ResourceEntry moved_entry = new ResourceEntry(src);
@@ -542,7 +542,7 @@ public class ProjectFilePane : Box
                 add_project_file(file_info, iter);
             }
         } catch (Error e) {
-            stderr.printf ("Error reading project directory: %s\n", e.message);
+            DF.Logger.log_error("Error reading project directory: %s\n", e.message);
             return;
         }
     }

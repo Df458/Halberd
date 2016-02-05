@@ -190,7 +190,7 @@ sprite* load_resource_to_sprite(const char* resource_location, const char* resou
     }
 
     if(spr->animation_count == 0) {
-        fprintf(stderr, "Error loading sprite: No animations found.\n");
+        error("Cannot load sprite: No animations found.\n");
         free(spr->animations);
         free(spr);
         free(boxes);
@@ -308,7 +308,7 @@ tileset* create_tileset()
 {
     uint8_t i;
     for(i = 0; i < MAX_LOADED_TILESETS; ++i) {
-        if(tilesets[i].layer == -1 || i > loaded_tilesets)
+        if(tilesets[i].layer == -1 || i >= loaded_tilesets)
             break;
     }
     if(i > loaded_tilesets && i < MAX_LOADED_TILESETS)
@@ -334,6 +334,7 @@ void destroy_tileset(tileset* set)
 // TODO: Add support for paths in tileset files
 tileset* load_resource_to_tileset(const char* resource_location, const char* resource_name)
 {
+    info("Loading tileset %s", resource_name);
     tileset* new_tileset = create_tileset();
     if(!new_tileset)
         return 0;
@@ -367,11 +368,12 @@ tileset* load_resource_to_tileset(const char* resource_location, const char* res
     }
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, new_tileset->layer, 1024, 1024, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, new_tileset->layer, TILE_WIDTH * 32, TILE_HEIGHT * 32, 1, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
     checkGLError();
 
     free(image_data);
     // TODO: Set solids
+    info("Loaded tileset with ID %d", new_tileset->layer);
     return new_tileset;
 }
 
@@ -409,4 +411,19 @@ tileset* get_tileset_from_id(uint8_t id)
         return 0;
     }
     return &tilesets[id];
+}
+
+GLuint get_tileset_texture()
+{
+    if(tile_buffer == 0) {
+        glGenTextures(1, &tile_buffer);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, tile_buffer);
+        glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, TILE_WIDTH * 32, TILE_HEIGHT * 32, MAX_LOADED_TILESETS);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if(checkGLError()) {
+            fatal("Failed to initialize the tileset buffer");
+        }
+    }
+    return tile_buffer;
 }

@@ -36,7 +36,7 @@ LIBEDITORDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(LIBEDITORSRCS))
 COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
 
 # Flags
-VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) --cc=$(CC)
+VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) -X -I/usr/include/dfgame/common/ --cc=$(CC)
 VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=dflib --pkg=dfgame-editor-frontend --pkg dfgame-editor --pkg dfgame-game --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
 CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags libxml-2.0 glew gl dfgame-common`
 CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua dfgame-common`

@@ -116,7 +116,7 @@ void draw_maps(mat4 transform)
     glDisable(GL_DEPTH_TEST);
     for(i = 0; i < 9; ++i) {
         if(maps[i].loaded)
-            draw_tiles(maps[i].tile_id_buffer, maps[i].tile_set_buffer, transform, maps[i].position_x, maps[i].position_y);
+            draw_tiles(get_tileset_texture(), maps[i].tile_id_buffer, maps[i].tile_set_buffer, transform, maps[i].position_x, maps[i].position_y);
     }
     glEnable(GL_DEPTH_TEST);
 }
@@ -126,7 +126,6 @@ void move_maps(int16_t x, int16_t y)
     if(x == 0 && y == 0)
         return;
 
-    /*fprintf(stderr, "Prev: %dx%d\nNext: %dx%d\n", central_pos_x, central_pos_y, central_pos_x - x, central_pos_y - y);*/
     central_pos_x -= x;
     central_pos_y -= y;
 

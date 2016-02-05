@@ -1,3 +1,4 @@
+#include <dfgame-common.h>
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -73,13 +74,9 @@ void quadtree_destroy(quadtree* tree)
 
 void read_quad_node(FILE* cursor, const fpos_t* start, struct quadtree_node* node)
 {
-    fprintf(stderr, "Reading node(%ld)\n", ftell(cursor));
+    info("Reading node(%ld)\n", ftell(cursor));
     uint32_t buffer[4];
     fread(buffer, sizeof(uint32_t), 4, cursor);
-    for(int i = 0; i < 4; ++i) {
-        fprintf(stderr, "%d, ", buffer[i]);
-    }
-    fprintf(stderr, "\n");
 
     for(int i = 0; i < 4; ++i) {
         if(buffer[i] == 0) {
@@ -96,7 +93,7 @@ void read_quad_node(FILE* cursor, const fpos_t* start, struct quadtree_node* nod
 // TODO: Write the position of leaf data
 void write_quad_node(FILE* cursor, const fpos_t* start, const struct quadtree_node* node, uint32_t* end_cursor)
 {
-    fprintf(stderr, "Writing node(%ld)\n", ftell(cursor));
+    info("Writing node(%ld)\n", ftell(cursor));
     uint32_t buffer[4] = { 0 };
     if(node->children[0]) {
         buffer[0] = *end_cursor;

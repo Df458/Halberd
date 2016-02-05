@@ -66,7 +66,6 @@ void save_actor()
     xmlTextWriterSetIndent(writer, 2);
     xmlTextWriterStartDocument(writer, NULL, NULL, NULL);
     xmlTextWriterStartElement(writer, "actor");
-    fprintf(stderr, "MY DATA: %u\n", loaded_actor->data.flags);
     if(loaded_actor->data.flags & FLAG_SOLID)
         xmlTextWriterWriteAttribute(writer, "solid", "true");
     else

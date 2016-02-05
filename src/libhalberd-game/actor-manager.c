@@ -167,7 +167,7 @@ void destroy_actor(actor a)
 
 void destroy_actors()
 {
-    fprintf(stderr, "Destroying %d actors...\n", actor_count);
+    info("Destroying %d actors...\n", actor_count);
     for(uint32_t i = 0; i < actor_count; ++i)
         destroy_actor(actor_list[i]);
     free(actor_list);

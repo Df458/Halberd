@@ -1,4 +1,4 @@
-using HLog;
+using DF.Logger;
 
 class HalberdEditor : Gtk.Application
 {
@@ -142,7 +142,7 @@ class HalberdEditor : Gtk.Application
             string? path;
             path = settings.get_string("project-dir");
             if(path == null || path.length == 0) {
-                stderr.printf("No main directory set. Generating one now...\n");
+                log_info("No main directory set. Generating one now...\n");
                 path = Environment.get_user_data_dir() + "/Halberd";
                 settings.set_string("project-dir", path);
             }

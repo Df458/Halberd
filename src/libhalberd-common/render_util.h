@@ -357,8 +357,8 @@ uint8_t init_graphics(void);
 void destroy_graphics();
 
 void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col);
-void draw_tiles(GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y);
-void draw_single_tile(GLuint tileset_id, GLuint tile_id, mat4 transform);
+void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y);
+void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat4 transform);
 void draw_box(uint16_t id, float x, float y, float w, float h);
 void draw_text(font* font, const char* text, float x, float y, uint16_t char_count);
 void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count);
