@@ -86,6 +86,12 @@ public class SidePane : Box
         {
             Popover select_pop = new Popover(button_add);
             ResourceSelector select_widget = new ResourceSelector("Select a tileset", "png");
+            select_widget.add_extension("jpg");
+            select_widget.add_extension("jpeg");
+            select_widget.add_extension("tga");
+            select_widget.add_extension("tif");
+            select_widget.add_extension("tiff");
+            select_widget.generate_list(); // TODO: Replace this with a proper refresh function or something
             select_pop.add(select_widget);
             select_pop.modal = true;
             select_widget.respond.connect((response) =>

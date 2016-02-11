@@ -2,6 +2,7 @@
 CC=gcc
 VALAC=valac
 PKGCONFIG=pkg-config
+OS=Linux
 
 # Targets
 GAMETARGET=halberd-game
@@ -61,6 +62,18 @@ $(shell mkdir -p $(OBJPATH)$(COMMONTARGET))
 #-include $(LIBEDITORDEPS)
 #-include $(LIBGAMEDEPS)
 #-include $(LIBEDITORDEPS)
+
+ifeq ($(OS), Linux)
+#OSFLAGS=$(LINUXFLAGS)
+#OSLIBS=$(LINUXLIBS)
+else ifeq ($(OS), Windows)
+#OSFLAGS=$(WINFLAGS)
+#OSLIBS=$(WINLIBS)
+CC=i686-w64-mingw32-gcc
+PKGCONFIG=i686-w64-mingw32-pkg-config
+else
+$(error Unknown OS selected for output)
+endif
 
 # Filetype rules
 $(OBJPATH)$(GAMETARGET)/%.depend: $(SRCPATH)$(GAMETARGET)/%.c

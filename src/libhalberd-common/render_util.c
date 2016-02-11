@@ -387,7 +387,7 @@ void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat
     glUniformMatrix4fv(single_tile_transform_uniform, 1, GL_FALSE, final.data);
     glUniform1i(single_tile_id_uniform, tile_id);
     glUniform1i(single_tile_tid_uniform, tileset_id);
-    info("SET ID: %d", tileset_id);
+    /*info("SET ID: %d", tileset_id);*/
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -110,6 +110,7 @@ void init_automaps()
     clear_automaps();
 }
 
+// FIXME: This should use the new asset registry
 bool automap_loader(FILE* infile, tilemap* map, uint16_t x, uint16_t y)
 {
     rewind(infile);
