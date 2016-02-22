@@ -1,5 +1,5 @@
 using Gtk;
-using Halberd.IO;
+using DF.IO;
 
 public class MissingFilesDialog : Dialog
 {

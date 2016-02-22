@@ -66,7 +66,7 @@ public class MainWindow : Window
     // TODO: This should probably be moved out of this class
     public void load_file(string? resource_path, string resource_name)
     {
-        unowned string? ext = Halberd.IO.get_extension(resource_name);
+        unowned string? ext = DF.IO.get_extension(resource_name);
         switch(ext) {
             case "map":
                 view_stack.set_visible_child(inspector_paned);
@@ -186,7 +186,7 @@ public class MainWindow : Window
                 case "map":
                     if(current_map_name.length == 0) {
                         current_map_path = project_view.get_selected_path();
-                        current_map_name = Halberd.IO.get_unique_name(current_map_path, "Untitled.map");
+                        current_map_name = DF.IO.get_unique_name(current_map_path, "Untitled.map");
                     }
                     Game.Maps.save(current_map_path, current_map_name);
                     break;
@@ -311,7 +311,7 @@ public class MainWindow : Window
         {
             if(r == Gtk.ResponseType.ACCEPT) {
                 try {
-                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + Halberd.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
+                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
                     fc.get_file().copy(dest, FileCopyFlags.NONE);
                 } catch(Error e) {
                     DF.Logger.log_error("Error importing asset: %s\n", e.message);

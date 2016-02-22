@@ -1,11 +1,10 @@
 #ifndef TEXTURE_UTIL_H
 #define TEXTURE_UTIL_H
+#include <dfgame-common.h>
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <inttypes.h>
 #include <stdbool.h>
-
-#include "dfgame-common.h"
 
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 32

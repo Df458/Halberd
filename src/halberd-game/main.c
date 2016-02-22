@@ -83,7 +83,7 @@ int main(int argc, char** argv)
         glfwSwapBuffers(win);
     } while(!get_quit_input());
 
-    destroy_player();
+    destroy_player_actor();
     destroy_actors();
     /*destroy_maps();*/
     destroy_ui();

@@ -24,20 +24,7 @@ class HalberdEditor : Gtk.Application
 
     public File get_content_directory()
     {
-        return File.new_for_path(Halberd.IO.get_path());
-    }
-
-    public string? path_to_content_path(string path)
-    {
-        string cpath = Halberd.IO.get_path();
-
-        if(path.substring(0, cpath.length) == cpath) {
-            if(path.length <= cpath.length + 1)
-                return null;
-            return path.substring(cpath.length + 1, path.length - cpath.length - 1);
-        }
-
-        return path;
+        return File.new_for_path(DF.IO.get_path());
     }
 
     public int runall()
@@ -113,7 +100,7 @@ class HalberdEditor : Gtk.Application
         if(startup_win != null)
             startup_win.destroy();
 
-        if(Halberd.IO.get_failed_count() > 0) {
+        if(DF.IO.get_failed_count() > 0) {
             MissingFilesDialog dialog = new MissingFilesDialog(window);
             dialog.response.connect((id) =>
             {
@@ -201,9 +188,9 @@ public void log_message(LogLevel level, string message)
  */
 public File file_from_resource(string? ext, string name, bool new_file = false)
 {
-    string path = Halberd.IO.make_path(ext, name);
+    string path = DF.IO.make_path(ext, name);
     if(new_file)
-        path = Halberd.IO.make_path(ext, Halberd.IO.get_unique_name(ext, name));
+        path = DF.IO.make_path(ext, DF.IO.get_unique_name(ext, name));
     File f = File.new_for_path(path);
     return f;
 }
@@ -214,7 +201,7 @@ public File file_from_resource(string? ext, string name, bool new_file = false)
 public bool file_is_content(File file)
 {
     string? path = file.get_path();
-    string cpath = Halberd.IO.get_path();
+    string cpath = DF.IO.get_path();
 
     if(path != null && path.length > cpath.length) {
         if(path.substring(0, cpath.length) == cpath) {

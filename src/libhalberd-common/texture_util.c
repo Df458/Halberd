@@ -1,5 +1,4 @@
 #include "texture_util.h"
-#include "xml_util.h"
 #include "render_util.h"
 
 #include <png.h>

@@ -437,7 +437,7 @@ public class ProjectFilePane : Box
                 file_data.set(file_iter, ProjectTreeColumn.URI,       dest.get_uri());
                 ResourceEntry prev_entry = new ResourceEntry(src);
                 ResourceEntry next_entry = new ResourceEntry(dest);
-                Halberd.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
+                DF.IO.move_resource(prev_entry.path, prev_entry.name, next_entry.path, next_entry.name);
                 break;
 
             case FileMonitorEvent.CREATED:
@@ -475,7 +475,7 @@ public class ProjectFilePane : Box
                     }
                 }
                 ResourceEntry deleted_entry = new ResourceEntry(src);
-                Halberd.IO.delete_resource(deleted_entry.path, deleted_entry.name);
+                DF.IO.delete_resource(deleted_entry.path, deleted_entry.name);
                 if(file_iter != null) {
                     file_data.remove(ref file_iter);
                 }
@@ -508,9 +508,9 @@ public class ProjectFilePane : Box
                 ResourceEntry moved_entry = new ResourceEntry(src);
                 ResourceEntry new_entry = new ResourceEntry(dest);
                 if(!file_is_content(dest)) {
-                    Halberd.IO.delete_resource(moved_entry.path, moved_entry.name);
+                    DF.IO.delete_resource(moved_entry.path, moved_entry.name);
                 } else {
-                    Halberd.IO.move_resource(moved_entry.path, moved_entry.name, new_entry.path, new_entry.name);
+                    DF.IO.move_resource(moved_entry.path, moved_entry.name, new_entry.path, new_entry.name);
                 }
                 file_data.remove(ref file_iter);
                 break;
@@ -569,7 +569,7 @@ public class ProjectFilePane : Box
         file_data.append(out temp_iter, parent_iter);
 
         string name = "text-x-generic";
-        string extension = Halberd.IO.get_extension(filename);
+        string extension = DF.IO.get_extension(filename);
         // TODO: Use custom non-placeholder icons
         switch(extension) {
             case "png":
