@@ -22,11 +22,6 @@ class HalberdEditor : Gtk.Application
         Halberd.Editor.Cursor.init();
     }
 
-    public File get_content_directory()
-    {
-        return File.new_for_path(DF.IO.get_path());
-    }
-
     public int runall()
     {
         string? last_path;
@@ -180,35 +175,4 @@ public void log_message(LogLevel level, string message)
     Gtk.MessageDialog dialog = new Gtk.MessageDialog(app.current_win, Gtk.DialogFlags.MODAL, type, Gtk.ButtonsType.OK, message);
     dialog.response.connect((r) => { dialog.destroy(); });
     dialog.show();
-}
-
-/*
- * This function takes a resource extension and filename and creates a GIO File
- * from the path returned by construct_extended_resource_path.
- */
-public File file_from_resource(string? ext, string name, bool new_file = false)
-{
-    string path = DF.IO.make_path(ext, name);
-    if(new_file)
-        path = DF.IO.make_path(ext, DF.IO.get_unique_name(ext, name));
-    File f = File.new_for_path(path);
-    return f;
-}
-
-/*
- * Returns whether or not a file is part of the current project's content
- */
-public bool file_is_content(File file)
-{
-    string? path = file.get_path();
-    string cpath = DF.IO.get_path();
-
-    if(path != null && path.length > cpath.length) {
-        if(path.substring(0, cpath.length) == cpath) {
-            return true;
-        }
-    }
-
-    g_free(path);
-    return false;
 }

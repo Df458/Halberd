@@ -311,7 +311,7 @@ public class MainWindow : Window
         {
             if(r == Gtk.ResponseType.ACCEPT) {
                 try {
-                    File dest = File.new_for_path(app.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
+                    File dest = File.new_for_path(get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
                     fc.get_file().copy(dest, FileCopyFlags.NONE);
                 } catch(Error e) {
                     DF.Logger.log_error("Error importing asset: %s\n", e.message);
