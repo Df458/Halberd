@@ -73,7 +73,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
             {
                 select_pop.hide();
                 ResourceEntry entry = select_widget.get_selected();
-                selected_sprite = Halberd.IO.get_id_from_resource(entry.path, entry.name, true);
+                selected_sprite = DF.IO.get_id_from_resource(entry.path, entry.name, true);
                 sprite_value_label.set_text(entry.name);
             });
             select_pop.show_all();
@@ -132,7 +132,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
         orient_check.active     = (actor.data.flags & Halberd.ActorFlags.CAN_ORIENT) != 0;
         ghost_check.active      = (actor.data.flags & Halberd.ActorFlags.BLOCK_WITH_SOLID) == 0;
         selected_sprite         = actor.data.sprites_id;
-        Logger.log_info("Sprite: %u, %s\n", selected_sprite, Halberd.IO.get_name_from_id(selected_sprite));
-        sprite_value_label.set_text(Halberd.IO.get_name_from_id(selected_sprite));
+        Logger.log_info("Sprite: %u, %s\n", selected_sprite, DF.IO.get_name_from_id(selected_sprite));
+        sprite_value_label.set_text(DF.IO.get_name_from_id(selected_sprite));
     }
 }

@@ -1,4 +1,4 @@
-[CCode (cheader_filename = "editor-render.h", cheader_filename = "project.h")]
+[CCode (cheader_filename = "editor-render.h")]
 namespace Halberd {
 namespace Editor {
     [CCode (cname="init_render")]

@@ -1,12 +1,12 @@
 #ifndef ACTOR_H
 #define ACTOR_H
+#include <dfgame-common.h>
 #include <inttypes.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 #include <stdbool.h>
 #include "render_util.h"
-#include "xml_util.h"
 
 #define FLAG_SOLID            0b10000000
 #define FLAG_VISIBLE          0b01000000
