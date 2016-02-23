@@ -85,7 +85,7 @@ public class SidePane : Box
         button_add.clicked.connect(() =>
         {
             Popover select_pop = new Popover(button_add);
-            ResourceSelector select_widget = new ResourceSelector("Select a tileset", "png");
+            DF.ResourceSelector select_widget = new DF.ResourceSelector("Select a tileset", "png");
             select_widget.add_extension("jpg");
             select_widget.add_extension("jpeg");
             select_widget.add_extension("tga");

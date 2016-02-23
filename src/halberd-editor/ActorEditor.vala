@@ -1,12 +1,13 @@
 using Gtk;
 using DF;
 
-public class ActorEditor : AssetEditor, SettingsGrid
+public class ActorEditor : AssetEditor, AssetViewer, Bin
 {
-    private Box        sprite_box;
-    private Label      sprite_value_label;
-    private Button     sprite_button;
-    private SpinButton speed_input;
+    private Box           sprite_box;
+    private Label         sprite_value_label;
+    private Button        sprite_button;
+    private SpinButton    speed_input;
+    private SettingsGrid  grid;
 
     private CheckButton visible_check;
     private CheckButton solid_check;
@@ -30,6 +31,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
     
     private void init_content()
     {
+        grid               = new SettingsGrid();
         sprite_box         = new Box(Orientation.HORIZONTAL, 6);
         sprite_value_label = new Label("None");
         sprite_button      = new Button.with_label("Choose\u2026");
@@ -52,13 +54,14 @@ public class ActorEditor : AssetEditor, SettingsGrid
 
         sprite_box.add(sprite_button);
         sprite_box.add(sprite_value_label);
-        add("Spriteset", sprite_box, 0);
-        add("Default Speed", speed_input, 1);
-        add("Flags", visible_check, 2);
-        add(null, solid_check, 2);
-        add(null, lock_check, 2);
-        add(null, orient_check, 2);
-        add(null, ghost_check, 2);
+        grid.add("Spriteset", sprite_box, 0);
+        grid.add("Default Speed", speed_input, 1);
+        grid.add("Flags", visible_check, 2);
+        grid.add(null, solid_check, 2);
+        grid.add(null, lock_check, 2);
+        grid.add(null, orient_check, 2);
+        grid.add(null, ghost_check, 2);
+        this.add(grid);
     }
 
     private void connect_signals()
@@ -80,7 +83,7 @@ public class ActorEditor : AssetEditor, SettingsGrid
         });
     }
 
-    public bool create_new(ResourceEntry entry)
+    public bool create(ResourceEntry entry)
     {
         actor = Halberd.create_actor_for_resource(entry.path, entry.name);
         if(actor == null)

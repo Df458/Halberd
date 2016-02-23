@@ -96,7 +96,7 @@ class HalberdEditor : Gtk.Application
             startup_win.destroy();
 
         if(DF.IO.get_failed_count() > 0) {
-            MissingFilesDialog dialog = new MissingFilesDialog(window);
+            DF.MissingFilesDialog dialog = new DF.MissingFilesDialog(window);
             dialog.response.connect((id) =>
             {
                 if(id == 0) {

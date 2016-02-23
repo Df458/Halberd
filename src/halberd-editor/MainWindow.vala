@@ -232,7 +232,7 @@ public class MainWindow : Window
                 return;
 
             ResourceEntry entry = new ResourceEntry.from_entry(project_view.get_selected_path(), name, true);
-            selected_editor.create_new(entry);
+            selected_editor.create(entry);
         });
 
         viewport.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK | Gdk.EventMask.SCROLL_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
@@ -311,7 +311,7 @@ public class MainWindow : Window
         {
             if(r == Gtk.ResponseType.ACCEPT) {
                 try {
-                    File dest = File.new_for_path(get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
+                    File dest = File.new_for_path(DF.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
                     fc.get_file().copy(dest, FileCopyFlags.NONE);
                 } catch(Error e) {
                     DF.Logger.log_error("Error importing asset: %s\n", e.message);

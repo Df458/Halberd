@@ -1,7 +1,9 @@
 using Gtk;
 
-public class FontEditor : AssetEditor, Box
+public class FontEditor : AssetEditor, AssetViewer, Bin
 {
+    private Box box;
+
     public bool save()
     {
         return false;
@@ -12,7 +14,7 @@ public class FontEditor : AssetEditor, Box
         return false;
     }
 
-    public bool create_new(ResourceEntry entry)
+    public bool create(ResourceEntry entry)
     {
         return false;
     }

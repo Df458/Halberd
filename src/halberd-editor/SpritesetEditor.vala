@@ -1,7 +1,8 @@
 using Gtk;
 
-public class SpriteEditor : AssetEditor, SettingsGrid
+public class SpriteEditor : AssetEditor, AssetViewer, Bin
 {
+    private SettingsGrid grid;
     private Box          anim_box;
     private ComboBoxText anim_combo;
     private Button       anim_add_button;
@@ -28,7 +29,7 @@ public class SpriteEditor : AssetEditor, SettingsGrid
         return false;
     }
 
-    public bool create_new(ResourceEntry entry)
+    public bool create(ResourceEntry entry)
     {
         //sprite = Halberd.create_sprite_for_resource(entry.path, entry.name);
         if(sprite == null)
@@ -40,6 +41,7 @@ public class SpriteEditor : AssetEditor, SettingsGrid
 
     private void init_content()
     {
+        grid            = new SettingsGrid();
         anim_box        = new Box(Orientation.HORIZONTAL, 0);
         anim_combo      = new ComboBoxText();
         anim_add_button = new Button.from_icon_name("list-add-symbolic", IconSize.BUTTON);
@@ -52,10 +54,11 @@ public class SpriteEditor : AssetEditor, SettingsGrid
         anim_box.pack_start(anim_combo, true, true);
         anim_box.add(anim_add_button);
 
-        add("Animation", anim_box, 0);
-        add("Length", length_entry, 1);
-        add("Speed", speed_entry, 1);
-        add("Orientations", orient_combo, 1);
+        grid.add("Animation", anim_box, 0);
+        grid.add("Length", length_entry, 1);
+        grid.add("Speed", speed_entry, 1);
+        grid.add("Orientations", orient_combo, 1);
         //add("Offset", , 1);
+        this.add(grid);
     }
 }
