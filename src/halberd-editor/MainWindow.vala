@@ -24,8 +24,9 @@ public class MainWindow : Window
     private ToolButton button_fill;
     private ToolButton button_erase;
 
-    // Project Pane
+    // Project               Pane
     private ProjectFilePane project_view;
+    private DF.LogPane         log_view;
 
     // Inspector Pane
     private SidePane inspector_pane;
@@ -130,20 +131,21 @@ public class MainWindow : Window
 
     private void init_content()
     {
-        viewport = new GLArea();
-        editor = new EditorEmbed(viewport);
-        game = new GameEmbed(viewport);
-        button_save = new Button.from_icon_name("document-save-symbolic", IconSize.SMALL_TOOLBAR);
-        button_play = new ToggleButton();
-        button_menu = new MenuButton();
-        project_view = new ProjectFilePane();
+        viewport       = new GLArea();
+        editor         = new EditorEmbed(viewport);
+        game           = new GameEmbed(viewport);
+        button_save    = new Button.from_icon_name("document-save-symbolic", IconSize.SMALL_TOOLBAR);
+        button_play    = new ToggleButton();
+        button_menu    = new MenuButton();
+        project_view   = new ProjectFilePane();
         inspector_pane = new SidePane();
-        empty_view = new BlankEditor();
-        actor_view = new ActorEditor();
-        sprite_view = new SpriteEditor();
+        empty_view     = new BlankEditor();
+        actor_view     = new ActorEditor();
+        sprite_view    = new SpriteEditor();
+        log_view       = new DF.LogPane();
 
-        button_draw = new ToggleToolButton();
-        button_fill = new ToggleToolButton();
+        button_draw  = new ToggleToolButton();
+        button_fill  = new ToggleToolButton();
         button_erase = new ToggleToolButton();
 
         button_play.set_image(new Gtk.Image.from_icon_name("media-playback-start-symbolic", IconSize.SMALL_TOOLBAR));
@@ -153,6 +155,8 @@ public class MainWindow : Window
         button_draw.set_icon_name("insert-object-symbolic");
         button_fill.set_icon_name("zoom-fit-best-symbolic");
         button_erase.set_icon_name("edit-clear-all-symbolic");
+
+        log_view.set_active();
 
         current_embed = editor;
         viewport.has_depth_buffer = true;
@@ -167,7 +171,8 @@ public class MainWindow : Window
         topbar.pack_end(button_menu);
         topbar.pack_end(button_play);
         inspector_paned.pack2(inspector_pane, false, true);
-        main_paned.pack2(project_view, true, false);
+        //main_paned.pack2(project_view, true, false);
+        main_paned.pack2(log_view, true, false);
         toolbar_box.pack_start(viewport, true, true);
         toolbar.insert(button_draw,  0);
         toolbar.insert(button_erase, 1);
@@ -311,7 +316,7 @@ public class MainWindow : Window
         {
             if(r == Gtk.ResponseType.ACCEPT) {
                 try {
-                    File dest = File.new_for_path(get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
+                    File dest = File.new_for_path(DF.IO.get_content_directory().get_path() + "/" + project_view.get_selected_path() + "/" + DF.IO.get_unique_name(project_view.get_selected_path(), fc.get_file().get_basename()));
                     fc.get_file().copy(dest, FileCopyFlags.NONE);
                 } catch(Error e) {
                     DF.Logger.log_error("Error importing asset: %s\n", e.message);
