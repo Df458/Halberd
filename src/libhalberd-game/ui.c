@@ -2,7 +2,7 @@
 #include "io.h"
 #include "ui.h"
 #include "texture_util.h"
-#include "controls.h"
+#include <dfgame-game.h>
 #include <stdlib.h>
 #include <string.h>
 

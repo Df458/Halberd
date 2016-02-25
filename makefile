@@ -37,13 +37,13 @@ LIBEDITORDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(LIBEDITORSRCS))
 COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
 
 # Flags
-VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) -X -I/usr/include/dfgame/common/ --cc=$(CC)
+VFLAGS=-c --vapidir=$(VAPIPATH) -X -I$(SRCPATH)$(LIBEDITORTARGET) -X -I$(SRCPATH)$(LIBGAMETARGET) -X -I$(SRCPATH)$(COMMONTARGET) -X -I/usr/include/dfgame/common/ -X -I/usr/include/dfgame/game/ --cc=$(CC)
 VLIBS=--pkg=glib-2.0 --pkg=gtk+-3.0 --pkg=gee-0.8 --pkg=libxml-2.0 --pkg=dflib --pkg=dfgame-editor-frontend --pkg dfgame-editor --pkg dfgame-game --pkg=$(LIBEDITORTARGET) --pkg=$(LIBGAMETARGET) --pkg=$(COMMONTARGET)
 CFLAGS=-g -Wall -Werror -Wno-unused-variable -Wno-traditional -Wno-pedantic -I$(SRCPATH)$(COMMONTARGET) `$(PKGCONFIG) --cflags glew gl dfgame-common`
 CLIBS=`$(PKGCONFIG) --libs libxml-2.0 glew gl lua dfgame-common`
-GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng dfgame-game-front`
+GAMEFLAGS=-I$(SRCPATH)$(LIBGAMETARGET) `pkg-config --cflags glfw3 libpng dfgame-game-front dfgame-game`
 GAMELIBS=`$(PKGCONFIG) --libs glfw3 dfgame-game-front`
-EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0 gee-0.8 dfgame-editor-front`
+EDITORFLAGS=-I$(SRCPATH)$(LIBEDITORTARGET) -I$(SRCPATH)$(LIBGAMETARGET) -L$(LIBPATH) `$(PKGCONFIG) --cflags glib-2.0 gtk+-3.0 gee-0.8 dfgame-editor-front dfgame-game`
 EDITORLIBS=-ldflib `$(PKGCONFIG) --libs glib-2.0 gtk+-3.0 gee-0.8 dfgame-editor-front` $(LIBEDITORLIBS) $(LIBGAMELIBS)
 LIBGAMEFLAGS=`$(PKGCONFIG) --cflags libpng dfgame-game`
 LIBGAMELIBS=-lm `$(PKGCONFIG) --libs glfw3 libpng dfgame-game`

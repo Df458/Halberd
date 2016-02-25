@@ -49,40 +49,40 @@ public class GameEmbed : EmbeddableView
     public override bool key_down(Gdk.EventKey event)
     {
         if(event.keyval == up_key)
-            Game.Controls.set_up_state(true);
+            DF.Input.set_up_state(true);
         if(event.keyval == down_key)
-            Game.Controls.set_down_state(true);
+            DF.Input.set_down_state(true);
         if(event.keyval == left_key)
-            Game.Controls.set_left_state(true);
+            DF.Input.set_left_state(true);
         if(event.keyval == right_key)
-            Game.Controls.set_right_state(true);
+            DF.Input.set_right_state(true);
         if(event.keyval == action_key)
-            Game.Controls.set_action_state(true);
+            DF.Input.set_action_state(true);
         if(event.keyval == confirm_key)
-            Game.Controls.set_confirm_state(true);
+            DF.Input.set_confirm_state(true);
         if(event.keyval == cancel_key)
-            Game.Controls.set_cancel_state(true);
+            DF.Input.set_cancel_state(true);
         if(event.keyval == menu_key)
-            Game.Controls.set_menu_state(true);
+            DF.Input.set_menu_state(true);
         if(event.keyval == quit_key)
-            Game.Controls.set_quit_state(true);
+            DF.Input.set_quit_state(true);
         return false;
     }
 
     public override bool key_up(Gdk.EventKey event)
     {
         if(event.keyval == up_key)
-            Game.Controls.set_up_state(false);
+            DF.Input.set_up_state(false);
         if(event.keyval == down_key)
-            Game.Controls.set_down_state(false);
+            DF.Input.set_down_state(false);
         if(event.keyval == left_key)
-            Game.Controls.set_left_state(false);
+            DF.Input.set_left_state(false);
         if(event.keyval == right_key)
-            Game.Controls.set_right_state(false);
+            DF.Input.set_right_state(false);
         if(event.keyval == menu_key)
-            Game.Controls.set_menu_state(false);
+            DF.Input.set_menu_state(false);
         if(event.keyval == quit_key)
-            Game.Controls.set_quit_state(false);
+            DF.Input.set_quit_state(false);
         return false;
     }
 
@@ -117,7 +117,7 @@ public class GameEmbed : EmbeddableView
         Game.Player.update(fdelta);
         Game.Actors.update(fdelta);
         Game.UI.update(fdelta);
-        Game.Controls.update();
+        DF.Input.update();
 
         viewport.queue_draw();
         return should_continue;

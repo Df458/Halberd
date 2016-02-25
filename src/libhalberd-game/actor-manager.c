@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <dfgame-common.h>
 
 actor* actor_list = 0;
 uint32_t actor_count = 0;

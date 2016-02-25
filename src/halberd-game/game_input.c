@@ -1,4 +1,6 @@
-#include "controls.h"
+#include <dfgame-game.h>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "game_input.h"
 #include "stdio.h"
 

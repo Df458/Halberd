@@ -1,17 +1,17 @@
 #include <dfgame-common.h>
+#include <dfgame-game.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
 #include "color.h"
-#include "controls.h"
-#include "game_input.h"
 #include "game-render.h"
 #include "io.h"
 #include "player.h"
 #include "render_util.h"
 #include "settings.h"
 #include "ui.h"
+#include "game_input.h"
 
 void sizeCallback(GLFWwindow* win, int width, int height)
 {
