@@ -1,6 +1,6 @@
+#include <dfgame-common.h>
 #include <GL/glew.h>
 #include "game-render.h"
-#include "matrix.h"
 #include "render_util.h"
 #include "player.h"
 #include "actor-manager.h"

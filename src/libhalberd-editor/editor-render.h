@@ -1,7 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include "map.h"
-#include "matrix.h"
+#include <dfgame-common.h>
 #include <stdbool.h>
 
 static const float GRID_BUFFER_DATA[] =

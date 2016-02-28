@@ -22,7 +22,7 @@ void update_ui(float dt)
     if(!current_link)
         return;
 
-    if(current_link->pen >= current_link->len && (get_confirm_input() == 1 || get_cancel_input() == 1 || get_action_input() == 1)) {
+    if(current_link->pen >= current_link->len && (get_input_state(0) == 2 || get_input_state(1) == 2 || get_input_state(2) == 2)) {
         message_link* prev = current_link;
         current_link = current_link->next_link;
         free(prev->message);
@@ -30,7 +30,7 @@ void update_ui(float dt)
     } else {
         if(current_link->pen < current_link->len)
             current_link->pen++;
-        if(get_cancel_input() == 1)
+        if(/*get_cancel_input()*/1 == 1)
             current_link->pen = current_link->len;
     }
 }

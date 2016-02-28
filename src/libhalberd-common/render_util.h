@@ -1,10 +1,10 @@
 #ifndef RENDER_UTIL
 #define RENDER_UTIL
+#include <dfgame-common.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <inttypes.h>
 #include "color.h"
-#include "matrix.h"
 #include "texture_util.h"
 
 #define TILE_WIDTH 32
@@ -163,17 +163,17 @@ static const char* BOX_FRAGMENT_SHADER[] =
 "discard;\n"
 "}"};
 
-static const float QUAD_BUFFER_DATA[] =
-{
-// Vertex positon/uv
-0.5, -0.5, 0,
--0.5, -0.5, 0,
--0.5, 0.5, 0,
+//static const float QUAD_BUFFER_DATA[] =
+//{
+//// Vertex positon/uv
+//0.5, -0.5, 0,
+//-0.5, -0.5, 0,
+//-0.5, 0.5, 0,
 
-0.5, -0.5, 0,
--0.5, 0.5, 0,
-0.5, 0.5, 0,
-};
+//0.5, -0.5, 0,
+//-0.5, 0.5, 0,
+//0.5, 0.5, 0,
+//};
 
 static const float BOX_S_BUFFER_DATA[] =
 {
@@ -347,11 +347,6 @@ static const float BLANK_TEXTURE_BUFFER_DATA[] =
 {
     1.0f, 1.0f, 1.0f, 1.0f,
 };
-
-uint8_t _checkGLError(const char* file, unsigned line);
-#define checkGLError() _checkGLError(__FILE__, __LINE__)
-
-void create_program(GLuint* program, const char** vs, const char** fs);
 
 uint8_t init_graphics(void);
 void destroy_graphics();

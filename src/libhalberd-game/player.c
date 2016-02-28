@@ -7,6 +7,8 @@
 #include <dfgame-game.h>
 
 actor player_actor;
+// TODO: Replace this later
+spriteset* player_spriteset;
 
 void init_player(uint32_t x, uint32_t y)
 {
@@ -20,14 +22,15 @@ void init_player(uint32_t x, uint32_t y)
     player_actor->data.position_x = x * TILE_WIDTH;
     player_actor->data.position_y = y * TILE_HEIGHT;
     player_actor->data.speed = 3;
-    player_actor->data.animation_timer = 0;
-    player_actor->data.animation_index = 0;
+    /*player_actor->data.animation_timer = 0;*/
+    /*player_actor->data.animation_index = 0;*/
     // TODO: Figure out how to properly get player info
-    player_actor->data.sprites = load_resource_to_sprite(NULL, "test.spr");
-    if(player_actor->data.sprites != 0) {
-        player_actor->data.animation_index = 0;
-        player_actor->data.animation_playing = player_actor->data.sprites->animations[0].play;
-    }
+    player_spriteset = load_resource_to_spriteset(NULL, "test.spr");
+    player_actor->data.sprites = create_sprite(player_spriteset);
+    /*if(player_actor->data.sprites != 0) {*/
+        /*player_actor->data.animation_index = 0;*/
+        /*player_actor->data.animation_playing = player_actor->data.sprites->animations[0].autoplay;*/
+    /*}*/
     for(uint8_t i = 0; i < CALLBACK_COUNT; ++i)
         player_actor->callbacks[i] = 0;
 }
@@ -35,9 +38,11 @@ void init_player(uint32_t x, uint32_t y)
 void update_player(float delta)
 {
     int direction;
-    if(player_actor->data.moving == 0 && get_action_input()) {
+    // Action key pressed
+    if(player_actor->data.moving == 0 && get_input_state(0) == 2) {
         actor_operate(player_actor);
-    } else if(player_actor->data.moving == 0 && (direction = get_directional_input())) {
+    // TODO: DFGAME REWORK
+    } else if(player_actor->data.moving == 0 && (direction = 0/*get_directional_input()*/)) {
         uint8_t o = player_actor->data.orientation;
         switch(direction) {
             case 1: player_actor->data.orientation = ORIENT_WEST; break;

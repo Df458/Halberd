@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "matrix.h"
+#include <dfgame-common.h>
 #include "render_util.h"
 
 #define TILEMAP_DIMS 128

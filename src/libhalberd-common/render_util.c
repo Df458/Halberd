@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include <dfgame-common.h>
 #include "render_util.h"
 #include "map.h"
 #include "io.h"
@@ -68,72 +68,6 @@ uint16_t view_height = 0;
 
 ui_box* boxes = 0;
 int16_t loaded_boxes;
-
-// TODO: Move this to dfgame and use the logging system
-uint8_t _checkGLError(const char* file, unsigned line)
-{
-    GLenum error;
-    uint8_t error_found = 0;
-    do {
-        error = glGetError();
-        if(error != GL_NO_ERROR) {
-            error_found = 1;
-
-            switch(error) {
-                case GL_INVALID_ENUM:
-                    fprintf(stderr, "Error in %s, line %u: Enum given is invalid.\n", file, line);
-                    break;
-                case GL_INVALID_VALUE:
-                    fprintf(stderr, "Error in %s, line %u: Parameter given is invalid.\n", file, line);
-                    break;
-                case GL_INVALID_OPERATION:
-                    fprintf(stderr, "Error in %s, line %u: Illegal operation attempted.\n", file, line);
-                    break;
-                default:
-                    fprintf(stderr, "%s, %u: Error code 0x%0X. Consider adding an entry.\n", file, line, error);
-            }
-        }
-    } while(error != GL_NO_ERROR);
-    return error_found;
-}
-
-void create_program(GLuint* program, const char** vs, const char** fs)
-{
-    GLuint vertex_shader, fragment_shader;
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    *program = glCreateProgram();
-    glShaderSource(vertex_shader, 1, vs, NULL);
-    glShaderSource(fragment_shader, 1, fs, NULL);
-    GLsizei len;
-    char log[1024];
-
-    glCompileShader(vertex_shader);
-    glCompileShader(fragment_shader);
-    glAttachShader(*program, vertex_shader);
-    glAttachShader(*program, fragment_shader);
-    glLinkProgram(*program);
-    if(checkGLError())
-        return;
-    glGetShaderInfoLog(vertex_shader, 1024, &len, log);
-    if(len)
-        info("Vertex Shader Log\n%s\n", log);
-    glGetShaderInfoLog(fragment_shader, 1024, &len, log);
-    if(len)
-        info("Fragment Shader Log\n%s\n", log);
-    glGetProgramInfoLog(*program, 1024, &len, log);
-    if(len)
-        info("Program Log\n%s\n", log);
-    if(checkGLError())
-        return;
-
-    glDetachShader(*program, vertex_shader);
-    glDetachShader(*program, fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-    if(checkGLError())
-        return;
-}
 
 uint8_t init_graphics(void)
 {
@@ -277,39 +211,39 @@ void destroy_graphics()
     glDeleteBuffers(1, &font_buffer);
 }
 
-void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)
-{
-    glUseProgram(sprite_program);
+/*void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)*/
+/*{*/
+    /*glUseProgram(sprite_program);*/
 
-    glEnableVertexAttribArray(sprite_vertex_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(sprite_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    checkGLError();
+    /*glEnableVertexAttribArray(sprite_vertex_attrib);*/
+    /*glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);*/
+    /*glVertexAttribPointer(sprite_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);*/
+    /*checkGLError();*/
 
-    glUniform4f(sprite_color_uniform, col.r, col.g, col.b, col.a);
-    glUniform2f(sprite_uv_dims_uniform, spr->animations[a_index].size_x, spr->animations[a_index].size_y / o_count);
-    glUniform2f(sprite_uv_offs_uniform, spr->animations[a_index].offset_x + (spr->animations[a_index].size_x * f_index), spr->animations[a_index].offset_y + (spr->animations[a_index].size_y * ((float)o_index / o_count)));
+    /*glUniform4f(sprite_color_uniform, col.r, col.g, col.b, col.a);*/
+    /*glUniform2f(sprite_uv_dims_uniform, spr->animations[a_index].size_x, spr->animations[a_index].size_y / o_count);*/
+    /*glUniform2f(sprite_uv_offs_uniform, spr->animations[a_index].offset_x + (spr->animations[a_index].size_x * f_index), spr->animations[a_index].offset_y + (spr->animations[a_index].size_y * ((float)o_index / o_count)));*/
 
-    mat4 tt = ident;
-    mat4 rt = ident;
-    mat4 st = ident;
-    translate(&tt, position_x + spr->animations[a_index].dimensions_x * 0.5 - spr->animations[a_index].origin_x, position_y + (spr->animations[a_index].dimensions_y / (float)o_count) * 0.5 - spr->animations[a_index].origin_y, 0);
-    rotate(&rt, rotation, 0);
-    scale(&st, scale_x * spr->animations[a_index].dimensions_x, scale_y * spr->animations[a_index].dimensions_y / o_count, 0);
-    mat4 transform = mul(mul(tt, rt), st);
-    mat4 final = mul(mul(camera, view), transform);
-    glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);
+    /*mat4 tt = ident;*/
+    /*mat4 rt = ident;*/
+    /*mat4 st = ident;*/
+    /*translate(&tt, position_x + spr->animations[a_index].dimensions_x * 0.5 - spr->animations[a_index].origin_x, position_y + (spr->animations[a_index].dimensions_y / (float)o_count) * 0.5 - spr->animations[a_index].origin_y, 0);*/
+    /*rotate(&rt, rotation, 0);*/
+    /*scale(&st, scale_x * spr->animations[a_index].dimensions_x, scale_y * spr->animations[a_index].dimensions_y / o_count, 0);*/
+    /*mat4 transform = mul(mul(tt, rt), st);*/
+    /*mat4 final = mul(mul(camera, view), transform);*/
+    /*glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);*/
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, spr->atlas->handle); // TODO: Use actual sprite
-    glUniform1i(sprite_texture_uniform, 0);
-    checkGLError();
+    /*glActiveTexture(GL_TEXTURE0);*/
+    /*glBindTexture(GL_TEXTURE_2D, spr->atlas->handle); // TODO: Use actual sprite*/
+    /*glUniform1i(sprite_texture_uniform, 0);*/
+    /*checkGLError();*/
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    checkGLError();
+    /*glDrawArrays(GL_TRIANGLES, 0, 6);*/
+    /*checkGLError();*/
 
-    glDisableVertexAttribArray(sprite_vertex_attrib);
-}
+    /*glDisableVertexAttribArray(sprite_vertex_attrib);*/
+/*}*/
 
 void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y)
 {

@@ -55,9 +55,9 @@ struct actordata
     uint8_t moving;
     uint8_t orientation;
     uint8_t flags;
-    int8_t animation_index;
-    uint8_t animation_playing;
-    float animation_timer;
+    //int8_t animation_index;
+    //uint8_t animation_playing;
+    //float animation_timer;
 
     sprite* sprites;
     uint32_t   sprites_id;

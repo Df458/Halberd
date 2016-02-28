@@ -1,5 +1,6 @@
 #include <dfgame-common.h>
 #include <dfgame-game.h>
+#include <dfgame-game-front.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -11,7 +12,6 @@
 #include "render_util.h"
 #include "settings.h"
 #include "ui.h"
-#include "game_input.h"
 
 void sizeCallback(GLFWwindow* win, int width, int height)
 {
@@ -76,12 +76,12 @@ int main(int argc, char** argv)
             update_player(delta);
         update_actors(delta);
         update_ui(delta);
-        update_input_states();
+        update_input_states(delta);
 
         render_game();
 
         glfwSwapBuffers(win);
-    } while(!get_quit_input());
+    } while(!glfwWindowShouldClose(win) && get_input_state(4) != 2);
 
     destroy_player_actor();
     destroy_actors();

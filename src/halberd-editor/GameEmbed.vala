@@ -1,6 +1,16 @@
 using Halberd;
 using Gtk;
 
+enum InputAction
+{
+    ACTION = 0,
+    CONFIRM,
+    CANCEL,
+    MENU,
+    QUIT,
+    ACTION_COUNT
+}
+
 public class GameEmbed : EmbeddableView
 {
     private bool should_continue = true;
@@ -49,40 +59,46 @@ public class GameEmbed : EmbeddableView
     public override bool key_down(Gdk.EventKey event)
     {
         if(event.keyval == up_key)
-            DF.Input.set_up_state(true);
+            DF.Input.set_axis(0, false, -1, false, false);
         if(event.keyval == down_key)
-            DF.Input.set_down_state(true);
+            DF.Input.set_axis(0, false, 1, false, false);
         if(event.keyval == left_key)
-            DF.Input.set_left_state(true);
+            DF.Input.set_axis(0, true, -1, false, false);
         if(event.keyval == right_key)
-            DF.Input.set_right_state(true);
+            DF.Input.set_axis(0, true, 1, false, false);
         if(event.keyval == action_key)
-            DF.Input.set_action_state(true);
+            DF.Input.set_state(InputAction.ACTION, true);
         if(event.keyval == confirm_key)
-            DF.Input.set_confirm_state(true);
+            DF.Input.set_state(InputAction.CONFIRM, true);
         if(event.keyval == cancel_key)
-            DF.Input.set_cancel_state(true);
+            DF.Input.set_state(InputAction.CANCEL, true);
         if(event.keyval == menu_key)
-            DF.Input.set_menu_state(true);
+            DF.Input.set_state(InputAction.MENU, true);
         if(event.keyval == quit_key)
-            DF.Input.set_quit_state(true);
+            DF.Input.set_state(InputAction.QUIT, true);
         return false;
     }
 
     public override bool key_up(Gdk.EventKey event)
     {
         if(event.keyval == up_key)
-            DF.Input.set_up_state(false);
+            DF.Input.set_axis(0, false, 1, false, false);
         if(event.keyval == down_key)
-            DF.Input.set_down_state(false);
+            DF.Input.set_axis(0, false, -1, false, false);
         if(event.keyval == left_key)
-            DF.Input.set_left_state(false);
+            DF.Input.set_axis(0, true, 1, false, false);
         if(event.keyval == right_key)
-            DF.Input.set_right_state(false);
+            DF.Input.set_axis(0, true, -1, false, false);
+        if(event.keyval == action_key)
+            DF.Input.set_state(InputAction.ACTION, false);
+        if(event.keyval == confirm_key)
+            DF.Input.set_state(InputAction.CONFIRM, false);
+        if(event.keyval == cancel_key)
+            DF.Input.set_state(InputAction.CANCEL, false);
         if(event.keyval == menu_key)
-            DF.Input.set_menu_state(false);
+            DF.Input.set_state(InputAction.MENU, false);
         if(event.keyval == quit_key)
-            DF.Input.set_quit_state(false);
+            DF.Input.set_state(InputAction.QUIT, false);
         return false;
     }
 
@@ -117,7 +133,7 @@ public class GameEmbed : EmbeddableView
         Game.Player.update(fdelta);
         Game.Actors.update(fdelta);
         Game.UI.update(fdelta);
-        DF.Input.update();
+        DF.Input.update(fdelta);
 
         viewport.queue_draw();
         return should_continue;

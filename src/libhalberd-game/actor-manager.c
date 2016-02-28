@@ -34,8 +34,8 @@ void update_actor(actor a, float delta)
         a->data.moving = 0;
     }
     if(a->data.moving) {
-        if(a->data.animation_index == 0) {
-            actor_set_anim_index(a, index_by_handle(a->data.sprites, "walk"));
+        if(sprite_get_current_index(a->data.sprites) == 0) {
+            sprite_set_animation_handle(a->data.sprites, "walk");
         }
         switch(a->data.orientation) {
             case 0:
@@ -96,39 +96,43 @@ void update_actor(actor a, float delta)
             a->data.position_y = a->data.grid_y * TILE_HEIGHT;
         }
     } else {
-        if(a->data.animation_index != 0) {
-            a->data.animation_index = 0;
-            a->data.animation_timer = 0;
-            actor_set_anim_index(a,  0);
-        }
+        /*if(a->data.animation_index != 0) {*/
+            /*a->data.animation_index = 0;*/
+            /*a->data.animation_timer = 0;*/
+            /*actor_set_anim_index(a,  0);*/
+        /*}*/
+        sprite_set_animation(a->data.sprites, 0);
     }
 
     // Update animation
-    if(a->data.animation_index == -1)
-        actor_set_anim_index(a,  0);
-    if(a->data.animation_playing)
-        a->data.animation_timer += delta * 10;
-    if((int)a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay >= a->data.sprites->animations[a->data.animation_index].length) {
-        if(a->data.sprites->animations[a->data.animation_index].loop){
-            a->data.animation_timer = 0;
-        }else{
-            a->data.animation_timer = (a->data.sprites->animations[a->data.animation_index].length - 1) * a->data.sprites->animations[a->data.animation_index].delay;
-            a->data.animation_playing = 0;
-        }
+    /*if(a->data.animation_index == -1)*/
+        /*actor_set_anim_index(a,  0);*/
+    /*if(a->data.animation_playing)*/
+        /*a->data.animation_timer += delta * 10;*/
+    /*if((int)a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay >= a->data.sprites->animations[a->data.animation_index].length) {*/
+        /*if(a->data.sprites->animations[a->data.animation_index].autoloop){*/
+            /*a->data.animation_timer = 0;*/
+        /*}else{*/
+            /*a->data.animation_timer = (a->data.sprites->animations[a->data.animation_index].length - 1) * a->data.sprites->animations[a->data.animation_index].delay;*/
+            /*a->data.animation_playing = 0;*/
+        /*}*/
+    /*}*/
+    if(!sprite_update(a->data.sprites, delta)) {
+        sprite_set_animation(a->data.sprites, 0);
     }
 }
 
-void actor_set_anim_index(actor a, int8_t index)
-{
-    if(!a || a->data.animation_index == index)
-        return;
-    if(index < 0 || index > a->data.sprites->animation_count)
-        index = 0;
-    // TODO: Set the animation
-    a->data.animation_index = index;
-    a->data.animation_timer = 0;
-    a->data.animation_playing = a->data.sprites->animations[index].play;
-}
+/*void actor_set_anim_index(actor a, int8_t index)*/
+/*{*/
+    /*if(!a || a->data.animation_index == index)*/
+        /*return;*/
+    /*if(index < 0 || index > a->data.sprites->animation_count)*/
+        /*index = 0;*/
+    /*// TODO: Set the animation*/
+    /*a->data.animation_index = index;*/
+    /*a->data.animation_timer = 0;*/
+    /*a->data.animation_playing = a->data.sprites->animations[index].autoplay;*/
+/*}*/
 
 void update_actors(float delta)
 {
@@ -140,13 +144,14 @@ void draw_actor(actor a)
 {
     if(!(a->data.flags & FLAG_VISIBLE))
         return;
-    struct color col;
-    col.r = 1;
-    col.g = 1;
-    col.b = 1;
-    col.a = 1;
+    /*struct color col;*/
+    /*col.r = 1;*/
+    /*col.g = 1;*/
+    /*col.b = 1;*/
+    /*col.a = 1;*/
 
-    draw_sprite(a->data.sprites, a->data.animation_index, a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay, a->data.orientation, actor_orients(a), a->data.position_x + a->data.super_grid_x * TILE_WIDTH * TILEMAP_DIMS, a->data.position_y + a->data.super_grid_y * TILE_HEIGHT * TILEMAP_DIMS, 0, 1, 1, col);
+    /*draw_sprite(a->data.sprites, a->data.animation_index, a->data.animation_timer / a->data.sprites->animations[a->data.animation_index].delay, a->data.orientation, actor_orients(a), a->data.position_x + a->data.super_grid_x * TILE_WIDTH * TILEMAP_DIMS, a->data.position_y + a->data.super_grid_y * TILE_HEIGHT * TILEMAP_DIMS, 0, 1, 1, col);*/
+    // TODO: Implement proper drawing for actors using sprite_draw()
 }
 
 void draw_actors()
