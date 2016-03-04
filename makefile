@@ -31,7 +31,7 @@ LIBEDITOROBJS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(LIBEDITORSRCS))
 COMMONOBJS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.o,$(COMMONSRCS))
 
 GAMEDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(GAMESRCS))
-EDITORDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(EDITORSRCS))
+# EDITORDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(EDITORSRCS))
 LIBGAMEDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(LIBGAMESRCS))
 LIBEDITORDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(LIBEDITORSRCS))
 COMMONDEPS:=$(patsubst $(SRCPATH)%.c,$(OBJPATH)%.depend,$(COMMONSRCS))
@@ -140,7 +140,7 @@ $(GAMETARGET): $(LIBGAMETARGET) $(GAMEDEPS) $(GAMESRCS) $(GAMEOBJS)
 	@echo -e "Build Complete"
 
 # $(EDITORSRCS) compiles the files. This should be changed.
-$(EDITORTARGET): $(LIBEDITORTARGET) $(EDITORSRCS) $(LIBGAMETARGET)
+$(EDITORTARGET): $(LIBEDITORTARGET) $(LIBGAMETARGET)
 	@echo -e "Building \e[1;35m$@\e[0m..."
 	$(VALAC) $(VFLAGS) $(EDITORSRCS) $(VLIBS)
 	mv *.o $(OBJPATH)/$(EDITORTARGET)

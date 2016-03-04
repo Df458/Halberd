@@ -53,7 +53,6 @@ GLuint box_scale_inner_uniform = 0;
 GLuint box_scale_full_uniform = 0;
 GLuint box_transform_uniform = 0;
 
-GLuint quad_buffer = 0;
 GLuint box_buffer = 0;
 GLuint box_s_buffer = 0;
 GLuint blank_texture = 0;
@@ -71,6 +70,9 @@ int16_t loaded_boxes;
 
 uint8_t init_graphics(void)
 {
+    if(!init_renderer())
+        return 0;
+
     glClearColor(.6, .6, .6, 1);
 
     create_program(&sprite_program, SPRITE_VERTEX_SHADER, SPRITE_FRAGMENT_SHADER);
@@ -130,12 +132,6 @@ uint8_t init_graphics(void)
     /*loaded_boxes = load_boxes("boxes.xml", &boxes);*/
     /*if(loaded_boxes == -1)*/
         /*return 0;*/
-
-    glGenBuffers(1, &quad_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-	glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), QUAD_BUFFER_DATA, GL_STATIC_DRAW);
-    if(checkGLError())
-        return 0;
 
     glGenBuffers(1, &box_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, box_buffer);
@@ -202,48 +198,15 @@ void destroy_graphics()
     glDeleteProgram(single_tile_program);
     glDeleteProgram(box_program);
 
-    glDeleteBuffers(1, &quad_buffer);
     glDeleteBuffers(1, &box_buffer);
     glDeleteBuffers(1, &box_s_buffer);
     glDeleteTextures(1, &blank_texture);
     glDeleteBuffers(1, &tile_position_buffer);
     glDeleteBuffers(1, &font_position_buffer);
     glDeleteBuffers(1, &font_buffer);
+
+    cleanup_renderer();
 }
-
-/*void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index, uint8_t o_count, float position_x, float position_y, float rotation, float scale_x, float scale_y, color col)*/
-/*{*/
-    /*glUseProgram(sprite_program);*/
-
-    /*glEnableVertexAttribArray(sprite_vertex_attrib);*/
-    /*glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);*/
-    /*glVertexAttribPointer(sprite_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);*/
-    /*checkGLError();*/
-
-    /*glUniform4f(sprite_color_uniform, col.r, col.g, col.b, col.a);*/
-    /*glUniform2f(sprite_uv_dims_uniform, spr->animations[a_index].size_x, spr->animations[a_index].size_y / o_count);*/
-    /*glUniform2f(sprite_uv_offs_uniform, spr->animations[a_index].offset_x + (spr->animations[a_index].size_x * f_index), spr->animations[a_index].offset_y + (spr->animations[a_index].size_y * ((float)o_index / o_count)));*/
-
-    /*mat4 tt = ident;*/
-    /*mat4 rt = ident;*/
-    /*mat4 st = ident;*/
-    /*translate(&tt, position_x + spr->animations[a_index].dimensions_x * 0.5 - spr->animations[a_index].origin_x, position_y + (spr->animations[a_index].dimensions_y / (float)o_count) * 0.5 - spr->animations[a_index].origin_y, 0);*/
-    /*rotate(&rt, rotation, 0);*/
-    /*scale(&st, scale_x * spr->animations[a_index].dimensions_x, scale_y * spr->animations[a_index].dimensions_y / o_count, 0);*/
-    /*mat4 transform = mul(mul(tt, rt), st);*/
-    /*mat4 final = mul(mul(camera, view), transform);*/
-    /*glUniformMatrix4fv(sprite_transform_uniform, 1, GL_FALSE, final.data);*/
-
-    /*glActiveTexture(GL_TEXTURE0);*/
-    /*glBindTexture(GL_TEXTURE_2D, spr->atlas->handle); // TODO: Use actual sprite*/
-    /*glUniform1i(sprite_texture_uniform, 0);*/
-    /*checkGLError();*/
-
-    /*glDrawArrays(GL_TRIANGLES, 0, 6);*/
-    /*checkGLError();*/
-
-    /*glDisableVertexAttribArray(sprite_vertex_attrib);*/
-/*}*/
 
 void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y)
 {
@@ -252,8 +215,8 @@ void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffe
     const tileset_data* data = tile_settings();
 
     glEnableVertexAttribArray(tile_vertex_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, get_quad_buffer());
+    glVertexAttribPointer(tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     checkGLError();
 
     glEnableVertexAttribArray(tile_position_attrib);
@@ -302,8 +265,8 @@ void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat
     const tileset_data* data = tile_settings();
 
     glEnableVertexAttribArray(single_tile_vertex_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(single_tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, get_quad_buffer());
+    glVertexAttribPointer(single_tile_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     checkGLError();
 
     glActiveTexture(GL_TEXTURE0);
@@ -376,8 +339,8 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
     glUseProgram(font_program);
 
     glEnableVertexAttribArray(font_vertex_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-    glVertexAttribPointer(font_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, get_quad_buffer());
+    glVertexAttribPointer(font_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     checkGLError();
 
      float pos[char_count * 3];

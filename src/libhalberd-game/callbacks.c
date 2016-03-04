@@ -44,7 +44,7 @@ int lua_animation_play(lua_State* state)
     actor* actor = lua_touserdata(state, -1);
     lua_pop(state, 1);
 
-    (*actor)->data.animation_playing = 1;
+    sprite_set_playing((*actor)->data.sprites, true);
 
     return 0;
 }
