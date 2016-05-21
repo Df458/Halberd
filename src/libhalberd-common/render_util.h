@@ -163,18 +163,6 @@ static const char* BOX_FRAGMENT_SHADER[] =
 "discard;\n"
 "}"};
 
-//static const float QUAD_BUFFER_DATA[] =
-//{
-//// Vertex positon/uv
-//0.5, -0.5, 0,
-//-0.5, -0.5, 0,
-//-0.5, 0.5, 0,
-
-//0.5, -0.5, 0,
-//-0.5, 0.5, 0,
-//0.5, 0.5, 0,
-//};
-
 static const float BOX_S_BUFFER_DATA[] =
 {
 //ul
@@ -361,7 +349,6 @@ void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, f
 void update_camera(float w, float h);
 void update_view(float x, float y, float zoom);
 mat4 get_camera();
-mat4 get_view();
 void get_viewport_dimensions(uint16_t* w, uint16_t* h);
 
 #endif

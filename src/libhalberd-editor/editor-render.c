@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-GLuint grid_program = 0;
+program grid_program;
 GLuint grid_position_attrib = 0;
 GLuint grid_vertex_attrib = 0;
 GLuint grid_horizontal_attrib = 0;
@@ -59,14 +59,14 @@ bool render_editor()
         tile_w = 1;
     if(tile_h == 0)
         tile_h = 1;
-    translate(&cursor_pos, c.selected_tile_x * TILE_WIDTH + (c.selected_map % 3 * TILEMAP_DIMS * TILE_WIDTH), c.selected_tile_y * TILE_HEIGHT + (c.selected_map / 3 * TILEMAP_DIMS * TILE_HEIGHT), 0);
+    mat4_translate(&cursor_pos, c.selected_tile_x * TILE_WIDTH + (c.selected_map % 3 * TILEMAP_DIMS * TILE_WIDTH), c.selected_tile_y * TILE_HEIGHT + (c.selected_map / 3 * TILEMAP_DIMS * TILE_HEIGHT), 0);
     draw_maps(t);
     if(can_place) {
         draw_single_tile(get_tileset_texture(), c.set_id, c.current_id, cursor_pos);
     }
     for(int i = 0; i < 3; ++i)
         for(int j = 0; j < 3; ++j) {
-            translate(&t, TILEMAP_DIMS * TILE_WIDTH * i, TILEMAP_DIMS * TILE_HEIGHT * j, 0);
+            mat4_translate(&t, TILEMAP_DIMS * TILE_WIDTH * i, TILEMAP_DIMS * TILE_HEIGHT * j, 0);
             draw_grid(t);
         }
     
@@ -85,15 +85,15 @@ void destroy_render()
 
 bool init_grid()
 {
-    create_program(&grid_program, GRID_VERTEX_SHADER, GRID_FRAGMENT_SHADER);
-    grid_position_attrib = glGetAttribLocation(grid_program, "position");
-    grid_horizontal_attrib = glGetAttribLocation(grid_program, "horizontal");
-    grid_vertex_attrib = glGetAttribLocation(grid_program, "vertex_pos");
-    grid_transform_uniform = glGetUniformLocation(grid_program, "transform");
-    grid_texture_uniform = glGetUniformLocation(grid_program, "texture");
-    grid_color_uniform = glGetUniformLocation(grid_program, "color");
-    if(checkGLError())
-        return false;
+    grid_program = create_program(GRID_VERTEX_SHADER, GRID_FRAGMENT_SHADER);
+    /* grid_position_attrib = glGetAttribLocation(grid_program, "position"); */
+    /* grid_horizontal_attrib = glGetAttribLocation(grid_program, "horizontal"); */
+    /* grid_vertex_attrib = glGetAttribLocation(grid_program, "vertex_pos"); */
+    /* grid_transform_uniform = glGetUniformLocation(grid_program, "transform"); */
+    /* grid_texture_uniform = glGetUniformLocation(grid_program, "texture"); */
+    /* grid_color_uniform = glGetUniformLocation(grid_program, "color"); */
+    /* if(checkGLError()) */
+    /*     return false; */
 
     glGenBuffers(1, &grid_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, grid_buffer);
@@ -145,7 +145,7 @@ bool init_grid()
 
 void draw_grid(mat4 transform)
 {
-    glUseProgram(grid_program);
+    glUseProgram(grid_program.handle);
 
     glEnableVertexAttribArray(grid_vertex_attrib);
     glBindBuffer(GL_ARRAY_BUFFER, grid_buffer);
@@ -166,11 +166,9 @@ void draw_grid(mat4 transform)
     checkGLError();
 
     mat4 tt = ident;
-    translate(&tt, 0, 0, -10);
+    mat4_translate(&tt, 0, 0, -10);
     mat4 camera = get_camera();
-    mat4 view = get_view();
-    mat4 final = mul(mul(camera, view), mul(transform, tt));
-    glUniformMatrix4fv(grid_transform_uniform, 1, GL_FALSE, final.data);
+    glUniformMatrix4fv(grid_transform_uniform, 1, GL_FALSE, camera.data);
 
     glVertexAttribDivisor(grid_vertex_attrib, 0);
     glVertexAttribDivisor(grid_position_attrib, 1);

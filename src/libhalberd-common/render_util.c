@@ -11,11 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 
-GLuint sprite_program = 0;
-GLuint tile_program = 0;
-GLuint font_program = 0;
-GLuint single_tile_program = 0;
-GLuint box_program = 0;
+program sprite_program;
+program tile_program;
+program font_program;
+program single_tile_program;
+program box_program;
 GLuint sprite_texture_uniform = 0;
 GLuint sprite_vertex_attrib = 0;
 GLuint sprite_color_uniform = 0;
@@ -60,8 +60,7 @@ GLuint tile_position_buffer = 0;
 GLuint font_position_buffer = 0;
 GLuint font_buffer = 0;
 
-mat4 camera = ident;
-mat4 view = ident;
+camera* viewport_camera = 0;
 uint16_t view_width = 0;
 uint16_t view_height = 0;
 
@@ -75,58 +74,58 @@ uint8_t init_graphics(void)
 
     glClearColor(.6, .6, .6, 1);
 
-    create_program(&sprite_program, SPRITE_VERTEX_SHADER, SPRITE_FRAGMENT_SHADER);
-    create_program(&tile_program, TILE_VERTEX_SHADER, TILE_FRAGMENT_SHADER);
-    create_program(&font_program, FONT_VERTEX_SHADER, FONT_FRAGMENT_SHADER);
-    create_program(&single_tile_program, SINGLE_TILE_VERTEX_SHADER, TILE_FRAGMENT_SHADER);
-    create_program(&box_program, BOX_VERTEX_SHADER, BOX_FRAGMENT_SHADER);
+    sprite_program      = create_program(SPRITE_VERTEX_SHADER,       SPRITE_FRAGMENT_SHADER);
+    tile_program        = create_program(TILE_VERTEX_SHADER,         TILE_FRAGMENT_SHADER);
+    font_program        = create_program(FONT_VERTEX_SHADER,         FONT_FRAGMENT_SHADER);
+    single_tile_program = create_program(SINGLE_TILE_VERTEX_SHADER,  TILE_FRAGMENT_SHADER);
+    box_program         = create_program(BOX_VERTEX_SHADER,          BOX_FRAGMENT_SHADER);
 
-    sprite_color_uniform = glGetUniformLocation(sprite_program, "color");
-    sprite_uv_offs_uniform = glGetUniformLocation(sprite_program, "uv_offset");
-    sprite_uv_dims_uniform = glGetUniformLocation(sprite_program, "uv_dimensions");
-    sprite_texture_uniform = glGetUniformLocation(sprite_program, "texture");
-    sprite_transform_uniform = glGetUniformLocation(sprite_program, "transform");
-    sprite_vertex_attrib = glGetAttribLocation(sprite_program, "vertex_pos");
-    if(checkGLError())
-        return 0;
+    /* sprite_color_uniform = glGetUniformLocation(sprite_program, "color"); */
+    /* sprite_uv_offs_uniform = glGetUniformLocation(sprite_program, "uv_offset"); */
+    /* sprite_uv_dims_uniform = glGetUniformLocation(sprite_program, "uv_dimensions"); */
+    /* sprite_texture_uniform = glGetUniformLocation(sprite_program, "texture"); */
+    /* sprite_transform_uniform = glGetUniformLocation(sprite_program, "transform"); */
+    /* sprite_vertex_attrib = glGetAttribLocation(sprite_program, "vertex_pos"); */
+    /* if(checkGLError()) */
+    /*     return 0; */
 
-    tile_transform_uniform = glGetUniformLocation(tile_program, "transform");
-    tile_texture_uniform = glGetUniformLocation(tile_program, "texture");
-    tile_vertex_attrib = glGetAttribLocation(tile_program, "vertex_pos");
-    tile_position_attrib = glGetAttribLocation(tile_program, "position");
-    tile_id_attrib = glGetAttribLocation(tile_program, "id_in");
-    tile_tid_attrib = glGetAttribLocation(tile_program, "tid_in");
-    tile_color_uniform = glGetUniformLocation(tile_program, "color");
-    if(checkGLError())
-        return 0;
+    /* tile_transform_uniform = glGetUniformLocation(tile_program, "transform"); */
+    /* tile_texture_uniform = glGetUniformLocation(tile_program, "texture"); */
+    /* tile_vertex_attrib = glGetAttribLocation(tile_program, "vertex_pos"); */
+    /* tile_position_attrib = glGetAttribLocation(tile_program, "position"); */
+    /* tile_id_attrib = glGetAttribLocation(tile_program, "id_in"); */
+    /* tile_tid_attrib = glGetAttribLocation(tile_program, "tid_in"); */
+    /* tile_color_uniform = glGetUniformLocation(tile_program, "color"); */
+    /* if(checkGLError()) */
+    /*     return 0; */
 
-    font_transform_uniform = glGetUniformLocation(tile_program, "transform");
-    font_texture_uniform = glGetUniformLocation(tile_program, "texture");
-    font_vertex_attrib = glGetAttribLocation(tile_program, "vertex_pos");
-    font_position_attrib = glGetAttribLocation(tile_program, "position");
-    font_id_attrib = glGetAttribLocation(tile_program, "id_in");
-    font_color_uniform = glGetUniformLocation(tile_program, "color");
-    if(checkGLError())
-        return 0;
+    /* font_transform_uniform = glGetUniformLocation(tile_program, "transform"); */
+    /* font_texture_uniform = glGetUniformLocation(tile_program, "texture"); */
+    /* font_vertex_attrib = glGetAttribLocation(tile_program, "vertex_pos"); */
+    /* font_position_attrib = glGetAttribLocation(tile_program, "position"); */
+    /* font_id_attrib = glGetAttribLocation(tile_program, "id_in"); */
+    /* font_color_uniform = glGetUniformLocation(tile_program, "color"); */
+    /* if(checkGLError()) */
+    /*     return 0; */
 
-    single_tile_transform_uniform = glGetUniformLocation(single_tile_program, "transform");
-    single_tile_texture_uniform = glGetUniformLocation(single_tile_program, "texture");
-    single_tile_vertex_attrib = glGetAttribLocation(single_tile_program, "vertex_pos");
-    single_tile_id_uniform = glGetUniformLocation(single_tile_program, "id_in");
-    single_tile_tid_uniform = glGetUniformLocation(single_tile_program, "tid_in");
-    single_tile_color_uniform = glGetUniformLocation(single_tile_program, "color");
-    if(checkGLError())
-        return 0;
+    /* single_tile_transform_uniform = glGetUniformLocation(single_tile_program, "transform"); */
+    /* single_tile_texture_uniform = glGetUniformLocation(single_tile_program, "texture"); */
+    /* single_tile_vertex_attrib = glGetAttribLocation(single_tile_program, "vertex_pos"); */
+    /* single_tile_id_uniform = glGetUniformLocation(single_tile_program, "id_in"); */
+    /* single_tile_tid_uniform = glGetUniformLocation(single_tile_program, "tid_in"); */
+    /* single_tile_color_uniform = glGetUniformLocation(single_tile_program, "color"); */
+    /* if(checkGLError()) */
+    /*     return 0; */
 
-    box_vertex_attrib = glGetAttribLocation(box_program, "vertex_pos");
-    box_uv_attrib = glGetAttribLocation(box_program, "vertex_uv");
-    box_outer_attrib = glGetAttribLocation(box_program, "vertex_rim");
-    box_texture_uniform = glGetUniformLocation(box_program, "texture");
-    box_scale_inner_uniform = glGetUniformLocation(box_program, "scale_inner");
-    box_scale_full_uniform = glGetUniformLocation(box_program, "scale_full");
-    box_transform_uniform = glGetUniformLocation(box_program, "transform");
-    if(checkGLError())
-        return 0;
+    /* box_vertex_attrib = glGetAttribLocation(box_program, "vertex_pos"); */
+    /* box_uv_attrib = glGetAttribLocation(box_program, "vertex_uv"); */
+    /* box_outer_attrib = glGetAttribLocation(box_program, "vertex_rim"); */
+    /* box_texture_uniform = glGetUniformLocation(box_program, "texture"); */
+    /* box_scale_inner_uniform = glGetUniformLocation(box_program, "scale_inner"); */
+    /* box_scale_full_uniform = glGetUniformLocation(box_program, "scale_full"); */
+    /* box_transform_uniform = glGetUniformLocation(box_program, "transform"); */
+    /* if(checkGLError()) */
+    /*     return 0; */
 
     // TODO: Move this to a separate box loading bit, maybe in game?
     /*loaded_boxes = load_boxes("boxes.xml", &boxes);*/
@@ -178,7 +177,8 @@ uint8_t init_graphics(void)
     if(checkGLError())
         return 0;
 
-    camera = ortho(0, 800, 600, 0, -100, 100);
+    viewport_camera = create_camera_2D();
+    camera_ortho(viewport_camera, 0, 800, 600, 0, -100, 100);
 
     return 1;
 }
@@ -192,11 +192,11 @@ void destroy_graphics()
     if(boxes)
         free(boxes);
 
-    glDeleteProgram(sprite_program);
-    glDeleteProgram(tile_program);
-    glDeleteProgram(font_program);
-    glDeleteProgram(single_tile_program);
-    glDeleteProgram(box_program);
+    delete_program(&sprite_program);
+    delete_program(&tile_program);
+    delete_program(&font_program);
+    delete_program(&single_tile_program);
+    delete_program(&box_program);
 
     glDeleteBuffers(1, &box_buffer);
     glDeleteBuffers(1, &box_s_buffer);
@@ -210,7 +210,7 @@ void destroy_graphics()
 
 void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y)
 {
-    glUseProgram(tile_program);
+    glUseProgram(tile_program.handle);
 
     const tileset_data* data = tile_settings();
 
@@ -239,9 +239,9 @@ void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffe
 
     mat4 st = ident;
     mat4 tt = ident;
-    translate(&tt, data->width * 0.5f + (TILEMAP_DIMS * data->width * x), data->height * 0.5f + (TILEMAP_DIMS * data->height * y), 0);
-    scale(&st, data->width, data->height, 0);
-    mat4 final = mul(mul(camera, view), mul(mul(transform, tt), st));
+    mat4_translate(&tt, data->width * 0.5f + (TILEMAP_DIMS * data->width * x), data->height * 0.5f + (TILEMAP_DIMS * data->height * y), 0);
+    mat4_scale(&st, data->width, data->height, 0);
+    mat4 final = mat4_mul(camera_get_matrix(viewport_camera), mat4_mul(mat4_mul(transform, tt), st));
     glUniformMatrix4fv(tile_transform_uniform, 1, GL_FALSE, final.data);
 
     glVertexAttribDivisor(tile_vertex_attrib, 0);
@@ -260,7 +260,7 @@ void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffe
 
 void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat4 transform)
 {
-    glUseProgram(single_tile_program);
+    glUseProgram(single_tile_program.handle);
 
     const tileset_data* data = tile_settings();
 
@@ -278,9 +278,9 @@ void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat
 
     mat4 st = ident;
     mat4 tt = ident;
-    translate(&tt, data->width * 0.5f, data->height * 0.5f, 0);
-    scale(&st, data->width, data->height, 0);
-    mat4 final = mul(mul(camera, view), mul(mul(transform, tt), st));
+    mat4_translate(&tt, data->width * 0.5f, data->height * 0.5f, 0);
+    mat4_scale(&st, data->width, data->height, 0);
+    mat4 final = mat4_mul(camera_get_matrix(viewport_camera), mat4_mul(mat4_mul(transform, tt), st));
     glUniformMatrix4fv(single_tile_transform_uniform, 1, GL_FALSE, final.data);
     glUniform1i(single_tile_id_uniform, tile_id);
     glUniform1i(single_tile_tid_uniform, tileset_id);
@@ -297,7 +297,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     if(id >= loaded_boxes)
         return;
     ui_box frame = boxes[id];
-    glUseProgram(box_program);
+    glUseProgram(box_program.handle);
 
     glEnableVertexAttribArray(box_vertex_attrib);
     glBindBuffer(GL_ARRAY_BUFFER, box_buffer);
@@ -310,15 +310,13 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     glVertexAttribPointer(box_uv_attrib, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
     checkGLError();
 
-    /*glUniform4f(box_color_uniform, col.r, col.g, col.b, col.a);*/
     glUniform3f(box_scale_inner_uniform, w, h, 1);
     glUniform3f(box_scale_full_uniform, w + frame.border_w * 2, h + frame.border_h * 2, 1);
     checkGLError();
 
     mat4 tt = ident;
-    translate(&tt, x + (w * 0.5) + frame.border_w, y + (h * 0.5) + frame.border_h, 0);
-    /*scale(&tt, 100, 100, 0);*/
-    mat4 final = mul(camera, tt);
+    mat4_translate(&tt, x + (w * 0.5) + frame.border_w, y + (h * 0.5) + frame.border_h, 0);
+    mat4 final = mat4_mul(camera_get_projection(viewport_camera), tt);
     glUniformMatrix4fv(box_transform_uniform, 1, GL_FALSE, final.data);
     checkGLError();
 
@@ -336,7 +334,7 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
 void draw_text(font* font, const char* text, float x, float y, uint16_t char_count)
 {
     glDisable(GL_DEPTH_TEST);
-    glUseProgram(font_program);
+    glUseProgram(font_program.handle);
 
     glEnableVertexAttribArray(font_vertex_attrib);
     glBindBuffer(GL_ARRAY_BUFFER, get_quad_buffer());
@@ -380,9 +378,9 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
 
     mat4 st = ident;
     mat4 tt = ident;
-    translate(&tt, font->glyph_width * 0.5f + x, font->glyph_height * 0.5f + y, 0);
-    scale(&st, font->glyph_width, font->glyph_height, 0);
-    mat4 final = mul(camera, mul(tt, st));
+    mat4_translate(&tt, font->glyph_width * 0.5f + x, font->glyph_height * 0.5f + y, 0);
+    mat4_scale(&st, font->glyph_width, font->glyph_height, 0);
+    mat4 final = mat4_mul(camera_get_projection(viewport_camera), mat4_mul(tt, st));
     glUniformMatrix4fv(font_transform_uniform, 1, GL_FALSE, final.data);
 
     glVertexAttribDivisor(font_vertex_attrib, 0);
@@ -409,26 +407,20 @@ void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, f
 
 void update_camera(float w, float h)
 {
-    camera = ortho(0, w, h, 0, -100, 100);
+    camera_ortho(viewport_camera, 0, w, h, 0, -100, 100);
     view_width = w;
     view_height = h;
 }
 
 mat4 get_camera()
 {
-    return camera;
+    return camera_get_matrix(viewport_camera);
 }
 
 void update_view(float x, float y, float zoom)
 {
-    mat_reset(&view);
-    translate(&view, -x, -y, 0);
-    scale(&view, zoom, zoom, 1);
-}
-
-mat4 get_view()
-{
-    return view;
+    camera_set_position(viewport_camera, x, y, false);
+    camera_set_scale(viewport_camera, zoom, zoom, false);
 }
 
 void get_viewport_dimensions(uint16_t* w, uint16_t* h)
