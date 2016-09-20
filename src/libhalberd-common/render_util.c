@@ -13,7 +13,7 @@
 
 program sprite_program;
 program tile_program;
-program font_program;
+program spritefont_program;
 program single_tile_program;
 program box_program;
 GLuint sprite_texture_uniform = 0;
@@ -38,12 +38,12 @@ GLuint single_tile_id_uniform = 0;
 GLuint single_tile_tid_uniform = 0;
 GLuint single_tile_color_uniform = 0;
 
-GLuint font_vertex_attrib = 0;
-GLuint font_texture_uniform = 0;
-GLuint font_transform_uniform = 0;
-GLuint font_position_attrib = 0;
-GLuint font_id_attrib = 0;
-GLuint font_color_uniform = 0;
+GLuint spritefont_vertex_attrib = 0;
+GLuint spritefont_texture_uniform = 0;
+GLuint spritefont_transform_uniform = 0;
+GLuint spritefont_position_attrib = 0;
+GLuint spritefont_id_attrib = 0;
+GLuint spritefont_color_uniform = 0;
 
 GLuint box_vertex_attrib = 0;
 GLuint box_uv_attrib = 0;
@@ -57,8 +57,8 @@ GLuint box_buffer = 0;
 GLuint box_s_buffer = 0;
 GLuint blank_texture = 0;
 GLuint tile_position_buffer = 0;
-GLuint font_position_buffer = 0;
-GLuint font_buffer = 0;
+GLuint spritefont_position_buffer = 0;
+GLuint spritefont_buffer = 0;
 
 camera* viewport_camera = 0;
 uint16_t view_width = 0;
@@ -76,7 +76,7 @@ uint8_t init_graphics(void)
 
     sprite_program      = create_program(SPRITE_VERTEX_SHADER,       SPRITE_FRAGMENT_SHADER);
     tile_program        = create_program(TILE_VERTEX_SHADER,         TILE_FRAGMENT_SHADER);
-    font_program        = create_program(FONT_VERTEX_SHADER,         FONT_FRAGMENT_SHADER);
+    spritefont_program  = create_program(SPRITEFONT_VERTEX_SHADER,   SPRITEFONT_FRAGMENT_SHADER);
     single_tile_program = create_program(SINGLE_TILE_VERTEX_SHADER,  TILE_FRAGMENT_SHADER);
     box_program         = create_program(BOX_VERTEX_SHADER,          BOX_FRAGMENT_SHADER);
 
@@ -159,12 +159,12 @@ uint8_t init_graphics(void)
     if(checkGLError())
         return 0;
 
-    glGenBuffers(1, &font_position_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, font_position_buffer);
+    glGenBuffers(1, &spritefont_position_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_position_buffer);
     if(checkGLError())
         return 0;
-    glGenBuffers(1, &font_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, font_buffer);
+    glGenBuffers(1, &spritefont_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_buffer);
     if(checkGLError())
         return 0;
 
@@ -194,7 +194,7 @@ void destroy_graphics()
 
     delete_program(&sprite_program);
     delete_program(&tile_program);
-    delete_program(&font_program);
+    delete_program(&spritefont_program);
     delete_program(&single_tile_program);
     delete_program(&box_program);
 
@@ -202,8 +202,8 @@ void destroy_graphics()
     glDeleteBuffers(1, &box_s_buffer);
     glDeleteTextures(1, &blank_texture);
     glDeleteBuffers(1, &tile_position_buffer);
-    glDeleteBuffers(1, &font_position_buffer);
-    glDeleteBuffers(1, &font_buffer);
+    glDeleteBuffers(1, &spritefont_position_buffer);
+    glDeleteBuffers(1, &spritefont_buffer);
 
     cleanup_renderer();
 }
@@ -331,14 +331,14 @@ void draw_box(uint16_t id, float x, float y, float w, float h)
     glEnable(GL_DEPTH_TEST);
 }
 
-void draw_text(font* font, const char* text, float x, float y, uint16_t char_count)
+void draw_text(spritefont* spritefont, const char* text, float x, float y, uint16_t char_count)
 {
     glDisable(GL_DEPTH_TEST);
-    glUseProgram(font_program.handle);
+    glUseProgram(spritefont_program.handle);
 
-    glEnableVertexAttribArray(font_vertex_attrib);
+    glEnableVertexAttribArray(spritefont_vertex_attrib);
     glBindBuffer(GL_ARRAY_BUFFER, get_quad_buffer());
-    glVertexAttribPointer(font_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(spritefont_vertex_attrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     checkGLError();
 
      float pos[char_count * 3];
@@ -358,51 +358,51 @@ void draw_text(font* font, const char* text, float x, float y, uint16_t char_cou
         }
      }
 
-    
-    glBindBuffer(GL_ARRAY_BUFFER, font_position_buffer);
-	glBufferData(GL_ARRAY_BUFFER, char_count * 3 * sizeof(float), pos, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, font_buffer);
-	glBufferData(GL_ARRAY_BUFFER, char_count * sizeof(GLuint), ids, GL_STREAM_DRAW);
-    glEnableVertexAttribArray(font_position_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, font_position_buffer);
-    glVertexAttribPointer(font_position_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glEnableVertexAttribArray(font_id_attrib);
-    glBindBuffer(GL_ARRAY_BUFFER, font_buffer);
-    glVertexAttribIPointer(font_id_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_position_buffer);
+	glBufferData(GL_ARRAY_BUFFER, char_count * 3 * sizeof(float), pos, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_buffer);
+	glBufferData(GL_ARRAY_BUFFER, char_count * sizeof(GLuint), ids, GL_STREAM_DRAW);
+    glEnableVertexAttribArray(spritefont_position_attrib);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_position_buffer);
+    glVertexAttribPointer(spritefont_position_attrib, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glEnableVertexAttribArray(spritefont_id_attrib);
+    glBindBuffer(GL_ARRAY_BUFFER, spritefont_buffer);
+    glVertexAttribIPointer(spritefont_id_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font->texture_data->handle);
-    glUniform1i(font_texture_uniform, 0);
+    glBindTexture(GL_TEXTURE_2D, spritefont->texture_data->handle);
+    glUniform1i(spritefont_texture_uniform, 0);
     checkGLError();
 
     mat4 st = ident;
     mat4 tt = ident;
-    mat4_translate(&tt, font->glyph_width * 0.5f + x, font->glyph_height * 0.5f + y, 0);
-    mat4_scale(&st, font->glyph_width, font->glyph_height, 0);
+    mat4_translate(&tt, spritefont->glyph_width * 0.5f + x, spritefont->glyph_height * 0.5f + y, 0);
+    mat4_scale(&st, spritefont->glyph_width, spritefont->glyph_height, 0);
     mat4 final = mat4_mul(camera_get_projection(viewport_camera), mat4_mul(tt, st));
-    glUniformMatrix4fv(font_transform_uniform, 1, GL_FALSE, final.data);
+    glUniformMatrix4fv(spritefont_transform_uniform, 1, GL_FALSE, final.data);
 
-    glVertexAttribDivisor(font_vertex_attrib, 0);
-    glVertexAttribDivisor(font_position_attrib, 1);
-    glVertexAttribDivisor(font_id_attrib, 1);
+    glVertexAttribDivisor(spritefont_vertex_attrib, 0);
+    glVertexAttribDivisor(spritefont_position_attrib, 1);
+    glVertexAttribDivisor(spritefont_id_attrib, 1);
     checkGLError();
 
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, char_count);
 
-    glDisableVertexAttribArray(font_vertex_attrib);
-    glVertexAttribDivisor(font_position_attrib, 0);
-    glVertexAttribDivisor(font_id_attrib, 0);
+    glDisableVertexAttribArray(spritefont_vertex_attrib);
+    glVertexAttribDivisor(spritefont_position_attrib, 0);
+    glVertexAttribDivisor(spritefont_id_attrib, 0);
     glEnable(GL_DEPTH_TEST);
 }
 
-void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count)
+void draw_textbox(spritefont* spritefont, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count)
 {
     if(id >= loaded_boxes)
         return;
     ui_box frame = boxes[id];
     draw_box(id, x, y, w, h);
-    draw_text(font, text, x + frame.border_w, y + frame.border_h, char_count);
+    draw_text(spritefont, text, x + frame.border_w, y + frame.border_h, char_count);
 }
 
 void update_camera(float w, float h)

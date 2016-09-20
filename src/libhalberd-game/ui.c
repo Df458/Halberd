@@ -8,12 +8,12 @@
 
 message_link* current_link = NULL;
 message_link* final_link = NULL;
-font* default_font = NULL;
+spritefont* default_spritefont = NULL;
 
 bool init_ui()
 {
     // TODO: Get the default font from elsewhere
-    default_font = load_resource_to_font(0, "Testfont.png");
+    default_spritefont = load_resource_to_spritefont(0, "Testspritefont.png");
     return true;
 }
 
@@ -41,7 +41,7 @@ void draw_ui()
         return;
 
     if(current_link->pen > 0)
-        draw_textbox(default_font, current_link->message, 0, 0, 150, 250, 48, current_link->pen);
+        draw_textbox(default_spritefont, current_link->message, 0, 0, 150, 250, 48, current_link->pen);
 }
 
 void add_message(const char* message)
@@ -53,8 +53,8 @@ void add_message(const char* message)
         final_link->next_link = malloc(sizeof(message_link));
         final_link = final_link->next_link;
     }
-    uint16_t max_len = 250 / default_font->glyph_width;
-    uint16_t max_lines = 48 / default_font->glyph_height;
+    uint16_t max_len = 250 / default_spritefont->glyph_width;
+    uint16_t max_lines = 48 / default_spritefont->glyph_height;
     message_link* link = final_link;
     link->next_link = 0;
     link->len = strlen(message);
@@ -140,8 +140,8 @@ void destroy_ui()
         free(m);
     }
 
-    if(default_font) {
-        destroy_texture(default_font->texture_data);
-        free(default_font);
+    if(default_spritefont) {
+        destroy_texture(default_spritefont->texture_data);
+        free(default_spritefont);
     }
 }

@@ -17,33 +17,33 @@ GLuint tile_buffer = 0;
 // Public functions
 ///////////////////////////////////////////////////////////////////////////////
 
-font* create_font(uint16_t w, uint16_t h)
+spritefont* create_spritefont(uint16_t w, uint16_t h)
 {
-	font* font_data = malloc(sizeof(font));
-    font_data->glyph_width = w;
-    font_data->glyph_width = h;
-    font_data->texture_data = create_texture(font_data->glyph_width * 16, font_data->glyph_height * 16);
+	spritefont* spritefont_data = malloc(sizeof(spritefont));
+    spritefont_data->glyph_width = w;
+    spritefont_data->glyph_width = h;
+    spritefont_data->texture_data = create_texture(spritefont_data->glyph_width * 16, spritefont_data->glyph_height * 16);
 
-    return font_data;
+    return spritefont_data;
 }
 
-void destroy_font(font* fnt)
+void destroy_spritefont(spritefont* fnt)
 {
     destroy_texture(fnt->texture_data);
     free(fnt);
 }
 
-font* load_resource_to_font(const char* resource_location, const char* resource_name)
+spritefont* load_resource_to_spritefont(const char* resource_location, const char* resource_name)
 {
-    font* new_font         = malloc(sizeof(font));
-    new_font->texture_data = load_resource_to_texture(resource_location, resource_name);
-    new_font->glyph_width  = new_font->texture_data->width  / 16;
-    new_font->glyph_width  = new_font->texture_data->height / 16;
+    spritefont* new_spritefont         = malloc(sizeof(spritefont));
+    new_spritefont->texture_data = load_resource_to_texture(resource_location, resource_name);
+    new_spritefont->glyph_width  = new_spritefont->texture_data->width  / 16;
+    new_spritefont->glyph_width  = new_spritefont->texture_data->height / 16;
 
-    return new_font;
+    return new_spritefont;
 }
 
-bool save_font_to_resource(font* fnt, const char* resource_location, const char* resource_name)
+bool save_spritefont_to_resource(spritefont* fnt, const char* resource_location, const char* resource_name)
 {
     stub(false);
 }

@@ -18,13 +18,13 @@
 // Struct Section
 //-----------------------------------------------------------------------------
 
-typedef struct font
+typedef struct spritefont
 {
     texture* texture_data;
     uint16_t glyph_width;
     uint16_t glyph_height;
 }
-font;
+spritefont;
 
 typedef struct ui_box
 {
@@ -55,26 +55,26 @@ tileset;
 
 // TODO: Use XML-based font files
 /*!
- * Creates an empty font
+ * Creates an empty spritefont
  */
-font* create_font(uint16_t w, uint16_t h);
+spritefont* create_spritefont(uint16_t w, uint16_t h);
 
 /*!
- * Frees a font and its resources
+ * Frees a spritefont and its resources
  */
-void destroy_font(font* fnt);
+void destroy_spritefont(spritefont* fnt);
 
 /*!
- * This loads a font.
+ * This loads a spritefont.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-font* load_resource_to_font(const char* resource_location, const char* resource_name);
+spritefont* load_resource_to_spritefont(const char* resource_location, const char* resource_name);
 
 /*!
- * This saves a font.
+ * This saves a spritefont.
  * See get_extended_resource_path(io_util.h) for usage details
  */
-bool save_font_to_resource(font* fnt, const char* resource_location, const char* resource_name);
+bool save_spritefont_to_resource(spritefont* fnt, const char* resource_location, const char* resource_name);
 
 
 /*!

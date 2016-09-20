@@ -104,7 +104,7 @@ static const char* TILE_FRAGMENT_SHADER[] =
 "discard;\n"
 "}"};
 
-static const char* FONT_VERTEX_SHADER[] =
+static const char* SPRITEFONT_VERTEX_SHADER[] =
 {"# version 330\n"
 "layout(location=0) in vec3 vertex_pos;\n"
 "layout(location=1) in vec3 position;\n"
@@ -123,7 +123,7 @@ static const char* FONT_VERTEX_SHADER[] =
 "gl_Position = transform * vec4(vertex_pos + position, 1.0);\n"
 "}"};
 
-static const char* FONT_FRAGMENT_SHADER[] =
+static const char* SPRITEFONT_FRAGMENT_SHADER[] =
 {"# version 330\n"
 "in vec2 uv;\n"
 "flat in int id;\n"
@@ -343,8 +343,8 @@ void draw_sprite(sprite* spr, uint8_t a_index, uint8_t f_index, uint8_t o_index,
 void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffer, mat4 transform, uint16_t x, uint16_t y);
 void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat4 transform);
 void draw_box(uint16_t id, float x, float y, float w, float h);
-void draw_text(font* font, const char* text, float x, float y, uint16_t char_count);
-void draw_textbox(font* font, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count);
+void draw_text(spritefont* spritefont, const char* text, float x, float y, uint16_t char_count);
+void draw_textbox(spritefont* spritefont, const char* text, uint16_t id, float x, float y, float w, float h, uint16_t char_count);
 
 void update_camera(float w, float h);
 void update_view(float x, float y, float zoom);
