@@ -2,8 +2,8 @@
 #include "render_util.h"
 #include "map.h"
 #include "io.h"
-#include "texture_util.h"
 #include "settings.h"
+#include "texture_util.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <stdlib.h>
@@ -90,7 +90,7 @@ uint8_t init_graphics(void)
     /*     return 0; */
 
     /* tile_transform_uniform = glGetUniformLocation(tile_program, "transform"); */
-    /* tile_texture_uniform = glGetUniformLocation(tile_program, "texture"); */
+    tile_texture_uniform = glGetUniformLocation(tile_program.handle, "texture");
     /* tile_vertex_attrib = glGetAttribLocation(tile_program, "vertex_pos"); */
     /* tile_position_attrib = glGetAttribLocation(tile_program, "position"); */
     /* tile_id_attrib = glGetAttribLocation(tile_program, "id_in"); */
@@ -108,8 +108,8 @@ uint8_t init_graphics(void)
     /* if(checkGLError()) */
     /*     return 0; */
 
-    /* single_tile_transform_uniform = glGetUniformLocation(single_tile_program, "transform"); */
-    /* single_tile_texture_uniform = glGetUniformLocation(single_tile_program, "texture"); */
+    single_tile_transform_uniform = glGetUniformLocation(single_tile_program.handle, "transform");
+    single_tile_texture_uniform = glGetUniformLocation(single_tile_program.handle, "texture");
     /* single_tile_vertex_attrib = glGetAttribLocation(single_tile_program, "vertex_pos"); */
     /* single_tile_id_uniform = glGetUniformLocation(single_tile_program, "id_in"); */
     /* single_tile_tid_uniform = glGetUniformLocation(single_tile_program, "tid_in"); */
@@ -256,6 +256,7 @@ void draw_tiles(GLuint tile_buffer, GLuint tile_id_buffer, GLuint tile_set_buffe
     glVertexAttribDivisor(tile_position_attrib, 0);
     glVertexAttribDivisor(tile_id_attrib, 0);
     glVertexAttribDivisor(tile_tid_attrib, 0);
+    checkGLError();
 }
 
 void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat4 transform)
@@ -274,21 +275,26 @@ void draw_single_tile(GLuint tile_buffer, GLuint tileset_id, GLuint tile_id, mat
     glUniform1i(single_tile_texture_uniform, 0);
     checkGLError();
 
-    glUniform4f(single_tile_color_uniform, 0.9, 0.9, 0.9, 0.7);
+    /* glUniform4f(single_tile_color_uniform, 0.9, 0.9, 0.9, 0.7); */
+    bind_vec4_to_program(single_tile_program, "color", create_vec4_data(0.9, 0.9, 0.9, 0.7));
+    checkGLError();
 
     mat4 st = ident;
     mat4 tt = ident;
     mat4_translate(&tt, data->width * 0.5f, data->height * 0.5f, 0);
     mat4_scale(&st, data->width, data->height, 0);
     mat4 final = mat4_mul(camera_get_matrix(viewport_camera), mat4_mul(mat4_mul(transform, tt), st));
-    glUniformMatrix4fv(single_tile_transform_uniform, 1, GL_FALSE, final.data);
-    glUniform1i(single_tile_id_uniform, tile_id);
-    glUniform1i(single_tile_tid_uniform, tileset_id);
+
+    bind_mat4_to_program(single_tile_program, "transform", final);
+    bind_int_to_program(single_tile_program, "id_in", tile_id);
+    bind_int_to_program(single_tile_program, "tid_in", tileset_id);
+    checkGLError();
     /*info("SET ID: %d", tileset_id);*/
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glDisableVertexAttribArray(single_tile_vertex_attrib);
+    checkGLError();
 }
 
 void draw_box(uint16_t id, float x, float y, float w, float h)

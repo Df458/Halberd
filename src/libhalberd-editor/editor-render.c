@@ -14,7 +14,7 @@ GLuint grid_transform_uniform = 0;
 GLuint grid_color_uniform = 0;
 GLuint grid_texture_uniform = 0;
 
-GLuint grid_dash_texture = 0;
+texture* grid_dash_texture = 0;
 GLuint grid_buffer = 0;
 GLuint grid_horiz_buffer = 0;
 GLuint grid_position_buffer = 0;
@@ -131,14 +131,7 @@ bool init_grid()
     if(checkGLError())
         return false;
 
-    glGenTextures(1, &grid_dash_texture);
-    glBindTexture(GL_TEXTURE_2D, grid_dash_texture);
-    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);*/
-    /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);*/
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 5, 0, GL_RGBA, GL_UNSIGNED_BYTE, GRID_TEXTURE_BUFFER_DATA);
-    if(checkGLError())
-        return false;
+    grid_dash_texture = create_texture_data(1, 5, GRID_TEXTURE_BUFFER_DATA);
 
     return true;
 }
@@ -160,10 +153,7 @@ void draw_grid(mat4 transform)
     glBindBuffer(GL_ARRAY_BUFFER, grid_horiz_buffer);
     glVertexAttribIPointer(grid_horizontal_attrib, 1, GL_UNSIGNED_INT, 0, (void*)0);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, grid_dash_texture);
-    glUniform1i(grid_texture_uniform, 0);
-    checkGLError();
+    bind_texture_to_program(grid_program, "texture", grid_dash_texture, GL_TEXTURE0);
 
     mat4 tt = ident;
     mat4_translate(&tt, 0, 0, -10);
